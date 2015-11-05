@@ -21,6 +21,7 @@ import org.topbraid.spin.vocabulary.SP;
 import com.hp.hpl.jena.enhanced.EnhGraph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -47,10 +48,20 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 		return getStringList(SP.fromNamed);
 	}
 	
-	public List<Element> getFromNamedWindow() {
-		//System.out.println("listing named windows");
-		//System.err.println(getElements(SP.fromNamedWindow));
-		return new LinkedList<Element>(); //getElements(SP.fromNamedWindow);
+	public List<ElementNamedWindow> getFromNamedWindow() {
+		LinkedList<ElementNamedWindow> windows = new LinkedList<>();
+		NodeIterator iter = getModel().listObjectsOfProperty(this, SP.fromNamedWindow);
+		while(iter.hasNext()){
+			Resource res = iter.next().asResource(); // How to get the element from the resource neatly?
+			String windowIRI = res.getProperty(SP.windowIRI).getObject().toString();
+			String streamIRI = res.getProperty(SP.streamIRI).getObject().toString();
+			String range = res.getProperty(SP.windowRange).getObject().toString();
+			String step = res.getProperty(SP.windowStep).getObject().toString();
+			ElementNamedWindow window = new ElementNamedWindow(windowIRI, streamIRI, range, step);
+			windows.add(window);
+		}
+
+		return windows;
 	}
 	
 	public Long getLimit() {
@@ -143,13 +154,23 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 			context.print(fromNamed);
 			context.print(">");
 		}
-		for(Element window : getFromNamedWindow()) {
-			ElementNamedWindow fromNamedWindow = (ElementNamedWindow) window;
+		for(ElementNamedWindow window : getFromNamedWindow()) {
+			// Note that prefixes can be supported by parsing the string into ARQ
 			context.println();
 			context.printKeyword("FROM NAMED WINDOW");
 			context.print(" <");
-			context.print(fromNamedWindow.getStreamIri());
-			context.print(">");
+			context.print(window.getWindowIri());
+			context.print("> ");
+			context.print("ON");
+			context.print(" <");
+			context.print(window.getStreamIri());
+			context.print("> ");
+			context.print("[");
+			context.print("RANGE ");
+			context.print(window.getRange());
+			context.print(" STEP ");
+			context.print(window.getStep());
+			context.print("]");
 		}
 	}
 	

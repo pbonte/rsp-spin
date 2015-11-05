@@ -19,12 +19,13 @@ public class DevARQ {
 		SPINModuleRegistry.get().init();
 		
 		String qString = "PREFIX : <http://test#> "
-				+ "SELECT * "
+				+ "CONSTRUCT {?a ?b ?c } "
 				+ "FROM NAMED :static1 "
 				+ "FROM NAMED :static2 "
 				+ "FROM NAMED WINDOW :w1 ON :stream1 [RANGE PT60S STEP PT20S] "
 				+ "FROM NAMED WINDOW :w2 ON :stream2 [RANGE PT60S STEP PT20S] "
-				+ "WHERE { ?a ?b ?c. FILTER regex(?a, ?b, 'i') }";
+				+ "WHERE { "
+				+ "?a ?b ?c. FILTER regex(?a, ?b, 'i') }";
 		
 		Model model = ModelFactory.createDefaultModel();
 		model.setNsPrefix("sp", "http://spinrdf.org/sp#");
@@ -39,17 +40,25 @@ public class DevARQ {
 		System.out.println("Converting ARQ query to SPIN");
 		ARQ2SPIN arq2SPIN = new ARQ2SPIN(model);
 		arq2SPIN.createQuery(query, "http://query1");
-		model.write(System.out,"TTL");
-		System.out.println();
+		//model.write(System.out,"TTL");
+		//System.out.println();
 		
 		// Get the query from the model
 		System.out.println("Get query from model");
 		org.topbraid.spin.model.Query q = SPINFactory.asQuery(model.getResource("http://query1"));
-		System.out.println(q.toString());
+		//System.out.println(q.toString());
+		System.out.println();
+		
+		System.out.println("Try parsing it back into ARQ");
+		Query secondParse = QueryFactory.create(q.toString(), Syntax.syntaxARQ);
+		secondParse.setPrefix("", "http://test#");
+		System.out.println(secondParse);
 		
 		
-		//Query q = QueryFactory.create(qString, Syntax.syntaxARQ);
-		//System.out.println(q);
-		
+		// Next 1: add support for in line references to window. This should be almost identical to named graphs in the where clause.
+		// Works: Next 2: check if it works also for construct and ask.
+		// Next 3: consider adding the beginning part of query from the RSP page "<... PREFIXES ...> REGISTER STREAM :query AS <... query ...>"
+		// Next 4: consider adding "CONSTRUCT ISTREAM" and "CONSTRUCT DSTREAM"
+		// Next: check if subqueries can be supported. Not supported with "FROM" so this should be fairly simple
 	}
 }

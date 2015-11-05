@@ -645,7 +645,7 @@ public class ARQ2SPIN {
 
 				@Override
 				public void visit(ElementNamedWindow namedWindow) {
-					System.out.println("Visiting named window");
+					System.err.println("################ Visiting named window");
 				}
 			});
 		}

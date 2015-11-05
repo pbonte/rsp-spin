@@ -34,7 +34,7 @@ public interface Query extends CommandWithWhere {
 	 * Gets the list of windows in FROM NAMED WINDOW clauses.
 	 * @return a List of URI Strings
 	 */
-	List<Element> getFromNamedWindow();
+	List<ElementNamedWindow> getFromNamedWindow();
 	
 	
 	/**
