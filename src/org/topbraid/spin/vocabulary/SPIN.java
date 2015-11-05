@@ -4,6 +4,7 @@
  *******************************************************************************/
 package org.topbraid.spin.vocabulary;
 
+import java.io.File;
 import java.io.InputStream;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -175,12 +176,10 @@ public class SPIN {
 	public static synchronized Model getModel() {
 		if(model == null) {
 			model = ModelFactory.createDefaultModel();
-			InputStream is = SPIN.class.getResourceAsStream("/etc/spin.ttl");
-			if(is == null) {
-				model.read(SPIN.BASE_URI);
-			}
-			else {
-				model.read(is, "http://dummy", FileUtils.langTurtle);
+			if(new File("./etc/spin.ttl").exists()){
+				model.read("./etc/spin.ttl", "TTL");
+			} else {
+				model.read(SPL.BASE_URI);
 			}
 		}
 		return model;

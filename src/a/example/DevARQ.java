@@ -4,6 +4,7 @@ package a.example;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.model.SPINFactory;
+import org.topbraid.spin.system.SPINModuleRegistry;
 
 import com.hp.hpl.jena.query.Query;
 //import com.hp.hpl.jena.query.Query;
@@ -14,13 +15,16 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public class DevARQ {
 	public static void main(String[] args) {
+		// Initialize system functions and templates
+		SPINModuleRegistry.get().init();
+		
 		String qString = "PREFIX : <http://test#> "
 				+ "SELECT * "
 				+ "FROM NAMED :static1 "
 				+ "FROM NAMED :static2 "
 				+ "FROM NAMED WINDOW :w1 ON :stream1 [RANGE PT60S STEP PT20S] "
 				+ "FROM NAMED WINDOW :w2 ON :stream2 [RANGE PT60S STEP PT20S] "
-				+ "WHERE { ?a ?b ?c. }";
+				+ "WHERE { ?a ?b ?c. FILTER regex(?a, ?b, 'i') }";
 		
 		Model model = ModelFactory.createDefaultModel();
 		model.setNsPrefix("sp", "http://spinrdf.org/sp#");

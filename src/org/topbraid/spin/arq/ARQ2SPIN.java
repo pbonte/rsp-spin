@@ -291,16 +291,14 @@ public class ARQ2SPIN {
 	}
 	
 	private void addNamedWindowClauses(Query arq, Resource spinQuery) {
-		System.out.println("Adding named windows");
-		
 		Iterator<ElementNamedWindow> windowURIs = arq.getNamedWindows().iterator();
 		while(windowURIs.hasNext()) {
 			ElementNamedWindow window = windowURIs.next();
-			String windowIri = window.getWindowIri();
-			
-			
+
 			// Window node
 			Resource windowNode = model.createResource();
+			windowNode.addProperty(RDF.type, SP.NamedWindow);
+			
 			spinQuery.addProperty(SP.fromNamedWindow, windowNode);
 			// Add iri, range, step
 			windowNode.addProperty(SP.windowIRI, model.getResource(window.getWindowIri()));
@@ -308,17 +306,6 @@ public class ARQ2SPIN {
 			windowNode.addProperty(SP.windowRange, window.getRange());
 			windowNode.addProperty(SP.windowStep, window.getStep());
 		}
-		/*
-		while(graphURIs.hasNext()) {
-			String graphURI = graphURIs.next();
-			spinQuery.addProperty(SP.from, model.getResource(graphURI));
-		}
-		
-		Iterator<String> namedGraphURIs = arq.getNamedGraphURIs().iterator();
-		while(namedGraphURIs.hasNext()) {
-			String namedGraphURI = namedGraphURIs.next();
-			spinQuery.addProperty(SP.fromNamed, model.getResource(namedGraphURI));
-		}*/
 	}
 
 

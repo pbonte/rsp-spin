@@ -4,6 +4,7 @@
  *******************************************************************************/
 package org.topbraid.spin.vocabulary;
 
+import java.io.File;
 import java.io.InputStream;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -87,14 +88,12 @@ public class SPL {
 	 * @return the namespace Model
 	 */
 	public static synchronized Model getModel() {
-		if(model == null) {
+		if (model == null) {
 			model = ModelFactory.createDefaultModel();
-			InputStream is = SPL.class.getResourceAsStream("/etc/spl.spin.ttl");
-			if(is == null) {
+			if (new File("./etc/spl.spin.ttl").exists()) {
+				model.read("./etc/spl.spin.ttl", "TTL");
+			} else {
 				model.read(SPL.BASE_URI);
-			}
-			else {
-				model.read(is, "http://dummy", FileUtils.langTurtle);
 			}
 		}
 		return model;

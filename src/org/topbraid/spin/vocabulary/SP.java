@@ -4,6 +4,7 @@
  *******************************************************************************/
 package org.topbraid.spin.vocabulary;
 
+import java.io.File;
 import java.io.InputStream;
 
 import org.topbraid.spin.model.Aggregation;
@@ -350,6 +351,7 @@ public class SP {
 	private static Model model;
 
 	// RSP related propterties and types
+    public final static Resource NamedWindow = ResourceFactory.createResource(NS + "NamedWindow");
 	public static Property fromNamedWindow =  ResourceFactory.createProperty(NS + "fromNamedWindow");
     public static Property windowIRI = ResourceFactory.createProperty(NS + "windowIRI");
     public static Property streamIRI = ResourceFactory.createProperty(NS + "streamIRI");
@@ -363,14 +365,12 @@ public class SP {
 	 * @return the namespace Model
 	 */
 	public static synchronized Model getModel() {
-		if(model == null) {
+		if (model == null) {
 			model = ModelFactory.createDefaultModel();
-			InputStream is = SP.class.getResourceAsStream("/etc/sp.ttl");
-			if(is == null) {
-				model.read(SP.BASE_URI);
-			}
-			else {
-				model.read(is, "http://dummy", FileUtils.langTurtle);
+			if (new File("./etc/sp.ttl").exists()) {
+				model.read("./etc/sp.ttl", "TTL");
+			} else {
+				model.read(SPL.BASE_URI);
 			}
 		}
 		return model;
