@@ -1,0 +1,2538 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix spin:  <http://spinrdf.org/spin#> .
+@prefix afn:   <http://jena.hpl.hp.com/ARQ/function#> .
+@prefix fn:    <http://www.w3.org/2005/xpath-functions#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sp:    <http://spinrdf.org/sp#> .
+@prefix spl:   <http://spinrdf.org/spl#> .
+
+sp:UUID  a               spin:Function ;
+        rdfs:comment     "Returns a fresh IRI from the UUID URN scheme. Each call of UUID() returns a different UUID. It must not be the \"nil\" UUID (all zeroes). The variant and version of the UUID is implementation dependent."^^xsd:string ;
+        rdfs:label       "UUID"^^xsd:string ;
+        rdfs:subClassOf  spl:URIFunctions ;
+        spin:returnType  rdfs:Resource ;
+        spin:symbol      "UUID"^^xsd:string .
+
+spl:InferDefaultValue
+        a                   spin:ConstructTemplate ;
+        rdfs:comment        "Can be used to infer default values for a given subject/predicate combination. This is typically assigned as spin:rule to a class. If ?this does not already have a value for a given property {?predicate}, then this will infer the value {?defaultValue}."^^xsd:string ;
+        rdfs:label          "Infer default value"^^xsd:string ;
+        rdfs:subClassOf     spin:ConstructTemplates ;
+        spin:body           [ a             sp:Construct ;
+                              sp:templates  ( [ sp:object     [ sp:varName  "defaultValue"^^xsd:string ] ;
+                                                sp:predicate  [ sp:varName  "predicate"^^xsd:string ] ;
+                                                sp:subject    spin:_this
+                                              ] ) ;
+                              sp:where      ( [ a            sp:Optional ;
+                                                sp:elements  ( [ sp:object     [ sp:varName  "anyValue"^^xsd:string ] ;
+                                                                 sp:predicate  [ sp:varName  "predicate"^^xsd:string ] ;
+                                                                 sp:subject    spin:_this
+                                                               ] )
+                                              ] [ a              sp:Filter ;
+                                                  sp:expression  [ a        sp:not ;
+                                                                   sp:arg1  [ a        sp:bound ;
+                                                                              sp:arg1  [ sp:varName  "anyValue"^^xsd:string ]
+                                                                            ]
+                                                                 ]
+                                                ] )
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "The default value to infer."^^xsd:string ;
+                              spl:predicate  spl:defaultValue
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "The predicate to infer the default value of."^^xsd:string ;
+                              spl:predicate  spl:predicate ;
+                              spl:valueType  rdf:Property
+                            ] ;
+        spin:labelTemplate  "Default value for {?predicate}: {?defaultValue}"^^xsd:string .
+
+sp:contains  a           spin:Function ;
+        rdfs:comment     "Returns an xsd:boolean indicating whether or not the value of ?arg1 contains (at the beginning, at the end, or anywhere within) at least one sequence of collation units that provides a minimal match to the collation units in the value of ?arg2, according to the collation that is used."^^xsd:string ;
+        rdfs:label       "contains"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-contains> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input string."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The sub-string to search for in the input string."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:symbol      "CONTAINS"^^xsd:string .
+
+spl:ConstructDefaultValues
+        a                   spin:ConstructTemplate ;
+        rdfs:comment        "This template can be attached as spin:constructor to a root class such as rdfs:Resource to ensure that SPIN processors assign default values to certain properties. Looks for any templates attached as spin:constraints to the types of ?this and then assigns their declared spl:defaultValues." ;
+        rdfs:label          "Construct default values"^^xsd:string ;
+        rdfs:subClassOf     spin:ConstructTemplates ;
+        spin:body           [ a             sp:Construct ;
+                              sp:templates  ( [ sp:object     [ sp:varName  "defaultValue"^^xsd:string ] ;
+                                                sp:predicate  [ sp:varName  "predicate"^^xsd:string ] ;
+                                                sp:subject    spin:_this
+                                              ] ) ;
+                              sp:where      ( [ sp:object     [ sp:varName  "directType"^^xsd:string ] ;
+                                                sp:predicate  rdf:type ;
+                                                sp:subject    spin:_this
+                                              ] [ a           sp:TriplePath ;
+                                                  sp:object   [ sp:varName  "type"^^xsd:string ] ;
+                                                  sp:path     [ a           sp:ModPath ;
+                                                                sp:modMax   -2 ;
+                                                                sp:modMin   0 ;
+                                                                sp:subPath  rdfs:subClassOf
+                                                              ] ;
+                                                  sp:subject  [ sp:varName  "directType"^^xsd:string ]
+                                                ] [ sp:object     [ sp:varName  "attribute"^^xsd:string ] ;
+                                                    sp:predicate  spin:constraint ;
+                                                    sp:subject    [ sp:varName  "type"^^xsd:string ]
+                                                  ] [ sp:object     [ sp:varName  "defaultValue"^^xsd:string ] ;
+                                                      sp:predicate  spl:defaultValue ;
+                                                      sp:subject    [ sp:varName  "attribute"^^xsd:string ]
+                                                    ] [ sp:object     [ sp:varName  "predicate"^^xsd:string ] ;
+                                                        sp:predicate  spl:predicate ;
+                                                        sp:subject    [ sp:varName  "attribute"^^xsd:string ]
+                                                      ] )
+                            ] ;
+        spin:labelTemplate  "Construct default values"^^xsd:string .
+
+spl:predicate  a            rdf:Property ;
+        rdfs:label          "predicate"^^xsd:string ;
+        rdfs:subPropertyOf  sp:arg .
+
+spl:minCount  a             rdf:Property ;
+        rdfs:subPropertyOf  spl:count .
+
+spl:objectInGraph  a     spin:Function ;
+        rdfs:comment     "Gets the object of a given subject (?arg1) / predicate (?arg2) combination in a given graph ?arg3. Note that if multiple values are present then the result might be unpredictably random."^^xsd:string ;
+        rdfs:label       "object in graph"^^xsd:string ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:body        [ a                   sp:Select ;
+                           sp:resultVariables  ( [ sp:varName  "object"^^xsd:string ] ) ;
+                           sp:where            ( [ a                 sp:NamedGraph ;
+                                                   sp:elements       ( [ sp:object     [ sp:varName  "object"^^xsd:string ] ;
+                                                                         sp:predicate  spin:_arg2 ;
+                                                                         sp:subject    spin:_arg1
+                                                                       ] ) ;
+                                                   sp:graphNameNode  spin:_arg3
+                                                 ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The subject to get the object from."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Resource
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The predicate to get the object of."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdf:Property
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The graph to query in."^^xsd:string ;
+                           spl:predicate  sp:arg3 ;
+                           spl:valueType  rdfs:Resource
+                         ] .
+
+spl:subClassOf  a        spin:Function ;
+        rdfs:comment     "Checks whether a given class (?arg1) is a (transitive) sub-class of another class (?arg2)."^^xsd:string ;
+        rdfs:label       "sub class of"^^xsd:string ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:body        [ a         sp:Ask ;
+                           sp:where  ( [ a           sp:TriplePath ;
+                                         sp:object   spin:_arg2 ;
+                                         sp:path     [ a           sp:ModPath ;
+                                                       sp:modMax   -2 ;
+                                                       sp:modMin   0 ;
+                                                       sp:subPath  rdfs:subClassOf
+                                                     ] ;
+                                         sp:subject  spin:_arg1
+                                       ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The potential sub-class."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Class
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The potential super-class."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Class
+                         ] ;
+        spin:returnType  xsd:boolean .
+
+spl:optional  a             rdf:Property ;
+        rdfs:label          "optional"^^xsd:string ;
+        rdfs:range          xsd:boolean ;
+        rdfs:subPropertyOf  sp:arg .
+
+sp:sha256  a             spin:Function ;
+        rdfs:comment     "Returns the SHA256 checksum, as a hex digit string, calculated on the UTF-8 representation of the simple literal or lexical form of the xsd:string. Hex digits SHOULD be in lower case."^^xsd:string ;
+        rdfs:label       "sha256"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-sha256> ;
+        rdfs:subClassOf  spl:MiscFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input literal."^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "SHA256"^^xsd:string .
+
+sp:lang  a               spin:Function ;
+        rdfs:comment     "Returns the language tag of ?arg1, if it has one. It returns \"\" if the literal has no language tag. Node that the RDF data model does not include literals with an empty language tag." ;
+        rdfs:label       "lang"^^xsd:string ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the literal to get the language of" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "lang"^^xsd:string .
+
+spl:relevantPropertyAtClass
+        a                spin:MagicProperty ;
+        rdfs:comment     "A magic property that establishes a relationship between properties (left) and classes (right) to determine which properties are \"relevant\" for the class. Relevant means that they have the class in their domain and/or restrictions, including superclasses and sub-properties (unless they define their own domain). Domains consisting of an owl:unionOf are also handled.\n\nNote that the performance of the body of this magic property has been optimized for the case in which the class is given, so ideally use this for queries such as  ?property spl:relevantPropertyAtClass skos:Concept ."^^xsd:string ;
+        rdfs:label       "relevant property at class"^^xsd:string ;
+        rdfs:subClassOf  spin:MagicProperties ;
+        spin:body        [ a                   sp:Select ;
+                           sp:distinct         true ;
+                           sp:resultVariables  ( [ sp:varName  "class"^^xsd:string ] ) ;
+                           sp:where            ( [ a           sp:TriplePath ;
+                                                   sp:object   [ sp:varName  "superClass"^^xsd:string ] ;
+                                                   sp:path     [ a           sp:ModPath ;
+                                                                 sp:modMax   -2 ;
+                                                                 sp:modMin   0 ;
+                                                                 sp:subPath  rdfs:subClassOf
+                                                               ] ;
+                                                   sp:subject  [ sp:varName  "class"^^xsd:string ]
+                                                 ] [ a            sp:Union ;
+                                                     sp:elements  ( ( [ sp:object     [ sp:varName  "superClass"^^xsd:string ] ;
+                                                                        sp:predicate  rdfs:domain ;
+                                                                        sp:subject    [ sp:varName  "property"^^xsd:string ]
+                                                                      ] ) ( [ sp:object     [ sp:varName  "property"^^xsd:string ] ;
+                                                                              sp:predicate  owl:onProperty ;
+                                                                              sp:subject    [ sp:varName  "superClass"^^xsd:string ]
+                                                                            ] ) ( [ sp:object     [ sp:varName  "superClass"^^xsd:string ] ;
+                                                                                    sp:predicate  rdf:first ;
+                                                                                    sp:subject    [ sp:varName  "listSegment"^^xsd:string ]
+                                                                                  ] [ a           sp:TriplePath ;
+                                                                                      sp:object   [ sp:varName  "listSegment"^^xsd:string ] ;
+                                                                                      sp:path     [ a           sp:ModPath ;
+                                                                                                    sp:modMax   -2 ;
+                                                                                                    sp:modMin   0 ;
+                                                                                                    sp:subPath  rdf:rest
+                                                                                                  ] ;
+                                                                                      sp:subject  [ sp:varName  "list"^^xsd:string ]
+                                                                                    ] [ a           sp:TriplePath ;
+                                                                                        sp:object   [ sp:varName  "list"^^xsd:string ] ;
+                                                                                        sp:path     [ a         sp:SeqPath ;
+                                                                                                      sp:path1  rdfs:domain ;
+                                                                                                      sp:path2  owl:unionOf
+                                                                                                    ] ;
+                                                                                        sp:subject  [ sp:varName  "property"^^xsd:string ]
+                                                                                      ] ) )
+                                                   ] [ a           sp:TriplePath ;
+                                                       sp:object   [ sp:varName  "property"^^xsd:string ] ;
+                                                       sp:path     [ a           sp:ModPath ;
+                                                                     sp:modMax   -2 ;
+                                                                     sp:modMin   0 ;
+                                                                     sp:subPath  rdfs:subPropertyOf
+                                                                   ] ;
+                                                       sp:subject  spin:_arg1
+                                                     ] [ a              sp:Filter ;
+                                                         sp:expression  [ a        sp:or ;
+                                                                          sp:arg1  [ a        sp:eq ;
+                                                                                     sp:arg1  spin:_arg1 ;
+                                                                                     sp:arg2  [ sp:varName  "property"^^xsd:string ]
+                                                                                   ] ;
+                                                                          sp:arg2  [ a            sp:notExists ;
+                                                                                     sp:elements  ( [ sp:object     [ sp:varName  "anyDomain"^^xsd:string ] ;
+                                                                                                      sp:predicate  rdfs:domain ;
+                                                                                                      sp:subject    spin:_arg1
+                                                                                                    ] )
+                                                                                   ]
+                                                                        ]
+                                                       ] [ a              sp:Filter ;
+                                                           sp:expression  [ a        sp:isIRI ;
+                                                                            sp:arg1  [ sp:varName  "class"^^xsd:string ]
+                                                                          ]
+                                                         ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The property."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdf:Property
+                         ] ;
+        spin:returnType  rdfs:Class .
+
+spl:UnionTemplate  a     rdfs:Class ;
+        rdfs:comment     "This type can be used for templates that serve as the union (or \"collector\") of other templates. Union templates differ from other templates in that all spl:Arguments are optional. This means that union templates can be declared as subclasses of multiple other templates, yet when instantiated, only some of the arguments defined by the superclasses need to be filled in."^^xsd:string ;
+        rdfs:label       "Union template"^^xsd:string ;
+        rdfs:subClassOf  spin:Template .
+
+sp:now  a                spin:Function ;
+        rdfs:comment     "Gets the current date and time as an xsd:dateTime literal."^^xsd:string ;
+        rdfs:label       "now"^^xsd:string ;
+        rdfs:subClassOf  spl:DateFunctions ;
+        spin:returnType  xsd:dateTime ;
+        spin:symbol      "now"^^xsd:string .
+
+sp:isBlank  a            spin:Function ;
+        rdfs:comment     "Checks whether a given node is a blank node." ;
+        rdfs:label       "isBlank"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the node being checked" ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "isBlank"^^xsd:string .
+
+sp:day  a                spin:Function ;
+        rdfs:comment     "Extracts the day from a date/time literal."^^xsd:string ;
+        rdfs:label       "day"^^xsd:string ;
+        rdfs:subClassOf  spl:DateFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The date or dateTime argument."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:integer ;
+        spin:symbol      "day"^^xsd:string .
+
+<http://spinrdf.org/arg#max>
+        a                   rdf:Property ;
+        rdfs:subPropertyOf  sp:arg .
+
+spl:valueType  a            rdf:Property ;
+        rdfs:label          "value type"^^xsd:string ;
+        rdfs:subPropertyOf  sp:arg .
+
+spl:min  a               spin:Function ;
+        rdfs:comment     "Takes two arguments and returns the smaller one of them."^^xsd:string ;
+        rdfs:label       "min"^^xsd:string ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:body        [ a                   sp:Select ;
+                           sp:resultVariables  ( [ sp:varName  "result"^^xsd:string ] ) ;
+                           sp:where            ( [ a              sp:Bind ;
+                                                   sp:expression  [ a        sp:if ;
+                                                                    sp:arg1  [ a        sp:lt ;
+                                                                               sp:arg1  spin:_arg1 ;
+                                                                               sp:arg2  spin:_arg2
+                                                                             ] ;
+                                                                    sp:arg2  spin:_arg1 ;
+                                                                    sp:arg3  spin:_arg2
+                                                                  ] ;
+                                                   sp:variable    [ sp:varName  "result"^^xsd:string ]
+                                                 ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The first argument."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The second argument."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  rdfs:Literal .
+
+spl:count  a                rdf:Property ;
+        rdfs:label          "count"^^xsd:string ;
+        rdfs:subPropertyOf  sp:arg .
+
+spl:Argument  a             spin:ConstructTemplate ;
+        rdfs:comment        "Provides metadata about an argument of a SPIN Function or Template. Arguments wrap a given rdf:Property (predicate) and specify its value type and whether the argument is optional. When used as spin:constraint, the body of this template will verify that a non-optional value exists and that it has the specified value type. Arguments that have been declared spl:optional true become optional if the type of ?this is spl:UnionTemplate. "^^xsd:string ;
+        rdfs:label          "Argument"^^xsd:string ;
+        rdfs:subClassOf     spin:ConstructTemplates ;
+        spin:body           [ a             sp:Construct ;
+                              sp:templates  ( [ sp:object     spin:ConstraintViolation ;
+                                                sp:predicate  rdf:type ;
+                                                sp:subject    _:b0
+                                              ] [ sp:object     spin:_this ;
+                                                  sp:predicate  spin:violationRoot ;
+                                                  sp:subject    _:b0
+                                                ] [ sp:object     [ sp:varName  "predicate"^^xsd:string ] ;
+                                                    sp:predicate  spin:violationPath ;
+                                                    sp:subject    _:b0
+                                                  ] [ sp:object     [ sp:varName  "label"^^xsd:string ] ;
+                                                      sp:predicate  rdfs:label ;
+                                                      sp:subject    _:b0
+                                                    ] ) ;
+                              sp:where      ( ( [ a              sp:Filter ;
+                                                  sp:expression  [ a        sp:isIRI ;
+                                                                   sp:arg1  spin:_this
+                                                                 ]
+                                                ] ) [ a            sp:Union ;
+                                                      sp:elements  ( ( ( ( [ a              sp:Filter ;
+                                                                             sp:expression  [ a        sp:or ;
+                                                                                              sp:arg1  [ a        sp:not ;
+                                                                                                         sp:arg1  [ a        sp:bound ;
+                                                                                                                    sp:arg1  [ sp:varName  "optional"^^xsd:string ]
+                                                                                                                  ]
+                                                                                                       ] ;
+                                                                                              sp:arg2  [ a        sp:eq ;
+                                                                                                         sp:arg1  [ sp:varName  "optional"^^xsd:string ] ;
+                                                                                                         sp:arg2  false
+                                                                                                       ]
+                                                                                            ]
+                                                                           ] ) [ a              sp:Filter ;
+                                                                                 sp:expression  [ a            sp:notExists ;
+                                                                                                  sp:elements  ( [ sp:object     [ sp:varName  "value"^^xsd:string ] ;
+                                                                                                                   sp:predicate  [ sp:varName  "predicate"^^xsd:string ] ;
+                                                                                                                   sp:subject    spin:_this
+                                                                                                                 ] )
+                                                                                                ]
+                                                                               ] [ a              sp:Filter ;
+                                                                                   sp:expression  [ a            sp:notExists ;
+                                                                                                    sp:elements  ( [ sp:object     [ sp:varName  "template"^^xsd:string ] ;
+                                                                                                                     sp:predicate  rdf:type ;
+                                                                                                                     sp:subject    spin:_this
+                                                                                                                   ] [ a              sp:Filter ;
+                                                                                                                       sp:expression  [ a        spl:instanceOf ;
+                                                                                                                                        sp:arg1  [ sp:varName  "template"^^xsd:string ] ;
+                                                                                                                                        sp:arg2  spl:UnionTemplate
+                                                                                                                                      ]
+                                                                                                                     ] )
+                                                                                                  ]
+                                                                                 ] ) [ a              sp:Bind ;
+                                                                                       sp:expression  [ a        sp:concat ;
+                                                                                                        sp:arg1  "Missing value for argument " ;
+                                                                                                        sp:arg2  [ a        afn:localname ;
+                                                                                                                   sp:arg1  [ sp:varName  "predicate"^^xsd:string ]
+                                                                                                                 ]
+                                                                                                      ] ;
+                                                                                       sp:variable    [ sp:varName  "label"^^xsd:string ]
+                                                                                     ] ) ( ( ( [ a              sp:Filter ;
+                                                                                                 sp:expression  [ a        sp:bound ;
+                                                                                                                  sp:arg1  [ sp:varName  "valueType"^^xsd:string ]
+                                                                                                                ]
+                                                                                               ] ) [ sp:object     [ sp:varName  "value"^^xsd:string ] ;
+                                                                                                     sp:predicate  [ sp:varName  "predicate"^^xsd:string ] ;
+                                                                                                     sp:subject    spin:_this
+                                                                                                   ] [ a              sp:Filter ;
+                                                                                                       sp:expression  [ a        sp:and ;
+                                                                                                                        sp:arg1  [ a        sp:not ;
+                                                                                                                                   sp:arg1  [ a        spl:instanceOf ;
+                                                                                                                                              sp:arg1  [ sp:varName  "value"^^xsd:string ] ;
+                                                                                                                                              sp:arg2  [ sp:varName  "valueType"^^xsd:string ]
+                                                                                                                                            ]
+                                                                                                                                 ] ;
+                                                                                                                        sp:arg2  [ a        sp:or ;
+                                                                                                                                   sp:arg1  [ a        sp:ne ;
+                                                                                                                                              sp:arg1  [ sp:varName  "valueType"^^xsd:string ] ;
+                                                                                                                                              sp:arg2  rdfs:Resource
+                                                                                                                                            ] ;
+                                                                                                                                   sp:arg2  [ a        sp:isLiteral ;
+                                                                                                                                              sp:arg1  [ sp:varName  "value"^^xsd:string ]
+                                                                                                                                            ]
+                                                                                                                                 ]
+                                                                                                                      ]
+                                                                                                     ] ) [ a              sp:Bind ;
+                                                                                                           sp:expression  [ a        sp:concat ;
+                                                                                                                            sp:arg1  "Incorrect type of argument " ;
+                                                                                                                            sp:arg2  [ a        afn:localname ;
+                                                                                                                                       sp:arg1  [ sp:varName  "predicate"^^xsd:string ]
+                                                                                                                                     ] ;
+                                                                                                                            sp:arg3  " (expected: " ;
+                                                                                                                            sp:arg4  [ a        afn:localname ;
+                                                                                                                                       sp:arg1  [ sp:varName  "valueType"^^xsd:string ]
+                                                                                                                                     ] ;
+                                                                                                                            sp:arg5  ")"
+                                                                                                                          ] ;
+                                                                                                           sp:variable    [ sp:varName  "label"^^xsd:string ]
+                                                                                                         ] ) )
+                                                    ] )
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "indicates whether the argument is optional"^^xsd:string ;
+                              spl:optional   true ;
+                              spl:predicate  spl:optional ;
+                              spl:valueType  xsd:boolean
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "the default value for the argument"^^xsd:string ;
+                              spl:optional   true ;
+                              spl:predicate  spl:defaultValue
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "the value type of the argument"^^xsd:string ;
+                              spl:optional   true ;
+                              spl:predicate  spl:valueType ;
+                              spl:valueType  rdfs:Class
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "a comment describing the argument"^^xsd:string ;
+                              spl:optional   true ;
+                              spl:predicate  rdfs:comment ;
+                              spl:valueType  xsd:string
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "the property holding the values of each function call"^^xsd:string ;
+                              spl:predicate  spl:predicate ;
+                              spl:valueType  rdf:Property
+                            ] ;
+        spin:labelTemplate  "Argument {?predicate} : {?valueType}"^^xsd:string .
+
+<http://spinrdf.org/arg#minCount>
+        a                   rdf:Property ;
+        rdfs:subPropertyOf  sp:arg .
+
+sp:sha384  a             spin:Function ;
+        rdfs:comment     "Returns the SHA384 checksum, as a hex digit string, calculated on the UTF-8 representation of the simple literal or lexical form of the xsd:string. Hex digits SHOULD be in lower case."^^xsd:string ;
+        rdfs:label       "sha384"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-sha384> ;
+        rdfs:subClassOf  spl:MiscFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input literal."^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "SHA384"^^xsd:string .
+
+sp:year  a               spin:Function ;
+        rdfs:comment     "Extracts the year from a date/time literal."^^xsd:string ;
+        rdfs:label       "year"^^xsd:string ;
+        rdfs:subClassOf  spl:DateFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The date or dateTime argument."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:integer ;
+        spin:symbol      "year"^^xsd:string .
+
+spl:OntologyFunctions
+        a                spin:Function ;
+        rdfs:comment     "A collection of functions performing ontology-related operations."^^xsd:string ;
+        rdfs:label       "Ontology functions"^^xsd:string ;
+        rdfs:subClassOf  spin:Functions ;
+        spin:abstract    true .
+
+spl:RangePropertyConstraint
+        a                   spl:ConstraintTemplate ;
+        rdfs:comment        "Represents a constraint that narrows down a property by a minimum and maximum value compared by <= and >=."^^xsd:string ;
+        rdfs:label          "Range property constraint"^^xsd:string ;
+        rdfs:subClassOf     spl:PropertyConstraintTemplates ;
+        spin:abstract       true ;
+        spin:body           [ a             sp:Construct ;
+                              sp:templates  ( [ sp:object     spin:ConstraintViolation ;
+                                                sp:predicate  rdf:type ;
+                                                sp:subject    _:b1
+                                              ] [ sp:object     spin:_this ;
+                                                  sp:predicate  spin:violationRoot ;
+                                                  sp:subject    _:b1
+                                                ] [ sp:object     [ sp:varName  "property"^^xsd:string ] ;
+                                                    sp:predicate  spin:violationPath ;
+                                                    sp:subject    _:b1
+                                                  ] [ sp:object     [ sp:varName  "message"^^xsd:string ] ;
+                                                      sp:predicate  rdfs:label ;
+                                                      sp:subject    _:b1
+                                                    ] ) ;
+                              sp:where      ( [ sp:object     [ sp:varName  "object"^^xsd:string ] ;
+                                                sp:predicate  [ sp:varName  "property"^^xsd:string ] ;
+                                                sp:subject    spin:_this
+                                              ] [ a              sp:Filter ;
+                                                  sp:expression  [ a        sp:or ;
+                                                                   sp:arg1  [ a        sp:and ;
+                                                                              sp:arg1  [ a        sp:bound ;
+                                                                                         sp:arg1  [ sp:varName  "min"^^xsd:string ]
+                                                                                       ] ;
+                                                                              sp:arg2  [ a        sp:lt ;
+                                                                                         sp:arg1  [ sp:varName  "object"^^xsd:string ] ;
+                                                                                         sp:arg2  [ sp:varName  "min"^^xsd:string ]
+                                                                                       ]
+                                                                            ] ;
+                                                                   sp:arg2  [ a        sp:and ;
+                                                                              sp:arg1  [ a        sp:bound ;
+                                                                                         sp:arg1  [ sp:varName  "max"^^xsd:string ]
+                                                                                       ] ;
+                                                                              sp:arg2  [ a        sp:gt ;
+                                                                                         sp:arg1  [ sp:varName  "object"^^xsd:string ] ;
+                                                                                         sp:arg2  [ sp:varName  "max"^^xsd:string ]
+                                                                                       ]
+                                                                            ]
+                                                                 ]
+                                                ] [ a              sp:Bind ;
+                                                    sp:expression  [ a        sp:concat ;
+                                                                     sp:arg1  "Value " ;
+                                                                     sp:arg2  [ sp:varName  "object"^^xsd:string ] ;
+                                                                     sp:arg3  " must be in the interval [" ;
+                                                                     sp:arg4  [ sp:varName  "min"^^xsd:string ] ;
+                                                                     sp:arg5  ", " ;
+                                                                     sp:arg6  [ sp:varName  "max"^^xsd:string ] ;
+                                                                     sp:arg7  "]"
+                                                                   ] ;
+                                                    sp:variable    [ sp:varName  "message"^^xsd:string ]
+                                                  ] )
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "The maximum value."^^xsd:string ;
+                              spl:optional   true ;
+                              spl:predicate  <http://spinrdf.org/arg#max> ;
+                              spl:valueType  rdfs:Literal
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "The minimum value."^^xsd:string ;
+                              spl:optional   true ;
+                              spl:predicate  <http://spinrdf.org/arg#min> ;
+                              spl:valueType  rdfs:Literal
+                            ] ;
+        spin:labelTemplate  "Values of {?property} must be within the interval [ {?min} , {?max} ]"^^xsd:string .
+
+sp:bnode  a              spin:Function ;
+        rdfs:comment     "Constructs a blank node that is distinct from all blank nodes in the dataset being queried and distinct from all blank nodes created by calls to this constructor for other query solutions. If the no argument form is used, every call results in a distinct blank node. If the form with a simple literal is used, every call results in distinct blank nodes for different simple literals, and the same blank node for calls with the same simple literal within expressions for one solution mapping. This functionality is compatible with the treatment of blank nodes in SPARQL CONSTRUCT templates."^^xsd:string ;
+        rdfs:label       "bnode"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-bnode> ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "A literal input node."^^xsd:string ;
+                           spl:optional   true ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:symbol      "BNODE"^^xsd:string .
+
+sp:sha1  a               spin:Function ;
+        rdfs:comment     "Returns the SHA1 checksum, as a hex digit string, calculated on the UTF-8 representation of the simple literal or lexical form of the xsd:string. Hex digits SHOULD be in lower case."^^xsd:string ;
+        rdfs:label       "sha1"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-sha1> ;
+        rdfs:subClassOf  spl:MiscFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input literal."^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "SHA1"^^xsd:string .
+
+sp:or   a                spin:Function ;
+        rdfs:comment     "Returns the logical OR between two (boolean) operands." ;
+        rdfs:label       "or"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first operand" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:boolean
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second operand" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:boolean
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "||"^^xsd:string .
+
+sp:gt   a                spin:Function ;
+        rdfs:comment     "Returns true if ?arg1 > arg2." ;
+        rdfs:label       "gt"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first operand" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second operand" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      ">"^^xsd:string .
+
+sp:strstarts  a          spin:Function ;
+        rdfs:comment     "Returns true if the lexical form of ?arg1 begins with the lexical form of ?arg2, otherwise it returns false."^^xsd:string ;
+        rdfs:label       "strstarts"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-starts> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input string."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The sub-string that the input string is supposed to begin with."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "STRSTARTS"^^xsd:string .
+
+spl:ConstraintTemplates
+        a                spl:ConstraintTemplate ;
+        rdfs:comment     "Abstract superclass of templates that can be used as spin:constraints. The subclasses are expected to construct spin:ConstraintViolations and use ?this to talk about the instances of the associated class."^^xsd:string ;
+        rdfs:label       "Constraint templates"^^xsd:string ;
+        rdfs:subClassOf  spin:ConstructTemplates ;
+        spin:abstract    true .
+
+sp:in   a                spin:Function ;
+        rdfs:comment     "Checks whether the value on the left (?arg1) is one of the values on the right (?arg2, ?arg3 ...)."^^xsd:string ;
+        rdfs:label       "IN"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The value to find."^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "IN"^^xsd:string .
+
+spl:Test-instanceOf-rdfsClass-false
+        a                   spl:TestCase ;
+        spl:testExpression  [ a        spl:instanceOf ;
+                              sp:arg1  owl:versionInfo ;
+                              sp:arg2  rdfs:Class
+                            ] ;
+        spl:testResult      false .
+
+sp:add  a                spin:Function ;
+        rdfs:comment     "Returns the arithmetic sum of its operands." ;
+        rdfs:label       "add"^^xsd:string ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first number" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Resource
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second number" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Resource
+                         ] ;
+        spin:symbol      "+"^^xsd:string .
+
+spl:Attribute  a            spin:ConstructTemplate ;
+        rdfs:comment        "Defines an \"attribute\" of a class. Attribute definitions bundle common modeling patterns known from object-oriented languages like UML. Each attribute can have min and max cardinality, a value type and a default value. The attribute links a class with one RDF property. This template should be used as spin:constraints on a class to make sure that classes meet the expected cardinalities and valueType constraints.\nIf a model wants to use spl:defaultValue, then it should instantiate the spl:ConstructDefaultValues as a spin:constructor at some root class, such as rdfs:Resource." ;
+        rdfs:label          "Attribute"^^xsd:string ;
+        rdfs:subClassOf     spin:ConstructTemplates ;
+        spin:body           [ a             sp:Construct ;
+                              sp:templates  ( [ sp:object     spin:ConstraintViolation ;
+                                                sp:predicate  rdf:type ;
+                                                sp:subject    _:b2
+                                              ] [ sp:object     spin:_this ;
+                                                  sp:predicate  spin:violationRoot ;
+                                                  sp:subject    _:b2
+                                                ] [ sp:object     [ sp:varName  "predicate"^^xsd:string ] ;
+                                                    sp:predicate  spin:violationPath ;
+                                                    sp:subject    _:b2
+                                                  ] ) ;
+                              sp:where      ( [ a            sp:Union ;
+                                                sp:elements  ( ( [ a              sp:Filter ;
+                                                                   sp:expression  [ a        sp:and ;
+                                                                                    sp:arg1  [ a        sp:bound ;
+                                                                                               sp:arg1  [ sp:varName  "minCount"^^xsd:string ]
+                                                                                             ] ;
+                                                                                    sp:arg2  [ a        sp:lt ;
+                                                                                               sp:arg1  [ a        spl:objectCount ;
+                                                                                                          sp:arg1  spin:_this ;
+                                                                                                          sp:arg2  [ sp:varName  "predicate"^^xsd:string ]
+                                                                                                        ] ;
+                                                                                               sp:arg2  [ sp:varName  "minCount"^^xsd:string ]
+                                                                                             ]
+                                                                                  ]
+                                                                 ] ) ( [ a              sp:Filter ;
+                                                                         sp:expression  [ a        sp:and ;
+                                                                                          sp:arg1  [ a        sp:bound ;
+                                                                                                     sp:arg1  [ sp:varName  "maxCount"^^xsd:string ]
+                                                                                                   ] ;
+                                                                                          sp:arg2  [ a        sp:gt ;
+                                                                                                     sp:arg1  [ a        spl:objectCount ;
+                                                                                                                sp:arg1  spin:_this ;
+                                                                                                                sp:arg2  [ sp:varName  "predicate"^^xsd:string ]
+                                                                                                              ] ;
+                                                                                                     sp:arg2  [ sp:varName  "maxCount"^^xsd:string ]
+                                                                                                   ]
+                                                                                        ]
+                                                                       ] ) ( [ a              sp:Filter ;
+                                                                               sp:expression  [ a        sp:bound ;
+                                                                                                sp:arg1  [ sp:varName  "valueType"^^xsd:string ]
+                                                                                              ]
+                                                                             ] [ sp:object     [ sp:varName  "value"^^xsd:string ] ;
+                                                                                 sp:predicate  [ sp:varName  "predicate"^^xsd:string ] ;
+                                                                                 sp:subject    spin:_this
+                                                                               ] [ a              sp:Filter ;
+                                                                                   sp:expression  [ a        sp:not ;
+                                                                                                    sp:arg1  [ a        spl:instanceOf ;
+                                                                                                               sp:arg1  [ sp:varName  "value"^^xsd:string ] ;
+                                                                                                               sp:arg2  [ sp:varName  "valueType"^^xsd:string ]
+                                                                                                             ]
+                                                                                                  ]
+                                                                                 ] ) )
+                                              ] )
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "a comment describing the meaning of this attribute" ;
+                              spl:optional   true ;
+                              spl:predicate  rdfs:comment ;
+                              spl:valueType  xsd:string
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "the type that all values of the property must have" ;
+                              spl:optional   true ;
+                              spl:predicate  spl:valueType ;
+                              spl:valueType  rdfs:Class
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "the default value of the attribute" ;
+                              spl:optional   true ;
+                              spl:predicate  spl:defaultValue
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "the RDF property holding the attribute value" ;
+                              spl:predicate  spl:predicate ;
+                              spl:valueType  rdf:Property
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "the maximum number of values permitted for the property" ;
+                              spl:optional   true ;
+                              spl:predicate  spl:maxCount ;
+                              spl:valueType  xsd:integer
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "the minimum number of values permitted for the property" ;
+                              spl:optional   true ;
+                              spl:predicate  spl:minCount ;
+                              spl:valueType  xsd:integer
+                            ] ;
+        spin:labelTemplate  "Attribute {?predicate} : {?valueType} [{?minCount},{?maxCount}]"^^xsd:string .
+
+spl:PropertyConstraintTemplates
+        a                spl:ConstraintTemplate ;
+        rdfs:comment     "Abstract superclass of constraint templates that constrain exactly one property."^^xsd:string ;
+        rdfs:label       "Property constraint templates"^^xsd:string ;
+        rdfs:subClassOf  spl:ConstraintTemplates ;
+        spin:abstract    true ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The property being constrained."^^xsd:string ;
+                           spl:predicate  <http://spinrdf.org/arg#property> ;
+                           spl:valueType  rdf:Property
+                         ] .
+
+spl:SPINOverview  a         spin:SelectTemplate ;
+        rdfs:comment        "Finds all constraints and rules attached to classes in the current graph, using spin:constraint, spin:constructor, spin:rule or their sub-properties. The result set will contain the associated class, the predicate, and the SPIN rule."^^xsd:string ;
+        rdfs:label          "SPIN Overview"^^xsd:string ;
+        rdfs:subClassOf     spin:SelectTemplates ;
+        spin:body           [ a                   sp:Select ;
+                              sp:resultVariables  ( [ sp:varName  "class"^^xsd:string ] [ sp:varName
+                                                "property"^^xsd:string ] [ sp:varName
+                                                "rule"^^xsd:string ] ) ;
+                              sp:where            ( ( [ a            sp:Union ;
+                                                        sp:elements  ( ( [ a              sp:Bind ;
+                                                                           sp:expression  spin:constraint ;
+                                                                           sp:variable    [ sp:varName  "bp"^^xsd:string ]
+                                                                         ] ) ( [ a              sp:Bind ;
+                                                                                 sp:expression  spin:constructor ;
+                                                                                 sp:variable    [ sp:varName  "bp"^^xsd:string ]
+                                                                               ] ) ( [ a              sp:Bind ;
+                                                                                       sp:expression  spin:rule ;
+                                                                                       sp:variable    [ sp:varName  "bp"^^xsd:string ]
+                                                                                     ] ) )
+                                                      ] ) [ a           sp:TriplePath ;
+                                                            sp:object   [ sp:varName  "bp"^^xsd:string ] ;
+                                                            sp:path     [ a           sp:ModPath ;
+                                                                          sp:modMax   -2 ;
+                                                                          sp:modMin   0 ;
+                                                                          sp:subPath  rdfs:subPropertyOf
+                                                                        ] ;
+                                                            sp:subject  [ sp:varName  "property"^^xsd:string ]
+                                                          ] [ sp:object     [ sp:varName  "rule"^^xsd:string ] ;
+                                                              sp:predicate  [ sp:varName  "property"^^xsd:string ] ;
+                                                              sp:subject    [ sp:varName  "class"^^xsd:string ]
+                                                            ] [ a              sp:Filter ;
+                                                                sp:expression  [ a        sp:ne ;
+                                                                                 sp:arg1  [ sp:varName  "class"^^xsd:string ] ;
+                                                                                 sp:arg2  spin:Modules
+                                                                               ]
+                                                              ] [ a              sp:Filter ;
+                                                                  sp:expression  [ a            sp:notExists ;
+                                                                                   sp:elements  ( [ sp:object     spl:Argument ;
+                                                                                                    sp:predicate  rdf:type ;
+                                                                                                    sp:subject    [ sp:varName  "rule"^^xsd:string ]
+                                                                                                  ] )
+                                                                                 ]
+                                                                ] [ a              sp:Filter ;
+                                                                    sp:expression  [ a            sp:notExists ;
+                                                                                     sp:elements  ( [ sp:object     spl:Attribute ;
+                                                                                                      sp:predicate  rdf:type ;
+                                                                                                      sp:subject    [ sp:varName  "rule"^^xsd:string ]
+                                                                                                    ] )
+                                                                                   ]
+                                                                  ] )
+                            ] ;
+        spin:labelTemplate  "SPIN Overview"^^xsd:string .
+
+sp:rand  a               spin:Function ;
+        rdfs:comment     "Returns a number between 0 (inclusive) and 1.0e0 (exclusive). Different numbers can be produced every time this function is invoked. Numbers should be produced with approximately equal probability."^^xsd:string ;
+        rdfs:label       "rand"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#idp3722352> ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:returnType  xsd:double ;
+        spin:symbol      "RAND"^^xsd:string .
+
+spl:RunTestCases  a      spin:SelectTemplate ;
+        rdfs:comment     "Runs all spl:TestCases on the current model."^^xsd:string ;
+        rdfs:label       "Run test cases"^^xsd:string ;
+        rdfs:subClassOf  spin:SelectTemplates ;
+        spin:body        [ a                   sp:Select ;
+                           sp:resultVariables  ( [ sp:varName  "testCase"^^xsd:string ] [ sp:varName
+                                             "expected"^^xsd:string ] [ sp:varName
+                                             "actual"^^xsd:string ] ) ;
+                           sp:where            ( [ sp:object     [ sp:varName  "expr"^^xsd:string ] ;
+                                                   sp:predicate  spl:testExpression ;
+                                                   sp:subject    [ sp:varName  "testCase"^^xsd:string ]
+                                                 ] [ a            sp:Optional ;
+                                                     sp:elements  ( [ sp:object     [ sp:varName  "expected"^^xsd:string ] ;
+                                                                      sp:predicate  spl:testResult ;
+                                                                      sp:subject    [ sp:varName  "testCase"^^xsd:string ]
+                                                                    ] )
+                                                   ] [ a              sp:Bind ;
+                                                       sp:expression  [ a        spin:eval ;
+                                                                        sp:arg1  [ sp:varName  "expr"^^xsd:string ]
+                                                                      ] ;
+                                                       sp:variable    [ sp:varName  "actual"^^xsd:string ]
+                                                     ] [ a              sp:Filter ;
+                                                         sp:expression  [ a        sp:or ;
+                                                                          sp:arg1  [ a        sp:ne ;
+                                                                                     sp:arg1  [ a        sp:bound ;
+                                                                                                sp:arg1  [ sp:varName  "expected"^^xsd:string ]
+                                                                                              ] ;
+                                                                                     sp:arg2  [ a        sp:bound ;
+                                                                                                sp:arg1  [ sp:varName  "actual"^^xsd:string ]
+                                                                                              ]
+                                                                                   ] ;
+                                                                          sp:arg2  [ a        sp:and ;
+                                                                                     sp:arg1  [ a        sp:bound ;
+                                                                                                sp:arg1  [ sp:varName  "expected"^^xsd:string ]
+                                                                                              ] ;
+                                                                                     sp:arg2  [ a        sp:ne ;
+                                                                                                sp:arg1  [ sp:varName  "actual"^^xsd:string ] ;
+                                                                                                sp:arg2  [ sp:varName  "expected"^^xsd:string ]
+                                                                                              ]
+                                                                                   ]
+                                                                        ]
+                                                       ] )
+                         ] .
+
+spl:instanceOf  a           spin:Function ;
+        rdfs:comment        "Checks whether a given resource (?arg1) has a given type (?arg2). In order to fulfill this condition, there must either be a triple ?arg1 rdf:type ?arg2, or ?instance rdf:type ?subClass where ?subClass is a subclass of ?arg2. If the first argument is a literal, then the second argument must be the matching XSD datatype." ;
+        rdfs:label          "instanceOf"^^xsd:string ;
+        rdfs:subClassOf     spl:BooleanFunctions ;
+        spin:body           [ a         sp:Ask ;
+                              sp:where  ( [ a            sp:Union ;
+                                            sp:elements  ( ( ( [ a              sp:Filter ;
+                                                                 sp:expression  [ a        sp:or ;
+                                                                                  sp:arg1  [ a        sp:isIRI ;
+                                                                                             sp:arg1  spin:_arg1
+                                                                                           ] ;
+                                                                                  sp:arg2  [ a        sp:isBlank ;
+                                                                                             sp:arg1  spin:_arg1
+                                                                                           ]
+                                                                                ]
+                                                               ] ) [ a           sp:TriplePath ;
+                                                                     sp:object   spin:_arg2 ;
+                                                                     sp:path     [ a           sp:ModPath ;
+                                                                                   sp:modMax   -2 ;
+                                                                                   sp:modMin   0 ;
+                                                                                   sp:subPath  rdfs:subClassOf
+                                                                                 ] ;
+                                                                     sp:subject  [ sp:varName  "class"^^xsd:string ]
+                                                                   ] [ sp:object     [ sp:varName  "class"^^xsd:string ] ;
+                                                                       sp:predicate  rdf:type ;
+                                                                       sp:subject    spin:_arg1
+                                                                     ] ) ( ( [ a              sp:Filter ;
+                                                                               sp:expression  [ a        sp:isLiteral ;
+                                                                                                sp:arg1  spin:_arg1
+                                                                                              ]
+                                                                             ] ) [ a              sp:Bind ;
+                                                                                   sp:expression  [ a        sp:datatype ;
+                                                                                                    sp:arg1  spin:_arg1
+                                                                                                  ] ;
+                                                                                   sp:variable    [ sp:varName  "datatype"^^xsd:string ]
+                                                                                 ] [ a              sp:Filter ;
+                                                                                     sp:expression  [ a        sp:or ;
+                                                                                                      sp:arg1  [ a        sp:or ;
+                                                                                                                 sp:arg1  [ a        sp:eq ;
+                                                                                                                            sp:arg1  [ sp:varName  "datatype"^^xsd:string ] ;
+                                                                                                                            sp:arg2  spin:_arg2
+                                                                                                                          ] ;
+                                                                                                                 sp:arg2  [ a        sp:eq ;
+                                                                                                                            sp:arg1  spin:_arg2 ;
+                                                                                                                            sp:arg2  rdfs:Literal
+                                                                                                                          ]
+                                                                                                               ] ;
+                                                                                                      sp:arg2  [ a        sp:and ;
+                                                                                                                 sp:arg1  [ a        sp:or ;
+                                                                                                                            sp:arg1  [ a        sp:not ;
+                                                                                                                                       sp:arg1  [ a        sp:bound ;
+                                                                                                                                                  sp:arg1  [ sp:varName  "datatype"^^xsd:string ]
+                                                                                                                                                ]
+                                                                                                                                     ] ;
+                                                                                                                            sp:arg2  [ a        sp:eq ;
+                                                                                                                                       sp:arg1  rdf:langString ;
+                                                                                                                                       sp:arg2  [ sp:varName  "datatype"^^xsd:string ]
+                                                                                                                                     ]
+                                                                                                                          ] ;
+                                                                                                                 sp:arg2  [ a        sp:eq ;
+                                                                                                                            sp:arg1  spin:_arg2 ;
+                                                                                                                            sp:arg2  xsd:string
+                                                                                                                          ]
+                                                                                                               ]
+                                                                                                    ]
+                                                                                   ] ) )
+                                          ] )
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "the type that the instance must have" ;
+                              spl:predicate  sp:arg2 ;
+                              spl:valueType  rdfs:Class
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "the instance being tested" ;
+                              spl:predicate  sp:arg1 ;
+                              spl:valueType  rdfs:Resource
+                            ] ;
+        spin:labelTemplate  "{?arg1} instance of {?arg2}"^^xsd:string ;
+        spin:returnType     xsd:boolean ;
+        owl:versionInfo     "Note that in TopBraid this function has been implemented in native Java code, for performance reasons."^^xsd:string .
+
+spl:Test-instanceOf-rdfsClass
+        a                   spl:TestCase ;
+        spl:testExpression  [ a        spl:instanceOf ;
+                              sp:arg1  owl:Thing ;
+                              sp:arg2  rdfs:Class
+                            ] ;
+        spl:testResult      true .
+
+sp:ne   a                spin:Function ;
+        rdfs:comment     "Returns true if ?arg1 != ?arg2." ;
+        rdfs:label       "ne"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first operand" ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second operand" ;
+                           spl:predicate  sp:arg2
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "!="^^xsd:string .
+
+spl:AllArguments  a         spin:SelectTemplate ;
+        rdfs:comment        "Gets a list of all spl:Arguments declared at a given class and its superclasses."^^xsd:string ;
+        rdfs:label          "All arguments"^^xsd:string ;
+        rdfs:subClassOf     spin:SelectTemplates ;
+        spin:body           [ a                   sp:Select ;
+                              sp:resultVariables  ( [ sp:varName  "arg"^^xsd:string ] [ sp:varName
+                                                "atClass"^^xsd:string ] ) ;
+                              sp:where            ( [ a           sp:TriplePath ;
+                                                      sp:object   [ sp:varName  "atClass"^^xsd:string ] ;
+                                                      sp:path     [ a           sp:ModPath ;
+                                                                    sp:modMax   -2 ;
+                                                                    sp:modMin   0 ;
+                                                                    sp:subPath  rdfs:subClassOf
+                                                                  ] ;
+                                                      sp:subject  [ sp:varName  "class"^^xsd:string ]
+                                                    ] [ sp:object     [ sp:varName  "arg"^^xsd:string ] ;
+                                                        sp:predicate  spin:constraint ;
+                                                        sp:subject    [ sp:varName  "atClass"^^xsd:string ]
+                                                      ] [ sp:object     spl:Argument ;
+                                                          sp:predicate  rdf:type ;
+                                                          sp:subject    [ sp:varName  "arg"^^xsd:string ]
+                                                        ] )
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "The class to get the arguments of."^^xsd:string ;
+                              spl:predicate  spl:class ;
+                              spl:valueType  rdfs:Class
+                            ] ;
+        spin:labelTemplate  "All spl:Arguments of {?class}"^^xsd:string .
+
+sp:tz   a                spin:Function ;
+        rdfs:comment     "Returns the timezone part of ?arg1 as a simple literal. Returns the empty string if there is no timezone."^^xsd:string ;
+        rdfs:label       "tz"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-tz> ;
+        rdfs:subClassOf  spl:DateFunctions ;
+        spin:symbol      "TZ"^^xsd:string .
+
+sp:not  a                spin:Function ;
+        rdfs:comment     "Returns the boolean negation of the argument." ;
+        rdfs:label       "not"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the operand to negate" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:boolean
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "!"^^xsd:string .
+
+spl:isUntypedLiteral  a  spin:Function ;
+        rdfs:comment     "Checks whether a given literal is untyped. This function was introduced because the built-in datatype operand in SPARQL casts untyped literals to xsd:string, making it impossible to check it this way. This function here uses a work-around using sameTerm instead." ;
+        rdfs:label       "isUntypedLiteral"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:body        [ a         sp:Ask ;
+                           sp:where  ( [ a              sp:Filter ;
+                                         sp:expression  [ a        sp:and ;
+                                                          sp:arg1  [ a        sp:isLiteral ;
+                                                                     sp:arg1  spin:_arg1
+                                                                   ] ;
+                                                          sp:arg2  [ a        sp:not ;
+                                                                     sp:arg1  [ a        sp:sameTerm ;
+                                                                                sp:arg1  spin:_arg1 ;
+                                                                                sp:arg2  [ a        xsd:string ;
+                                                                                           sp:arg1  spin:_arg1
+                                                                                         ]
+                                                                              ]
+                                                                   ]
+                                                        ]
+                                       ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The literal to test."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:boolean .
+
+<http://spinrdf.org/spl>
+        a                spin:LibraryOntology , owl:Ontology ;
+        rdfs:comment     "A collection of generally useful SPARQL functions (expressed as SPIN functions), and SPIN templates. Also provides a top-level classification of functions, and definitions of the standard SPARQL functions."^^xsd:string ;
+        rdfs:label       "SPIN Standard Library"^^xsd:string ;
+        owl:imports      <http://spinrdf.org/spin> ;
+        owl:versionInfo  "1.3.0"^^xsd:string .
+
+spl:objectSubProp  a     spin:Function ;
+        rdfs:comment     "Gets the object of a given subject (?arg1) / predicate (?arg2) combination, also taking the sub-properties of ?arg2 into account. Note that if multiple values are present then the result might be unpredictably random."^^xsd:string ;
+        rdfs:label       "object sub prop"^^xsd:string ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:body        [ a                   sp:Select ;
+                           sp:resultVariables  ( [ sp:varName  "object"^^xsd:string ] ) ;
+                           sp:where            ( [ a           sp:TriplePath ;
+                                                   sp:object   spin:_arg2 ;
+                                                   sp:path     [ a           sp:ModPath ;
+                                                                 sp:modMax   -2 ;
+                                                                 sp:modMin   0 ;
+                                                                 sp:subPath  rdfs:subPropertyOf
+                                                               ] ;
+                                                   sp:subject  [ sp:varName  "property"^^xsd:string ]
+                                                 ] [ sp:object     [ sp:varName  "object"^^xsd:string ] ;
+                                                     sp:predicate  [ sp:varName  "property"^^xsd:string ] ;
+                                                     sp:subject    spin:_arg1
+                                                   ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The subject to get the object from."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Resource
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The predicate to get the object of (including sub-properties of it)."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdf:Property
+                         ] .
+
+sp:strlen  a             spin:Function ;
+        rdfs:comment     "Computes the length of a given input string."^^xsd:string ;
+        rdfs:label       "strlen"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-strlen> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input string."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:integer ;
+        spin:symbol      "STRLEN"^^xsd:string .
+
+spl:NonExistencePropertyPairConstraint
+        a                   spl:ConstraintTemplate ;
+        rdfs:label          "Non-existence property pair constraint"^^xsd:string ;
+        rdfs:subClassOf     spl:PropertyPairConstraintTemplates ;
+        spin:body           [ a             sp:Construct ;
+                              sp:templates  ( [ sp:object     spin:ConstraintViolation ;
+                                                sp:predicate  rdf:type ;
+                                                sp:subject    _:b3
+                                              ] [ sp:object     spin:_this ;
+                                                  sp:predicate  spin:violationRoot ;
+                                                  sp:subject    _:b3
+                                                ] [ sp:object     [ sp:varName  "property"^^xsd:string ] ;
+                                                    sp:predicate  spin:violationPath ;
+                                                    sp:subject    _:b3
+                                                  ] [ sp:object     [ sp:varName  "message"^^xsd:string ] ;
+                                                      sp:predicate  rdfs:label ;
+                                                      sp:subject    _:b3
+                                                    ] ) ;
+                              sp:where      ( [ a              sp:Filter ;
+                                                sp:expression  [ a            sp:notExists ;
+                                                                 sp:elements  ( [ sp:object     [ sp:varName  "someValue"^^xsd:string ] ;
+                                                                                  sp:predicate  [ sp:varName  "otherProperty"^^xsd:string ] ;
+                                                                                  sp:subject    spin:_this
+                                                                                ] )
+                                                               ]
+                                              ] [ a              sp:Filter ;
+                                                  sp:expression  [ a            sp:exists ;
+                                                                   sp:elements  ( [ sp:object     [ sp:varName  "object"^^xsd:string ] ;
+                                                                                    sp:predicate  [ sp:varName  "property"^^xsd:string ] ;
+                                                                                    sp:subject    spin:_this
+                                                                                  ] )
+                                                                 ]
+                                                ] [ a              sp:Bind ;
+                                                    sp:expression  [ a        sp:concat ;
+                                                                     sp:arg1  "Property must have no values because " ;
+                                                                     sp:arg2  [ sp:varName  "otherProperty"^^xsd:string ] ;
+                                                                     sp:arg3  " has none"
+                                                                   ] ;
+                                                    sp:variable    [ sp:varName  "message"^^xsd:string ]
+                                                  ] )
+                            ] ;
+        spin:labelTemplate  "The property {?property} must have no values as long as {?otherProperty} has none"^^xsd:string .
+
+spl:ConstraintTemplate
+        a                rdfs:Class ;
+        rdfs:comment     "Metaclass for CONSTRUCT templates that create spin:ConstraintViolations and can be used as values of spin:constraint."^^xsd:string ;
+        rdfs:label       "Constraint template"^^xsd:string ;
+        rdfs:subClassOf  spin:ConstructTemplate .
+
+sp:isNumeric  a          spin:Function ;
+        rdfs:comment     "Returns true if arg1 is a numeric value. Returns false otherwise. term is numeric if it has an appropriate datatype (see the section Operand Data Types) and has a valid lexical form, making it a valid argument to functions and operators taking numeric arguments."^^xsd:string ;
+        rdfs:label       "is numeric"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-isNumeric> ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The node to check whether it's numeric.\n"^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:symbol      "isNumeric"^^xsd:string .
+
+sp:isIRI  a              spin:Function ;
+        rdfs:comment     "Checks whether a given node is a IRI node." ;
+        rdfs:label       "isIRI"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the node being tested" ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "isIRI"^^xsd:string .
+
+spl:hasValueOfType  a    spin:Function ;
+        rdfs:comment     "Checks whether a given subject (?arg1) has at least one value of a given type (?arg3) for a given property (?arg2) or one of its sub-properties." ;
+        rdfs:label       "hasValueOfType"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:body        [ a         sp:Ask ;
+                           sp:where  ( [ a           sp:TriplePath ;
+                                         sp:object   spin:_arg2 ;
+                                         sp:path     [ a           sp:ModPath ;
+                                                       sp:modMax   -2 ;
+                                                       sp:modMin   0 ;
+                                                       sp:subPath  rdfs:subPropertyOf
+                                                     ] ;
+                                         sp:subject  [ sp:varName  "p"^^xsd:string ]
+                                       ] [ sp:object     [ sp:varName  "value"^^xsd:string ] ;
+                                           sp:predicate  [ sp:varName  "p"^^xsd:string ] ;
+                                           sp:subject    spin:_arg1
+                                         ] [ a              sp:Filter ;
+                                             sp:expression  [ a        spl:instanceOf ;
+                                                              sp:arg1  [ sp:varName  "value"^^xsd:string ] ;
+                                                              sp:arg2  spin:_arg3
+                                                            ]
+                                           ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the subject that is expected to have the value"^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Resource
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the expected property"^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdf:Property
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the type to match against"^^xsd:string ;
+                           spl:predicate  sp:arg3 ;
+                           spl:valueType  rdfs:Class
+                         ] ;
+        spin:returnType  xsd:boolean .
+
+sp:ge   a                spin:Function ;
+        rdfs:comment     "Returns true if ?arg1 >= ?arg2." ;
+        rdfs:label       "ge"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first operand" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second operand" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      ">="^^xsd:string .
+
+<http://spinrdf.org/arg#min>
+        a                   rdf:Property ;
+        rdfs:subPropertyOf  sp:arg .
+
+sp:unaryMinus  a         spin:Function ;
+        rdfs:comment     "Returns the operand ?arg1 with the sign reversed. If ?arg1 is positive, its negative is returned; if it is negative, its positive is returned." ;
+        rdfs:label       "unary minus"^^xsd:string ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the operand" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:symbol      "-"^^xsd:string .
+
+sp:strends  a            spin:Function ;
+        rdfs:comment     "Returns true if the lexical form of ?arg1 ends with the lexical form of ?arg2, otherwise it returns false."^^xsd:string ;
+        rdfs:label       "strends"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-ends> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input string."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The sub-string that the input string is supposed to end with."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "STRENDS"^^xsd:string .
+
+sp:strdt  a              spin:Function ;
+        rdfs:comment     "Constructs a literal with lexical form and type as specified by the arguments."^^xsd:string ;
+        rdfs:label       "strdt"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-strdt> ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The lexical form of the new literal."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The datatype of the new literal."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Datatype
+                         ] ;
+        spin:symbol      "STRDT"^^xsd:string .
+
+sp:strafter  a           spin:Function ;
+        rdfs:comment     "Returns a literal of the same kind (simple literal, plain literal same language tag, xsd:string) as the first argument arg1. The lexical form of the result is the substring of the value of arg1 that proceeds in arg1 the first occurrence of the lexical form of arg2; otherwise the lexical form of the result is the empty string. If the lexical form of arg2 is the empty string, the lexical form of the result is the emprty string."^^xsd:string ;
+        rdfs:label       "strafter"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-strafter> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input string."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The pattern to find within the input string."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "STRAFTER"^^xsd:string .
+
+<http://spinrdf.org/arg#otherProperty>
+        a                   rdf:Property ;
+        rdfs:subPropertyOf  sp:arg .
+
+sp:encode_for_uri  a     spin:Function ;
+        rdfs:label       "encode_for_uri"^^xsd:string ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The string to convert."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "ENCODE_FOR_URI"^^xsd:string .
+
+sp:bound  a              spin:Function ;
+        rdfs:comment     "Returns true if ?arg1 is bound to a value. Returns false otherwise. Variables with the value NaN or INF are considered bound." ;
+        rdfs:label       "bound"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the variable or expression that is checked" ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "bound"^^xsd:string .
+
+sp:unaryPlus  a          spin:Function ;
+        rdfs:comment     "Returns the operand ?arg1 with the sign unchanged. Semantically, this operation performs no operation." ;
+        rdfs:label       "unary plus"^^xsd:string ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the operand" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:symbol      "+"^^xsd:string .
+
+<http://spinrdf.org/arg#property>
+        a                   rdf:Property ;
+        rdfs:subPropertyOf  sp:arg .
+
+spl:Test-instanceOf-untypedString
+        a                   spl:TestCase ;
+        spl:testExpression  [ a        spl:instanceOf ;
+                              sp:arg1  "test" ;
+                              sp:arg2  xsd:string
+                            ] ;
+        spl:testResult      true .
+
+spl:StringFunctions  a   spin:Function ;
+        rdfs:comment     "A collection of functions that return strings."^^xsd:string ;
+        rdfs:label       "String functions"^^xsd:string ;
+        rdfs:subClassOf  spin:Functions ;
+        spin:abstract    true .
+
+spl:subject  a           spin:Function ;
+        rdfs:comment     "Gets the \"first\" subject of a given predicate (?arg1)/object (?arg2) combination. Note that if multiple values are present then the result might be unpredictably random."^^xsd:string ;
+        rdfs:label       "subject"^^xsd:string ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:body        [ a                   sp:Select ;
+                           sp:resultVariables  ( [ sp:varName  "subject"^^xsd:string ] ) ;
+                           sp:where            ( [ sp:object     spin:_arg2 ;
+                                                   sp:predicate  spin:_arg1 ;
+                                                   sp:subject    [ sp:varName  "subject"^^xsd:string ]
+                                                 ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The predicate."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdf:Property
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The object."^^xsd:string ;
+                           spl:predicate  sp:arg2
+                         ] .
+
+spl:DateFunctions  a     spin:Function ;
+        rdfs:comment     "A collection of functions that operate on date/time literals."^^xsd:string ;
+        rdfs:label       "Date functions"^^xsd:string ;
+        rdfs:subClassOf  spin:Functions ;
+        spin:abstract    true .
+
+sp:divide  a             spin:Function ;
+        rdfs:comment     "Returns the arithmetic quotient of its operands." ;
+        rdfs:label       "divide"^^xsd:string ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first operand" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second operand" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  rdfs:Literal ;
+        spin:symbol      "/"^^xsd:string .
+
+sp:exists  a             spin:Function ;
+        rdfs:comment     "The filter function EXISTS. The graph pattern is stored in sp:elements."^^xsd:string ;
+        rdfs:label       "EXISTS"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "EXISTS"^^xsd:string .
+
+sp:seconds  a            spin:Function ;
+        rdfs:comment     "Extracts the seconds from a date/time literal."^^xsd:string ;
+        rdfs:label       "seconds"^^xsd:string ;
+        rdfs:subClassOf  spl:DateFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The dateTime or time argument."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:integer ;
+        spin:symbol      "seconds"^^xsd:string .
+
+sp:round  a              spin:Function ;
+        rdfs:comment     "Returns the number with no fractional part that is closest to the argument. If there are two such numbers, then the one that is closest to positive infinity is returned. An error is raised if ?arg1 is not a numeric value."^^xsd:string ;
+        rdfs:label       "round"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-round> ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The number to round."^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:symbol      "round"^^xsd:string .
+
+sp:iri  a                spin:Function ;
+        rdfs:comment     "Creates a IRI resource (node) from a given IRI string (?arg1)."^^xsd:string ;
+        rdfs:label       "IRI"^^xsd:string ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The IRI string to convert to a resource."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  rdfs:Resource ;
+        spin:symbol      "IRI"^^xsd:string .
+
+sp:concat  a             spin:Function ;
+        rdfs:comment     "The CONCAT built-in function. Creates a single string by concatenating all arguments from left to right. Note that if any one of the arguments is unbound (null) then the whole result string will be unbound."^^xsd:string ;
+        rdfs:label       "concat"^^xsd:string ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "CONCAT"^^xsd:string .
+
+sp:notExists  a          spin:Function ;
+        rdfs:comment     "The filter function NOT EXISTS. The graph pattern is stored in sp:elements."^^xsd:string ;
+        rdfs:label       "NOT EXISTS"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "NOT EXISTS"^^xsd:string .
+
+sp:if   a                spin:Function ;
+        rdfs:comment     "The SPARQL 1.1 built-in function IF."^^xsd:string ;
+        rdfs:label       "IF"^^xsd:string ;
+        rdfs:subClassOf  spl:MiscFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "A condition to evaluate - if true then the ?arg2 will be returned, otherwise ?arg3."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:boolean
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The function result if ?arg1 is true."^^xsd:string ;
+                           spl:predicate  sp:arg2
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The function result if ?arg1 is false."^^xsd:string ;
+                           spl:predicate  sp:arg3
+                         ] ;
+        spin:symbol      "IF"^^xsd:string .
+
+sp:sub  a                spin:Function ;
+        rdfs:comment     "Returns the arithmetic difference of its operands." ;
+        rdfs:label       "sub"^^xsd:string ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first operand" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second operand" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:symbol      "-"^^xsd:string .
+
+sp:langMatches  a        spin:Function ;
+        rdfs:comment     "Returns true if language-tag (first argument) matches language-range (second argument) per the basic filtering scheme defined in [RFC4647] section 3.3.1." ;
+        rdfs:label       "langMatches"^^xsd:string ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the literal that is expected to have ?arg2 as language tag" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the language tag that ?arg1 must have" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "langMatches"^^xsd:string .
+
+sp:timezone  a           spin:Function ;
+        rdfs:comment     "Returns the timezone part of ?arg1 as an xsd:dayTimeDuration. Raises an error if there is no timezone."^^xsd:string ;
+        rdfs:label       "timezone"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-timezone> ;
+        rdfs:subClassOf  spl:DateFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input time."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:dateTime
+                         ] ;
+        spin:returnType  xsd:duration ;
+        spin:symbol      "TIMEZONE"^^xsd:string .
+
+spl:Test-instanceOf-rdfsLiteral-false
+        a                   spl:TestCase ;
+        spl:testExpression  [ a        spl:instanceOf ;
+                              sp:arg1  owl:Thing ;
+                              sp:arg2  rdfs:Literal
+                            ] ;
+        spl:testResult      false .
+
+sp:isLiteral  a          spin:Function ;
+        rdfs:comment     "Checks whether a given node is a literal." ;
+        rdfs:label       "isLiteral"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the node being tested" ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "isLiteral"^^xsd:string .
+
+sp:abs  a                spin:Function ;
+        rdfs:comment     "Returns the absolute value of arg. An error is raised if arg is not a numeric value."^^xsd:string ;
+        rdfs:label       "abs"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-abs> ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input value."^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:symbol      "abs"^^xsd:string .
+
+sp:ceil  a               spin:Function ;
+        rdfs:comment     "Returns the smallest (closest to negative infinity) number with no fractional part that is not less than the value of arg. An error is raised if ?arg1 is not a numeric value."^^xsd:string ;
+        rdfs:label       "ceil"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-ceil> ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The number to get the ceiling of."^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:symbol      "ceil"^^xsd:string .
+
+sp:lt   a                spin:Function ;
+        rdfs:comment     "Returns true if ?arg1 < ?arg2." ;
+        rdfs:label       "lt"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first operand" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second operand" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "<"^^xsd:string .
+
+sp:isURI  a              spin:Function ;
+        rdfs:comment     "Checks whether a node is a URI." ;
+        rdfs:label       "isURI"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the node to check" ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "isURI"^^xsd:string .
+
+spl:URIFunctions  a      spin:Function ;
+        rdfs:comment     "A collection of functions that create URI resources."^^xsd:string ;
+        rdfs:label       "URI functions"^^xsd:string ;
+        rdfs:subClassOf  spin:Functions ;
+        spin:abstract    true .
+
+sp:sameTerm  a           spin:Function ;
+        rdfs:comment     "Returns TRUE if ?arg1 and ?arg2 are the same RDF term as defined in Resource Description Framework (RDF): Concepts and Abstract Syntax; returns FALSE otherwise."^^xsd:string ;
+        rdfs:label       "same term"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-sameTerm> ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first argument" ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second argument" ;
+                           spl:predicate  sp:arg2
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "sameTerm"^^xsd:string .
+
+spl:TestCase  a          rdfs:Class ;
+        rdfs:comment     "A test to verify that a SPIN function or magic property works as expected, and to generate documentation of example uses of the function. Each TestCase consists of a SPARQL function call or an expression that can be executed with spin:eval, and an expected result. The test framework only needs to execute spin:eval on the expression and compare it with the expected result."^^xsd:string ;
+        rdfs:label       "Test case"^^xsd:string ;
+        rdfs:subClassOf  rdfs:Resource ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The expected result of the test case, or nothing to indicate that an error is expected."^^xsd:string ;
+                           spl:optional   true ;
+                           spl:predicate  spl:testResult
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The test expression or SELECT query (anything that can be evaluated with spin:eval)."^^xsd:string ;
+                           spl:predicate  spl:testExpression
+                         ] .
+
+sp:ucase  a              spin:Function ;
+        rdfs:comment     "Converts a string to upper case characters."^^xsd:string ;
+        rdfs:label       "UCASE"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-ucase> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input string."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "UCASE"^^xsd:string .
+
+sp:substr  a             spin:Function ;
+        rdfs:comment     "Gets the sub-string of a given string. The index of the first character is 1."^^xsd:string ;
+        rdfs:label       "substr"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-substr> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The start index."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:integer
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The end index."^^xsd:string ;
+                           spl:optional   true ;
+                           spl:predicate  sp:arg3 ;
+                           spl:valueType  xsd:integer
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input string."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "SUBSTR"^^xsd:string .
+
+spl:ObjectCountPropertyConstraint
+        a                   spl:ConstraintTemplate ;
+        rdfs:comment        "Represents a constraint that can be attached to a class to specify that a given property must have between min and max values."^^xsd:string ;
+        rdfs:label          "Object count property constraint"^^xsd:string ;
+        rdfs:subClassOf     spl:CountPropertyConstraintTemplates ;
+        spin:body           [ a             sp:Construct ;
+                              sp:templates  ( [ sp:object     spin:ConstraintViolation ;
+                                                sp:predicate  rdf:type ;
+                                                sp:subject    _:b4
+                                              ] [ sp:object     spin:_this ;
+                                                  sp:predicate  spin:violationRoot ;
+                                                  sp:subject    _:b4
+                                                ] [ sp:object     [ sp:varName  "property"^^xsd:string ] ;
+                                                    sp:predicate  spin:violationPath ;
+                                                    sp:subject    _:b4
+                                                  ] [ sp:object     [ sp:varName  "message"^^xsd:string ] ;
+                                                      sp:predicate  rdfs:label ;
+                                                      sp:subject    _:b4
+                                                    ] ) ;
+                              sp:where      ( [ a              sp:Bind ;
+                                                sp:expression  [ a        spl:objectCount ;
+                                                                 sp:arg1  spin:_this ;
+                                                                 sp:arg2  [ sp:varName  "property"^^xsd:string ]
+                                                               ] ;
+                                                sp:variable    [ sp:varName  "objectCount"^^xsd:string ]
+                                              ] [ a              sp:Filter ;
+                                                  sp:expression  [ a        sp:or ;
+                                                                   sp:arg1  [ a        sp:and ;
+                                                                              sp:arg1  [ a        sp:bound ;
+                                                                                         sp:arg1  [ sp:varName  "minCount"^^xsd:string ]
+                                                                                       ] ;
+                                                                              sp:arg2  [ a        sp:lt ;
+                                                                                         sp:arg1  [ sp:varName  "objectCount"^^xsd:string ] ;
+                                                                                         sp:arg2  [ sp:varName  "minCount"^^xsd:string ]
+                                                                                       ]
+                                                                            ] ;
+                                                                   sp:arg2  [ a        sp:and ;
+                                                                              sp:arg1  [ a        sp:bound ;
+                                                                                         sp:arg1  [ sp:varName  "maxCount"^^xsd:string ]
+                                                                                       ] ;
+                                                                              sp:arg2  [ a        sp:gt ;
+                                                                                         sp:arg1  [ sp:varName  "objectCount"^^xsd:string ] ;
+                                                                                         sp:arg2  [ sp:varName  "maxCount"^^xsd:string ]
+                                                                                       ]
+                                                                            ]
+                                                                 ]
+                                                ] [ a              sp:Bind ;
+                                                    sp:expression  [ a        sp:concat ;
+                                                                     sp:arg1  "Invalid number of values: " ;
+                                                                     sp:arg2  [ sp:varName  "objectCount"^^xsd:string ]
+                                                                   ] ;
+                                                    sp:variable    [ sp:varName  "message"^^xsd:string ]
+                                                  ] )
+                            ] ;
+        spin:labelTemplate  "The property {?property} must have between {?minCount} and {?maxCount} values"^^xsd:string .
+
+spl:Test-instanceOf-lingualString
+        a                   spl:TestCase ;
+        spl:testExpression  [ a        spl:instanceOf ;
+                              sp:arg1  "test"@en ;
+                              sp:arg2  xsd:string
+                            ] ;
+        spl:testResult      true .
+
+spl:instance  a             rdf:Property ;
+        rdfs:domain         sp:ModuleCall ;
+        rdfs:label          "instance"^^xsd:string ;
+        rdfs:subPropertyOf  sp:arg .
+
+spl:CountPropertyConstraintTemplates
+        a                spl:ConstraintTemplate ;
+        rdfs:comment     "Abstract superclass of property constraints that compare the number of values with either min or max count."^^xsd:string ;
+        rdfs:label       "Count property constraint templates"^^xsd:string ;
+        rdfs:subClassOf  spl:PropertyConstraintTemplates ;
+        spin:abstract    true ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The maximum number of values that the property must have."^^xsd:string ;
+                           spl:optional   true ;
+                           spl:predicate  <http://spinrdf.org/arg#maxCount> ;
+                           spl:valueType  xsd:integer
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The minimum number of values that the property must have."^^xsd:string ;
+                           spl:optional   true ;
+                           spl:predicate  <http://spinrdf.org/arg#minCount> ;
+                           spl:valueType  xsd:integer
+                         ] .
+
+sp:strbefore  a          spin:Function ;
+        rdfs:comment     "Returns a literal of the same kind (simple literal, plain literal same language tag, xsd:string) as the first argument arg1. The lexical form of the result is the substring of the value of arg1 that precedes in arg1 the first occurrence of the lexical form of arg2; otherwise the lexical form of the result is the empty string. If the lexical form of arg2 is the empty string, the lexical form of the result is the emprty string."^^xsd:string ;
+        rdfs:label       "strbefore"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-strbefore> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input string."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The pattern to find within the input string."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "STRBEFORE"^^xsd:string .
+
+sp:str  a                spin:Function ;
+        rdfs:comment     "Returns the lexical form of ?arg1 (a literal); returns the codepoint representation of ?arg1 (an IRI). This is useful for examining parts of an IRI, for instance, the host-name." ;
+        rdfs:label       "str"^^xsd:string ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the node to convert to string" ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "str"^^xsd:string .
+
+spl:hasValue  a          spin:Function ;
+        rdfs:comment     "Checks whether a given resource (?arg1) has a given value (?arg3) for a given property (?arg2) or one of the sub-properties of it." ;
+        rdfs:label       "hasValue"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:body        [ a         sp:Ask ;
+                           sp:where  ( [ a           sp:TriplePath ;
+                                         sp:object   spin:_arg2 ;
+                                         sp:path     [ a           sp:ModPath ;
+                                                       sp:modMax   -2 ;
+                                                       sp:modMin   0 ;
+                                                       sp:subPath  rdfs:subPropertyOf
+                                                     ] ;
+                                         sp:subject  [ sp:varName  "p"^^xsd:string ]
+                                       ] [ sp:object     spin:_arg3 ;
+                                           sp:predicate  [ sp:varName  "p"^^xsd:string ] ;
+                                           sp:subject    spin:_arg1
+                                         ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the subject that is expected to have the value"^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Resource
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the property that is expected to hold the value"^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdf:Property
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the expected value"^^xsd:string ;
+                           spl:predicate  sp:arg3
+                         ] ;
+        spin:returnType  xsd:boolean .
+
+spl:maxCount  a             rdf:Property ;
+        rdfs:subPropertyOf  spl:count .
+
+spl:Test-instanceOf-typedString
+        a                   spl:TestCase ;
+        spl:testExpression  [ a        spl:instanceOf ;
+                              sp:arg1  "test"^^xsd:string ;
+                              sp:arg2  xsd:string
+                            ] ;
+        spl:testResult      true .
+
+spl:testResult  a           rdf:Property ;
+        rdfs:label          "testResult"^^xsd:string ;
+        rdfs:subPropertyOf  sp:arg .
+
+spl:BooleanFunctions  a  spin:Function ;
+        rdfs:comment     "A collection of functions that return a boolean value (true or false)."^^xsd:string ;
+        rdfs:label       "Boolean functions"^^xsd:string ;
+        rdfs:subClassOf  spin:Functions ;
+        spin:abstract    true .
+
+sp:uri  a                spin:Function ;
+        rdfs:comment     "Equivalent to IRI."^^xsd:string ;
+        rdfs:label       "URI"^^xsd:string ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The IRI string to convert to a resource."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  rdfs:Resource ;
+        spin:symbol      "URI"^^xsd:string .
+
+sp:minutes  a            spin:Function ;
+        rdfs:comment     "Extracts the minutes from a date/time literal."^^xsd:string ;
+        rdfs:label       "minutes"^^xsd:string ;
+        rdfs:subClassOf  spl:DateFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The dateTime or time argument."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:integer ;
+        spin:symbol      "minutes"^^xsd:string .
+
+spl:ExistencePropertyPairConstraint
+        a                   spl:ConstraintTemplate ;
+        rdfs:label          "Existence property pair constraint"^^xsd:string ;
+        rdfs:subClassOf     spl:PropertyPairConstraintTemplates ;
+        spin:body           [ a             sp:Construct ;
+                              sp:templates  ( [ sp:object     spin:ConstraintViolation ;
+                                                sp:predicate  rdf:type ;
+                                                sp:subject    _:b5
+                                              ] [ sp:object     spin:_this ;
+                                                  sp:predicate  spin:violationRoot ;
+                                                  sp:subject    _:b5
+                                                ] [ sp:object     [ sp:varName  "property"^^xsd:string ] ;
+                                                    sp:predicate  spin:violationPath ;
+                                                    sp:subject    _:b5
+                                                  ] [ sp:object     [ sp:varName  "message"^^xsd:string ] ;
+                                                      sp:predicate  rdfs:label ;
+                                                      sp:subject    _:b5
+                                                    ] ) ;
+                              sp:where      ( [ a              sp:Filter ;
+                                                sp:expression  [ a            sp:exists ;
+                                                                 sp:elements  ( [ sp:object     [ sp:varName  "someValue"^^xsd:string ] ;
+                                                                                  sp:predicate  [ sp:varName  "otherProperty"^^xsd:string ] ;
+                                                                                  sp:subject    spin:_this
+                                                                                ] )
+                                                               ]
+                                              ] [ a              sp:Filter ;
+                                                  sp:expression  [ a            sp:notExists ;
+                                                                   sp:elements  ( [ sp:object     [ sp:varName  "object"^^xsd:string ] ;
+                                                                                    sp:predicate  [ sp:varName  "property"^^xsd:string ] ;
+                                                                                    sp:subject    spin:_this
+                                                                                  ] )
+                                                                 ]
+                                                ] [ a              sp:Bind ;
+                                                    sp:expression  [ a        sp:concat ;
+                                                                     sp:arg1  "Property must have a value because " ;
+                                                                     sp:arg2  [ sp:varName  "otherProperty"^^xsd:string ] ;
+                                                                     sp:arg3  " has"
+                                                                   ] ;
+                                                    sp:variable    [ sp:varName  "message"^^xsd:string ]
+                                                  ] )
+                            ] ;
+        spin:labelTemplate  "The property {?property} must have a value whenever {?otherProperty} has a value"^^xsd:string .
+
+sp:replace  a            spin:Function ;
+        rdfs:comment     "Replaces each non-overlapping occurrence of a regular expression pattern with a replacement string. Regular expession matching may involve modifier flags."^^xsd:string ;
+        rdfs:label       "replace"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-replace> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input string."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "Additional flags for the replacement."^^xsd:string ;
+                           spl:optional   true ;
+                           spl:predicate  sp:arg4 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The replacement string."^^xsd:string ;
+                           spl:predicate  sp:arg3 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The pattern to replace.\n"^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "REPLACE"^^xsd:string .
+
+spl:class  a                rdf:Property ;
+        rdfs:label          "class"^^xsd:string ;
+        rdfs:subPropertyOf  sp:arg .
+
+sp:floor  a              spin:Function ;
+        rdfs:comment     "Returns the largest (closest to positive infinity) number with no fractional part that is not greater than the value of ?arg1. An error is raised if ?arg1 is not a numeric value."^^xsd:string ;
+        rdfs:label       "floor"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-floor> ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The value to get the floor of."^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:symbol      "floor"^^xsd:string .
+
+sp:le   a                spin:Function ;
+        rdfs:comment     "Returns true if ?arg1 <= ?arg2." ;
+        rdfs:label       "le"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first operand" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second operand" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "<="^^xsd:string .
+
+spl:Test-instanceOf-rdfsLiteral
+        a                   spl:TestCase ;
+        spl:testExpression  [ a        spl:instanceOf ;
+                              sp:arg1  "test"^^xsd:string ;
+                              sp:arg2  rdfs:Literal
+                            ] ;
+        spl:testResult      true .
+
+sp:md5  a                spin:Function ;
+        rdfs:comment     "Returns the MD5 checksum, as a hex digit string, calculated on the UTF-8 representation of the simple literal or lexical form of the xsd:string. Hex digits SHOULD be in lower case."^^xsd:string ;
+        rdfs:label       "md5"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-md5> ;
+        rdfs:subClassOf  spl:MiscFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input literal."^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "MD5"^^xsd:string .
+
+spl:subjectCount  a      spin:Function ;
+        rdfs:comment     "Gets the number of values of a given property (?arg1) at a given object (?arg2). The result is the number of matches of (?subject, ?arg1, ?arg2)."^^xsd:string ;
+        rdfs:label       "subjectCount"^^xsd:string ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:body        [ a                   sp:Select ;
+                           sp:resultVariables  ( [ sp:expression  [ a              sp:Count ;
+                                                                    sp:expression  [ sp:varName  "subject"^^xsd:string ]
+                                                                  ] ;
+                                                   sp:varName     "result"^^xsd:string
+                                                 ] ) ;
+                           sp:where            ( [ sp:object     spin:_arg2 ;
+                                                   sp:predicate  spin:_arg1 ;
+                                                   sp:subject    [ sp:varName  "subject"^^xsd:string ]
+                                                 ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the predicate to get the number of subjects of"^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdf:Property
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the object to get the number of subjects of"^^xsd:string ;
+                           spl:predicate  sp:arg2
+                         ] ;
+        spin:returnType  xsd:integer .
+
+<http://spinrdf.org/arg#maxCount>
+        a                   rdf:Property ;
+        rdfs:subPropertyOf  sp:arg .
+
+spin:eval  spin:constraint  [ a              spl:Argument ;
+                              rdfs:comment   "The expression to evaluate. Should be a sp:Select, sp:Ask, a sp:Variable or an instance of a SPARQL function class, but may also be a simple RDF value."^^xsd:string ;
+                              spl:predicate  sp:arg1
+                            ] .
+
+sp:mul  a                spin:Function ;
+        rdfs:comment     "Returns the arithmetic product of its operands." ;
+        rdfs:label       "mul"^^xsd:string ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first operand" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second operand" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:symbol      "*"^^xsd:string .
+
+sp:regex  a              spin:Function ;
+        rdfs:comment     "Returns true if a string (?arg1) matches the regular expression supplied as a pattern (?arg2) as influenced by the value of flags (?arg3), otherwise returns false." ;
+        rdfs:label       "regex"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-regex> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the match pattern" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the flags" ;
+                           spl:optional   true ;
+                           spl:predicate  sp:arg3 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the input string" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "regex"^^xsd:string .
+
+spl:UntypedObjectPropertyConstraint
+        a                   spl:ConstraintTemplate ;
+        rdfs:comment        "A generic SPIN template that can be used to declare a constraint that all values of a given property must have an rdf:type."^^xsd:string ;
+        rdfs:label          "Untyped object property constraint"^^xsd:string ;
+        rdfs:subClassOf     spl:PropertyConstraintTemplates ;
+        spin:body           [ a             sp:Construct ;
+                              sp:templates  ( [ sp:object     spin:ConstraintViolation ;
+                                                sp:predicate  rdf:type ;
+                                                sp:subject    _:b6
+                                              ] [ sp:object     spin:_this ;
+                                                  sp:predicate  spin:violationRoot ;
+                                                  sp:subject    _:b6
+                                                ] [ sp:object     [ sp:varName  "property"^^xsd:string ] ;
+                                                    sp:predicate  spin:violationPath ;
+                                                    sp:subject    _:b6
+                                                  ] [ sp:object     [ sp:varName  "message"^^xsd:string ] ;
+                                                      sp:predicate  rdfs:label ;
+                                                      sp:subject    _:b6
+                                                    ] ) ;
+                              sp:where      ( [ sp:object     [ sp:varName  "object"^^xsd:string ] ;
+                                                sp:predicate  [ sp:varName  "property"^^xsd:string ] ;
+                                                sp:subject    spin:_this
+                                              ] [ a              sp:Filter ;
+                                                  sp:expression  [ a            sp:notExists ;
+                                                                   sp:elements  ( [ sp:object     [ sp:varName  "anyType"^^xsd:string ] ;
+                                                                                    sp:predicate  rdf:type ;
+                                                                                    sp:subject    [ sp:varName  "object"^^xsd:string ]
+                                                                                  ] )
+                                                                 ]
+                                                ] [ a              sp:Bind ;
+                                                    sp:expression  [ a        sp:concat ;
+                                                                     sp:arg1  "Value " ;
+                                                                     sp:arg2  [ sp:varName  "object"^^xsd:string ] ;
+                                                                     sp:arg3  " must have a type"
+                                                                   ] ;
+                                                    sp:variable    [ sp:varName  "message"^^xsd:string ]
+                                                  ] )
+                            ] ;
+        spin:labelTemplate  "Values of {?property} must have a type"^^xsd:string .
+
+spl:Test-instanceOf-typedString-false
+        a                   spl:TestCase ;
+        spl:testExpression  [ a        spl:instanceOf ;
+                              sp:arg1  "test"^^xsd:string ;
+                              sp:arg2  xsd:integer
+                            ] ;
+        spl:testResult      false .
+
+sp:lcase  a              spin:Function ;
+        rdfs:comment     "Converts a string to lower case characters."^^xsd:string ;
+        rdfs:label       "LCASE"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-lcase> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input string."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "LCASE"^^xsd:string .
+
+spl:hasArgument  a       spin:Function ;
+        rdfs:comment     "Checks if a given module class (?module) has at least one declared spl:Argument."^^xsd:string ;
+        rdfs:label       "has argument"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:body        [ a         sp:Ask ;
+                           sp:where  ( [ a           sp:TriplePath ;
+                                         sp:object   [ sp:varName  "superClass"^^xsd:string ] ;
+                                         sp:path     [ a           sp:ModPath ;
+                                                       sp:modMax   -2 ;
+                                                       sp:modMin   0 ;
+                                                       sp:subPath  rdfs:subClassOf
+                                                     ] ;
+                                         sp:subject  [ sp:varName  "class"^^xsd:string ]
+                                       ] [ sp:object     [ sp:varName  "con"^^xsd:string ] ;
+                                           sp:predicate  spin:constraint ;
+                                           sp:subject    [ sp:varName  "superClass"^^xsd:string ]
+                                         ] [ sp:object     spl:Argument ;
+                                             sp:predicate  rdf:type ;
+                                             sp:subject    [ sp:varName  "con"^^xsd:string ]
+                                           ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The module class to check."^^xsd:string ;
+                           spl:predicate  spl:class ;
+                           spl:valueType  spin:Module
+                         ] ;
+        spin:returnType  xsd:boolean .
+
+sp:coalesce  a           spin:Function ;
+        rdfs:comment     "Takes any number of arguments, and returns the first bound argument, starting at the left."^^xsd:string ;
+        rdfs:label       "COALESCE"^^xsd:string ;
+        rdfs:subClassOf  spl:MiscFunctions ;
+        spin:symbol      "COALESCE"^^xsd:string .
+
+sp:struuid  a            spin:Function ;
+        rdfs:comment     "Returns a string that is the scheme specific part of UUID. That is, as a simple literal, the result of generating a UUID, converting to a simple literal and removing the initial urn:uuid:."^^xsd:string ;
+        rdfs:label       "struuid"^^xsd:string ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "STRUUID"^^xsd:string .
+
+spl:MiscFunctions  a     spin:Function ;
+        rdfs:comment     "A collection of functions that are difficult to categorize."^^xsd:string ;
+        rdfs:label       "Misc functions"^^xsd:string ;
+        rdfs:subClassOf  spin:Functions ;
+        spin:abstract    true .
+
+sp:strlang  a            spin:Function ;
+        rdfs:comment     "Takes a string (?arg1) and a language (?arg2) and constructs a literal with a corresponding language tag."^^xsd:string ;
+        rdfs:label       "strlang"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-strlang> ;
+        rdfs:subClassOf  spl:StringFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The string value."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The language tag, e.g. \"en-AU\"."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:string
+                         ] ;
+        spin:returnType  rdf:PlainLiteral ;
+        spin:symbol      "STRLANG"^^xsd:string .
+
+spl:max  a               spin:Function ;
+        rdfs:comment     "Takes two arguments and returns the larger one of them."^^xsd:string ;
+        rdfs:label       "max"^^xsd:string ;
+        rdfs:subClassOf  spl:MathematicalFunctions ;
+        spin:body        [ a                   sp:Select ;
+                           sp:resultVariables  ( [ sp:varName  "result"^^xsd:string ] ) ;
+                           sp:where            ( [ a              sp:Bind ;
+                                                   sp:expression  [ a        sp:if ;
+                                                                    sp:arg1  [ a        sp:gt ;
+                                                                               sp:arg1  spin:_arg1 ;
+                                                                               sp:arg2  spin:_arg2
+                                                                             ] ;
+                                                                    sp:arg2  spin:_arg1 ;
+                                                                    sp:arg3  spin:_arg2
+                                                                  ] ;
+                                                   sp:variable    [ sp:varName  "result"^^xsd:string ]
+                                                 ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The first argument."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The second argument."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  rdfs:Literal .
+
+spl:Test-instanceOf-rdfsClassInheritance
+        a                   spl:TestCase ;
+        spl:testExpression  [ a        spl:instanceOf ;
+                              sp:arg1  owl:Restriction ;
+                              sp:arg2  rdfs:Class
+                            ] ;
+        spl:testResult      true .
+
+spl:Test-object-labelOfArgument
+        a                   spl:TestCase ;
+        spl:testExpression  [ a                   sp:Select ;
+                              sp:resultVariables  ( [ sp:varName  "value"^^xsd:string ] ) ;
+                              sp:where            ( [ a                 sp:NamedGraph ;
+                                                      sp:elements       ( [ a              sp:Bind ;
+                                                                            sp:expression  [ a        spl:object ;
+                                                                                             sp:arg1  spl:Argument ;
+                                                                                             sp:arg2  rdfs:label
+                                                                                           ] ;
+                                                                            sp:variable    [ sp:varName  "value"^^xsd:string ]
+                                                                          ] ) ;
+                                                      sp:graphNameNode  <http://spinrdf.org/spl>
+                                                    ] )
+                            ] ;
+        spl:testResult      "Argument"^^xsd:string .
+
+spl:subPropertyOf  a     spin:Function ;
+        rdfs:comment     "Checks whether a given property (?arg1) is a (transitive) sub-property of another property (?arg2)."^^xsd:string ;
+        rdfs:label       "sub property of"^^xsd:string ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:body        [ a         sp:Ask ;
+                           sp:where  ( [ a           sp:TriplePath ;
+                                         sp:object   spin:_arg2 ;
+                                         sp:path     [ a           sp:ModPath ;
+                                                       sp:modMax   -2 ;
+                                                       sp:modMin   0 ;
+                                                       sp:subPath  rdfs:subPropertyOf
+                                                     ] ;
+                                         sp:subject  spin:_arg1
+                                       ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The potential sub-property."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdf:Property
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The potential super-property."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdf:Property
+                         ] ;
+        spin:returnType  xsd:boolean .
+
+sp:month  a              spin:Function ;
+        rdfs:comment     "Extracts the month from a date/time literal."^^xsd:string ;
+        rdfs:label       "month"^^xsd:string ;
+        rdfs:subClassOf  spl:DateFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The date or dateTime argument."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:integer ;
+        spin:symbol      "month"^^xsd:string .
+
+spl:object  a            spin:Function ;
+        rdfs:comment     "Gets the object of a given subject (?arg1) / predicate (?arg2) combination. Note that if multiple values are present then the result might be unpredictably random."^^xsd:string ;
+        rdfs:label       "object"^^xsd:string ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:body        [ a                   sp:Select ;
+                           sp:resultVariables  ( [ sp:varName  "object"^^xsd:string ] ) ;
+                           sp:where            ( [ sp:object     [ sp:varName  "object"^^xsd:string ] ;
+                                                   sp:predicate  spin:_arg2 ;
+                                                   sp:subject    spin:_arg1
+                                                 ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The subject to get the object from."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Resource
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The predicate to get the object of."^^xsd:string ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdf:Property
+                         ] ;
+        owl:versionInfo  "Note that in TopBraid this function has been implemented in native Java code, for performance reasons."^^xsd:string .
+
+sp:eq   a                spin:Function ;
+        rdfs:comment     "Returns true if both arguments are equal." ;
+        rdfs:label       "eq"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first value to compare" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:boolean
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second value to compare" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:boolean
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "="^^xsd:string .
+
+spl:RegexPropertyConstraint
+        a                   spl:ConstraintTemplate ;
+        rdfs:label          "Regex property constraint"^^xsd:string ;
+        rdfs:subClassOf     spl:PropertyConstraintTemplates ;
+        spin:body           [ a             sp:Construct ;
+                              sp:templates  ( [ sp:object     spin:ConstraintViolation ;
+                                                sp:predicate  rdf:type ;
+                                                sp:subject    _:b7
+                                              ] [ sp:object     spin:_this ;
+                                                  sp:predicate  spin:violationRoot ;
+                                                  sp:subject    _:b7
+                                                ] [ sp:object     [ sp:varName  "property"^^xsd:string ] ;
+                                                    sp:predicate  spin:violationPath ;
+                                                    sp:subject    _:b7
+                                                  ] [ sp:object     [ sp:varName  "message"^^xsd:string ] ;
+                                                      sp:predicate  rdfs:label ;
+                                                      sp:subject    _:b7
+                                                    ] ) ;
+                              sp:where      ( [ sp:object     [ sp:varName  "object"^^xsd:string ] ;
+                                                sp:predicate  [ sp:varName  "property"^^xsd:string ] ;
+                                                sp:subject    spin:_this
+                                              ] [ a              sp:Filter ;
+                                                  sp:expression  [ a        sp:not ;
+                                                                   sp:arg1  [ a        sp:regex ;
+                                                                              sp:arg1  [ a        xsd:string ;
+                                                                                         sp:arg1  [ sp:varName  "object"^^xsd:string ]
+                                                                                       ] ;
+                                                                              sp:arg2  [ sp:varName  "pattern"^^xsd:string ]
+                                                                            ]
+                                                                 ]
+                                                ] [ a              sp:Bind ;
+                                                    sp:expression  [ a        sp:concat ;
+                                                                     sp:arg1  "Value " ;
+                                                                     sp:arg2  [ sp:varName  "object"^^xsd:string ] ;
+                                                                     sp:arg3  " must match the regular expression \"" ;
+                                                                     sp:arg4  [ sp:varName  "pattern"^^xsd:string ] ;
+                                                                     sp:arg5  "\""
+                                                                   ] ;
+                                                    sp:variable    [ sp:varName  "message"^^xsd:string ]
+                                                  ] )
+                            ] ;
+        spin:constraint     [ a              spl:Argument ;
+                              rdfs:comment   "The regular expression to match."^^xsd:string ;
+                              spl:predicate  <http://spinrdf.org/arg#pattern> ;
+                              spl:valueType  xsd:string
+                            ] ;
+        spin:labelTemplate  "Values of {?property} must match the regular expression {?pattern}"^^xsd:string .
+
+sp:sha512  a             spin:Function ;
+        rdfs:comment     "Returns the SHA512 checksum, as a hex digit string, calculated on the UTF-8 representation of the simple literal or lexical form of the xsd:string. Hex digits SHOULD be in lower case."^^xsd:string ;
+        rdfs:label       "sha512"^^xsd:string ;
+        rdfs:seeAlso     <http://www.w3.org/TR/sparql11-query/#func-sha512> ;
+        rdfs:subClassOf  spl:MiscFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The input literal."^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:string ;
+        spin:symbol      "SHA512"^^xsd:string .
+
+sp:hours  a              spin:Function ;
+        rdfs:comment     "Extracts the hours from a date/time literal."^^xsd:string ;
+        rdfs:label       "hours"^^xsd:string ;
+        rdfs:subClassOf  spl:DateFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The dateTime or time argument."^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  xsd:integer ;
+        spin:symbol      "hours"^^xsd:string .
+
+spl:objectCount  a       spin:Function ;
+        rdfs:comment     "Gets the number of values of a given property (?arg2) at a given subject (?arg1). The result is the number of matches of (?arg1, ?arg2, ?object)." ;
+        rdfs:label       "objectCount"^^xsd:string ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:body        [ a                   sp:Select ;
+                           sp:resultVariables  ( [ sp:expression  [ a              sp:Count ;
+                                                                    sp:expression  [ sp:varName  "object"^^xsd:string ]
+                                                                  ] ;
+                                                   sp:varName     "result"^^xsd:string
+                                                 ] ) ;
+                           sp:where            ( [ sp:object     [ sp:varName  "object"^^xsd:string ] ;
+                                                   sp:predicate  spin:_arg2 ;
+                                                   sp:subject    spin:_arg1
+                                                 ] )
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the subject to get the number of objects of"^^xsd:string ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Resource
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the property to get the number of values of" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  rdf:Property
+                         ] ;
+        spin:returnType  xsd:integer .
+
+<http://spinrdf.org/arg#pattern>
+        a                   rdf:Property ;
+        rdfs:subPropertyOf  sp:arg .
+
+spl:PropertyPairConstraintTemplates
+        a                spl:ConstraintTemplate ;
+        rdfs:comment     "Abstract base class for templates that take two properties as arguments and establish a relationship between them."^^xsd:string ;
+        rdfs:label       "Property pair constraint templates"^^xsd:string ;
+        rdfs:subClassOf  spl:PropertyConstraintTemplates ;
+        spin:abstract    true ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The \"other\" property."^^xsd:string ;
+                           spl:predicate  <http://spinrdf.org/arg#otherProperty> ;
+                           spl:valueType  rdf:Property
+                         ] .
+
+sp:and  a                spin:Function ;
+        rdfs:comment     "Return the logical AND between two (boolean) operands." ;
+        rdfs:label       "and"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the first operand of the intersection" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  xsd:boolean
+                         ] ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the second operand of the intersection" ;
+                           spl:predicate  sp:arg2 ;
+                           spl:valueType  xsd:boolean
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "&&"^^xsd:string .
+
+spl:MathematicalFunctions
+        a                spin:Function ;
+        rdfs:comment     "A collection of functions operating on numbers."^^xsd:string ;
+        rdfs:label       "Mathematical functions"^^xsd:string ;
+        rdfs:subClassOf  spin:Functions ;
+        spin:abstract    true .
+
+spl:defaultValue  a         rdf:Property ;
+        rdfs:label          "default value"^^xsd:string ;
+        rdfs:subPropertyOf  sp:arg .
+
+spl:testExpression  a       rdf:Property ;
+        rdfs:label          "test expression"^^xsd:string ;
+        rdfs:subPropertyOf  sp:arg .
+
+sp:datatype  a           spin:Function ;
+        rdfs:comment     "Returns the datatype IRI of argument ?arg1; returns xsd:string if the parameter is a simple literal." ;
+        rdfs:label       "datatype"^^xsd:string ;
+        rdfs:subClassOf  spl:OntologyFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "the literal to get the datatype of" ;
+                           spl:predicate  sp:arg1 ;
+                           spl:valueType  rdfs:Literal
+                         ] ;
+        spin:returnType  rdfs:Class ;
+        spin:symbol      "datatype"^^xsd:string .
+
+sp:notIn  a              spin:Function ;
+        rdfs:comment     "Checks whether the value on the left (?arg1) is none of the values on the right (?arg2, ?arg3 ...)."^^xsd:string ;
+        rdfs:label       "NOT IN"^^xsd:string ;
+        rdfs:subClassOf  spl:BooleanFunctions ;
+        spin:constraint  [ a              spl:Argument ;
+                           rdfs:comment   "The value to find."^^xsd:string ;
+                           spl:predicate  sp:arg1
+                         ] ;
+        spin:returnType  xsd:boolean ;
+        spin:symbol      "NOT IN"^^xsd:string .
+
+spl:Test-object-noValue
+        a                   spl:TestCase ;
+        spl:testExpression  [ a        spl:object ;
+                              sp:arg1  owl:versionInfo ;
+                              sp:arg2  owl:versionInfo
+                            ] .
