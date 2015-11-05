@@ -107,6 +107,7 @@ import com.hp.hpl.jena.sparql.syntax.ElementFilter;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.sparql.syntax.ElementMinus;
 import com.hp.hpl.jena.sparql.syntax.ElementNamedGraph;
+import com.hp.hpl.jena.sparql.syntax.ElementNamedWindow;
 import com.hp.hpl.jena.sparql.syntax.ElementNotExists;
 import com.hp.hpl.jena.sparql.syntax.ElementOptional;
 import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
@@ -287,6 +288,37 @@ public class ARQ2SPIN {
 			String namedGraphURI = namedGraphURIs.next();
 			spinQuery.addProperty(SP.fromNamed, model.getResource(namedGraphURI));
 		}
+	}
+	
+	private void addNamedWindowClauses(Query arq, Resource spinQuery) {
+		System.out.println("Adding named windows");
+		
+		Iterator<ElementNamedWindow> windowURIs = arq.getNamedWindows().iterator();
+		while(windowURIs.hasNext()) {
+			ElementNamedWindow window = windowURIs.next();
+			String windowIri = window.getWindowIri();
+			
+			
+			// Window node
+			Resource windowNode = model.createResource();
+			spinQuery.addProperty(SP.fromNamedWindow, windowNode);
+			// Add iri, range, step
+			windowNode.addProperty(SP.windowIRI, model.getResource(window.getWindowIri()));
+			windowNode.addProperty(SP.streamIRI, model.getResource(window.getStreamIri()));
+			windowNode.addProperty(SP.windowRange, window.getRange());
+			windowNode.addProperty(SP.windowStep, window.getStep());
+		}
+		/*
+		while(graphURIs.hasNext()) {
+			String graphURI = graphURIs.next();
+			spinQuery.addProperty(SP.from, model.getResource(graphURI));
+		}
+		
+		Iterator<String> namedGraphURIs = arq.getNamedGraphURIs().iterator();
+		while(namedGraphURIs.hasNext()) {
+			String namedGraphURI = namedGraphURIs.next();
+			spinQuery.addProperty(SP.fromNamed, model.getResource(namedGraphURI));
+		}*/
 	}
 
 
@@ -515,6 +547,7 @@ public class ARQ2SPIN {
 
 				@Override
 				public void visit(ElementNamedGraph namedGraph) {
+					System.out.println("Printing named graph");
 					Resource graphNameNode;
 					Node nameNode = namedGraph.getGraphNameNode();
 					if(nameNode.isVariable()) {
@@ -621,6 +654,11 @@ public class ARQ2SPIN {
 							members.add(SPINFactory.createTriplePattern(model, subject, predicate, object));
 						}
 					}
+				}
+
+				@Override
+				public void visit(ElementNamedWindow namedWindow) {
+					System.out.println("Visiting named window");
 				}
 			});
 		}
@@ -901,6 +939,7 @@ public class ARQ2SPIN {
 		Resource spinQuery = model.createResource(uri);
 		
 		addNamedGraphClauses(arq, spinQuery);
+		addNamedWindowClauses(arq, spinQuery);
 		
 		Resource where = createElementList(arq.getQueryPattern());
 		spinQuery.addProperty(SP.where, where);

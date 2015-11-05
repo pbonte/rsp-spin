@@ -41,7 +41,7 @@ public class ElementNamedWindow extends Element {
 	}
 
 	public String getStreamIri() {
-		return windowIri;
+		return streamIri;
 	}
 
 	public String getRange() {

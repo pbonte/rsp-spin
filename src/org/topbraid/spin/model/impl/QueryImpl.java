@@ -26,6 +26,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.syntax.ElementNamedWindow;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 
@@ -46,6 +47,11 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 		return getStringList(SP.fromNamed);
 	}
 	
+	public List<Element> getFromNamedWindow() {
+		//System.out.println("listing named windows");
+		//System.err.println(getElements(SP.fromNamedWindow));
+		return new LinkedList<Element>(); //getElements(SP.fromNamedWindow);
+	}
 	
 	public Long getLimit() {
 		return getLong(SP.limit);
@@ -135,6 +141,14 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 			context.printKeyword("FROM NAMED");
 			context.print(" <");
 			context.print(fromNamed);
+			context.print(">");
+		}
+		for(Element window : getFromNamedWindow()) {
+			ElementNamedWindow fromNamedWindow = (ElementNamedWindow) window;
+			context.println();
+			context.printKeyword("FROM NAMED WINDOW");
+			context.print(" <");
+			context.print(fromNamedWindow.getStreamIri());
 			context.print(">");
 		}
 	}

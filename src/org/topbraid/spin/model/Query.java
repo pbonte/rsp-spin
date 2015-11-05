@@ -6,6 +6,8 @@ package org.topbraid.spin.model;
 
 import java.util.List;
 
+import com.hp.hpl.jena.sparql.syntax.ElementNamedWindow;
+
 
 /**
  * Base interface of the various SPARQL query types such as
@@ -27,6 +29,12 @@ public interface Query extends CommandWithWhere {
 	 * @return a List of URI Strings
 	 */
 	List<String> getFromNamed();
+	
+	/**
+	 * Gets the list of windows in FROM NAMED WINDOW clauses.
+	 * @return a List of URI Strings
+	 */
+	List<Element> getFromNamedWindow();
 	
 	
 	/**

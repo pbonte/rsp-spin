@@ -348,6 +348,13 @@ public class SP {
 	
 	
 	private static Model model;
+
+	// RSP related propterties and types
+	public static Property fromNamedWindow =  ResourceFactory.createProperty(NS + "fromNamedWindow");
+    public static Property windowIRI = ResourceFactory.createProperty(NS + "windowIRI");
+    public static Property streamIRI = ResourceFactory.createProperty(NS + "streamIRI");
+	public static Property windowRange =  ResourceFactory.createProperty(NS + "range");
+	public static Property windowStep =  ResourceFactory.createProperty(NS + "step");
 	
 
 	/**
