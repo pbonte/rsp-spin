@@ -305,8 +305,24 @@ public class ARQ2SPIN {
 			// Add iri, range, step
 			windowNode.addProperty(SP.windowIRI, model.getResource(window.getWindowIri()));
 			windowNode.addProperty(SP.streamIRI, model.getResource(window.getStreamIri()));
-			windowNode.addProperty(SP.windowRange, window.getRange());
-			windowNode.addProperty(SP.windowStep, window.getStep());
+			
+			Object range = window.getRange();
+			if(range instanceof Node){
+				String varName = ((Node) range).getName();
+				Resource variable = getVariable(varName);
+				windowNode.addProperty(SP.windowRange, variable);
+			} else {
+				windowNode.addProperty(SP.windowRange, range.toString());
+			}
+			
+			Object step = window.getStep();
+			if(step instanceof Node){
+				String varName = ((Node) step).getName();
+				Resource variable = getVariable(varName);
+				windowNode.addProperty(SP.windowStep, variable);
+			} else {
+				windowNode.addProperty(SP.windowStep, step.toString());
+			}
 		}
 	}
 

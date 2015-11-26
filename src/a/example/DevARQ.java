@@ -20,19 +20,12 @@ public class DevARQ {
 		
 		String qString = "PREFIX : <http://test#> "
 				+ "CONSTRUCT {?a ?b ?c } "
-				+ "FROM NAMED :static1 "
-				+ "FROM NAMED :static2 "
-				+ "FROM NAMED WINDOW :w1 ON :stream1 [RANGE PT60S STEP PT20S] "
-				+ "FROM NAMED WINDOW :w2 ON :stream2 [RANGE PT60S STEP PT20S] "
+				+ "FROM NAMED <http://static1> "
+				+ "FROM NAMED WINDOW :w1 ON :stream1 [RANGE ?theRange STEP ?theStep] "
 				+ "WHERE { "
-				+ "GRAPH ?graph1 { "
-				+ "   GRAPH :static3 {?a ?b ?c} "
+				+ "WINDOW :w1 { "
+				+ "   ?a ?b ?c . "
 				+ "} "
-				+ "WINDOW ?w1 { "
-				+ "   GRAPH :static3 {?a ?b ?c} "
-				+ "   GRAPH :static4 {?a ?b ?c} "
-				+ "} "
-				+ "FILTER regex(?a, ?b, 'i') "
 				+ "}";
 
 		
@@ -58,7 +51,7 @@ public class DevARQ {
 		// Get the query from the model
 		System.out.println("Get query from model");
 		org.topbraid.spin.model.Query q = SPINFactory.asQuery(model.getResource("http://query1"));
-		//System.out.println(q.toString());
+		System.out.println(q.toString());
 		System.out.println();
 		
 		System.out.println("Try parsing it back into ARQ");

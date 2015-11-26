@@ -307,7 +307,6 @@ public class Query extends Prologue implements Cloneable, Printable
      */
     public void addNamedWindow(ElementNamedWindow windowElement)
     {
-
         if ( namedWindows == null )
             namedWindows = new ArrayList<ElementNamedWindow>() ;
         else

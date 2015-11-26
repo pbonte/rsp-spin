@@ -153,10 +153,12 @@ public class QuerySerializer implements QueryVisitor {
 				// One per line
 				String windowUri = FmtUtils.stringForURI(window.getWindowIri(), query);
 				String streamUri = FmtUtils.stringForURI(window.getStreamIri(), query);
-				String range = window.getRange();
-				String step = window.getStep();
 				out.print("FROM NAMED WINDOW " + windowUri + " ON " + streamUri + " ");
-				out.print("[RANGE " + range + " STEP " + step + "]");
+
+				String range = window.getRange().toString();
+				String step = window.getStep().toString();
+				
+				out.print(String.format("[RANGE %s STEP %s]", range, step));
 				out.newline();
 			}
 		}
@@ -170,7 +172,7 @@ public class QuerySerializer implements QueryVisitor {
 			out.newline();
 
 			Element el = query.getQueryPattern();
-			
+
 			fmtElement.visitAsGroup(el);
 			// el.visit(fmtElement) ;
 			out.decIndent(BLOCK_INDENT);

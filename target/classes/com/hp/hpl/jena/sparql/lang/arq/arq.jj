@@ -256,7 +256,7 @@ void NamedGraphClause() : { String iri ; }
     getQuery().addNamedGraphURI(iri) ;
   }
 }
-void NamedWindowClause() : { String windowIri ; String streamIri ; Token range ; Token step ;}
+void NamedWindowClause() : { String windowIri ; String streamIri ; Object range ; Object step ;}
 {
   <WINDOW>
   windowIri = SourceSelector()
@@ -264,12 +264,12 @@ void NamedWindowClause() : { String windowIri ; String streamIri ; Token range ;
   streamIri = SourceSelector()
   <LBRACKET>
   <RANGE>
-  range = <TIME>
+  range = VarOrTime()
   <STEP>
-  step = <TIME>
+  step = VarOrTime()
   <RBRACKET>
   {
-    getQuery().addNamedWindow(new ElementNamedWindow(windowIri, streamIri,  range.image, step.image)) ;
+    getQuery().addNamedWindow(new ElementNamedWindow(windowIri, streamIri, range, step)) ;
   }
 }
 String SourceSelector() : { String iri ; }
@@ -1254,6 +1254,12 @@ Node VarOrTerm() : {Node n = null ; }
 Node VarOrIri() : {Node n = null ; String iri ; }
 {
   ( n = Var() | iri = iri() { n = createNode(iri) ; } )
+  { return n ; }
+}
+// Step and range are variables or a time notation
+Object VarOrTime() : { Object n = null ; }
+{
+  ( n = Var() | n = <TIME> )
   { return n ; }
 }
 Var Var() : { Token t ;}

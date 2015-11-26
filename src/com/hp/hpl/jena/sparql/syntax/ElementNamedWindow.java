@@ -18,18 +18,15 @@
 
 package com.hp.hpl.jena.sparql.syntax;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.util.NodeIsomorphismMap;
 
 public class ElementNamedWindow extends Element {
 	private String windowIri;
 	private String streamIri;
-	private String range;
-	private String step;
+	private Object range;
+	private Object step;
 
-	public ElementNamedWindow(String windowIri, String streamIri, String range, String step) {
+	public ElementNamedWindow(String windowIri, String streamIri, Object range, Object step) {
 		this.windowIri = windowIri;
 		this.streamIri = streamIri;
 		this.step = step;
@@ -44,11 +41,11 @@ public class ElementNamedWindow extends Element {
 		return streamIri;
 	}
 
-	public String getRange() {
+	public Object getRange() {
 		return range;
 	}
 
-	public String getStep() {
+	public Object getStep() {
 		return step;
 	}
 
