@@ -99,6 +99,9 @@ public class RecursiveElementVisitor implements ElementVisitor
     
     public void endElement(ElementNamedWindow el)     {}
     public void startElement(ElementNamedWindow el)   {}
+    
+    public void endElement(ElementWindow el)     {}
+    public void startElement(ElementWindow el)   {}
 
     protected ElementVisitor visitor = null ;
     
@@ -245,6 +248,11 @@ public class RecursiveElementVisitor implements ElementVisitor
 	@Override
 	public void visit(ElementNamedWindow el) {
         startElement(el) ;
+        endElement(el) ;
+	}
+	@Override
+	public void visit(ElementWindow el) {
+		startElement(el) ;
         endElement(el) ;
 	}
 }

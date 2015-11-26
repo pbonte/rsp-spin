@@ -11,6 +11,7 @@ import java.util.Set;
 import org.topbraid.spin.model.Element;
 import org.topbraid.spin.model.ElementList;
 import org.topbraid.spin.model.FunctionCall;
+import org.topbraid.spin.model.NamedWindow;
 import org.topbraid.spin.model.Query;
 import org.topbraid.spin.model.SPINFactory;
 import org.topbraid.spin.model.TriplePattern;

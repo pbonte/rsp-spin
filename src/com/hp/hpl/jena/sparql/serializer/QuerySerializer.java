@@ -170,7 +170,7 @@ public class QuerySerializer implements QueryVisitor {
 			out.newline();
 
 			Element el = query.getQueryPattern();
-
+			
 			fmtElement.visitAsGroup(el);
 			// el.visit(fmtElement) ;
 			out.decIndent(BLOCK_INDENT);

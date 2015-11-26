@@ -666,6 +666,8 @@ Element GraphPatternNotTriples() : { Element el = null ; }
  |
    el = GraphGraphPattern()
  |
+   el = WindowGraphPattern()
+ |
    el = ServiceGraphPattern()
  |
    el = Filter()
@@ -691,6 +693,13 @@ Element GraphGraphPattern() : { Element el ; Node n ;}
 {
   <GRAPH> n = VarOrIri() el = GroupGraphPattern()
     { return new ElementNamedGraph(n, el) ; }
+
+}
+Element WindowGraphPattern() : { Element el ; Node n ;}
+{
+  <WINDOW> n = VarOrIri() el = GroupGraphPattern()
+    { return new ElementWindow(n, el) ; }
+
 }
 Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ; }
 {

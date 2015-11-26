@@ -123,6 +123,9 @@ public class SPINFactory {
 		else if(resource.canAs(NamedGraph.class)) {
 			return resource.as(NamedGraph.class); 
 		}
+		else if(resource.canAs(NamedWindow.class)) {
+			return resource.as(NamedWindow.class); 
+		}
 		else if(resource.canAs(Minus.class)) {
 			return resource.as(Minus.class);
 		}
@@ -526,6 +529,21 @@ public class SPINFactory {
 	public static NamedGraph createNamedGraph(Model model, Resource graphNameNode, RDFList elements) {
 		NamedGraph result = model.createResource(SP.NamedGraph).as(NamedGraph.class);
 		result.addProperty(SP.graphNameNode, graphNameNode);
+		result.addProperty(SP.elements, elements);
+		return result;
+	}
+	
+	/**
+	 * Creates a new NamedWindow element as a blank node in a given Model.
+	 * @param model  the Model to generate the NamedWindow in
+	 * @param windowNameNode  the URI resource of the window name
+	 * @param elements  the elements in the NamedWindow
+	 * @return a new NamedWindow
+	 */
+	public static NamedWindow createNamedWindow(Model model, Resource windowNameNode, RDFList elements) {
+		NamedWindow result = model.createResource(SP.NamedWindow).as(NamedWindow.class);
+		
+		result.addProperty(SP.windowNameNode, windowNameNode);
 		result.addProperty(SP.elements, elements);
 		return result;
 	}

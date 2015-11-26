@@ -10,6 +10,7 @@ import org.topbraid.spin.model.Exists;
 import org.topbraid.spin.model.Filter;
 import org.topbraid.spin.model.Minus;
 import org.topbraid.spin.model.NamedGraph;
+import org.topbraid.spin.model.NamedWindow;
 import org.topbraid.spin.model.NotExists;
 import org.topbraid.spin.model.Optional;
 import org.topbraid.spin.model.Service;
@@ -50,6 +51,9 @@ public abstract class AbstractElementVisitor implements ElementVisitor {
 
 
 	public void visit(NamedGraph namedGraph) {
+	}
+	
+	public void visit(NamedWindow namedWindow) {
 	}
 	
 	

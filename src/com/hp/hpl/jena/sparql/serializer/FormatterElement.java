@@ -362,7 +362,7 @@ public class FormatterElement extends FormatterBase
     @Override
     public void visit(ElementNamedGraph el)
     {
-        visitNodePattern("GRAPH", el.getGraphNameNode(), el.getElement()) ;
+    	visitNodePattern("GRAPH", el.getGraphNameNode(), el.getElement()) ;
     }
 
     @Override
@@ -656,5 +656,11 @@ public class FormatterElement extends FormatterBase
 
 	@Override
 	public void visit(ElementNamedWindow el) {
+		System.out.println("this is sparta");
+	}
+
+	@Override
+	public void visit(ElementWindow el) {
+		visitNodePattern("WINDOW", el.getWindowNameNode(), el.getElement()) ;
 	}
 }

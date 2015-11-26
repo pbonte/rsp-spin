@@ -14,6 +14,7 @@ import org.topbraid.spin.model.Exists;
 import org.topbraid.spin.model.Filter;
 import org.topbraid.spin.model.Minus;
 import org.topbraid.spin.model.NamedGraph;
+import org.topbraid.spin.model.NamedWindow;
 import org.topbraid.spin.model.NotExists;
 import org.topbraid.spin.model.Optional;
 import org.topbraid.spin.model.Service;
@@ -139,5 +140,12 @@ public class ElementWalker implements ElementVisitor {
 			ExpressionWalker expressionWalker = new ExpressionWalker(expressionVisitor);
 			ExpressionVisitors.visit(node, expressionWalker);
 		}
+	}
+
+
+	@Override
+	public void visit(NamedWindow namedWindow) {
+		elementVisitor.visit(namedWindow);
+		visitChildren(namedWindow);
 	}
 }

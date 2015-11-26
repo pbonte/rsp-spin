@@ -22,6 +22,7 @@ import org.topbraid.spin.model.Function;
 import org.topbraid.spin.model.FunctionCall;
 import org.topbraid.spin.model.Minus;
 import org.topbraid.spin.model.NamedGraph;
+import org.topbraid.spin.model.NamedWindow;
 import org.topbraid.spin.model.NotExists;
 import org.topbraid.spin.model.Optional;
 import org.topbraid.spin.model.SPINFactory;
@@ -115,6 +116,7 @@ import com.hp.hpl.jena.sparql.syntax.ElementService;
 import com.hp.hpl.jena.sparql.syntax.ElementSubQuery;
 import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
 import com.hp.hpl.jena.sparql.syntax.ElementUnion;
+import com.hp.hpl.jena.sparql.syntax.ElementWindow;
 import com.hp.hpl.jena.sparql.syntax.Template;
 import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
@@ -293,7 +295,7 @@ public class ARQ2SPIN {
 	private void addNamedWindowClauses(Query arq, Resource spinQuery) {
 		Iterator<ElementNamedWindow> windowURIs = arq.getNamedWindows().iterator();
 		while(windowURIs.hasNext()) {
-			ElementNamedWindow window = windowURIs.next();
+			ElementNamedWindow window = windowURIs.next(); // TODO: can be vars
 
 			// Window node
 			Resource windowNode = model.createResource();
@@ -534,7 +536,6 @@ public class ARQ2SPIN {
 
 				@Override
 				public void visit(ElementNamedGraph namedGraph) {
-					System.out.println("Printing named graph");
 					Resource graphNameNode;
 					Node nameNode = namedGraph.getGraphNameNode();
 					if(nameNode.isVariable()) {
@@ -645,7 +646,23 @@ public class ARQ2SPIN {
 
 				@Override
 				public void visit(ElementNamedWindow namedWindow) {
-					System.err.println("################ Visiting named window");
+					// All is handled in addNamedWindowClauses
+				}
+
+				@Override
+				public void visit(ElementWindow elementWindow) {
+					Resource windowNameNode;
+					Node nameNode = elementWindow.getWindowNameNode();
+					if(nameNode.isVariable()) {
+						windowNameNode = getVariable(nameNode.getName());
+					}
+					else {
+						windowNameNode = model.getResource(nameNode.getURI());
+					}
+					Element element = elementWindow.getElement();
+					RDFList elements = createElementList(element);
+					NamedWindow ng = SPINFactory.createNamedWindow(model, windowNameNode, elements);
+					members.add(ng);
 				}
 			});
 		}
@@ -893,7 +910,6 @@ public class ARQ2SPIN {
 		}
 		return model.createList(members.iterator());
 	}
-
 
 	private Resource createNestedNamedGraph(Node nestedGraph, List<Resource> nested) {
 		RDFList nestedMembers = model.createList(nested.iterator());

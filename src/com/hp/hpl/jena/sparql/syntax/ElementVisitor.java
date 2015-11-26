@@ -31,7 +31,10 @@ public interface ElementVisitor
     public void visit(ElementGroup el) ;
     public void visit(ElementDataset el) ;
     public void visit(ElementNamedGraph el) ;
+    
     public void visit(ElementNamedWindow el) ; // RSP window
+	public void visit(ElementWindow el);
+	
     public void visit(ElementExists el) ;
     public void visit(ElementNotExists el) ;
     public void visit(ElementMinus el) ;

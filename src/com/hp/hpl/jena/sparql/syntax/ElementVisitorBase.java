@@ -74,4 +74,7 @@ public class ElementVisitorBase implements ElementVisitor
 
 	@Override
 	public void visit(ElementNamedWindow el) { }
+
+	@Override
+	public void visit(ElementWindow elementWindow) { }
 }

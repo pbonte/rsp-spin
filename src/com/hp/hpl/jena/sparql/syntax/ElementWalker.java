@@ -194,7 +194,13 @@ public class ElementWalker {
 			before(el);
 			proc.visit(el);
 			after(el);
+		}
 
+		@Override
+		public void visit(ElementWindow el) {
+			before(el);
+			proc.visit(el);
+			after(el);
 		}
 	}
 }

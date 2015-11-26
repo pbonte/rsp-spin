@@ -23,6 +23,7 @@ import org.topbraid.spin.model.FunctionCall;
 import org.topbraid.spin.model.Minus;
 import org.topbraid.spin.model.Module;
 import org.topbraid.spin.model.NamedGraph;
+import org.topbraid.spin.model.NamedWindow;
 import org.topbraid.spin.model.NotExists;
 import org.topbraid.spin.model.Optional;
 import org.topbraid.spin.model.SPINFactory;
@@ -53,6 +54,7 @@ import org.topbraid.spin.model.impl.FunctionImpl;
 import org.topbraid.spin.model.impl.MinusImpl;
 import org.topbraid.spin.model.impl.ModuleImpl;
 import org.topbraid.spin.model.impl.NamedGraphImpl;
+import org.topbraid.spin.model.impl.NamedWindowImpl;
 import org.topbraid.spin.model.impl.NotExistsImpl;
 import org.topbraid.spin.model.impl.OptionalImpl;
 import org.topbraid.spin.model.impl.SPINInstanceImpl;
@@ -357,7 +359,8 @@ public class SP {
     public static Property streamIRI = ResourceFactory.createProperty(NS + "streamIRI");
 	public static Property windowRange =  ResourceFactory.createProperty(NS + "range");
 	public static Property windowStep =  ResourceFactory.createProperty(NS + "step");
-	
+	public static Property windowNameNode = ResourceFactory.createProperty(NS + "windowNameNode");
+    
 
 	/**
 	 * Gets a Model with the content of the SP namespace, from a file
@@ -409,6 +412,7 @@ public class SP {
     	p.add(Modify.class, new SimpleImplementation(Modify.asNode(), ModifyImpl.class));
     	p.add(Module.class, new SimpleImplementation(SPIN.Module.asNode(), ModuleImpl.class));
     	p.add(NamedGraph.class, new SimpleImplementation(NamedGraph.asNode(), NamedGraphImpl.class));
+    	p.add(NamedWindow.class, new SimpleImplementation(NamedWindow.asNode(), NamedWindowImpl.class));
     	p.add(NotExists.class, new SimpleImplementation(NotExists.asNode(), NotExistsImpl.class));
     	p.add(Optional.class, new SimpleImplementation(Optional.asNode(), OptionalImpl.class));
     	p.add(Service.class, new SimpleImplementation(Service.asNode(), ServiceImpl.class));
