@@ -736,18 +736,18 @@ public class ARQParser extends ARQParserBase implements ARQParserConstants {
   }
 
   final public void NamedWindowClause() throws ParseException {
-                             String windowIri ; String streamIri ; Object range ; Object step ;
+                             String windowIri ; Object stream ; Object range ; Object step ;
     jj_consume_token(WINDOW);
     windowIri = SourceSelector();
     jj_consume_token(ON);
-    streamIri = SourceSelector();
+    stream = VarOrIri();
     jj_consume_token(LBRACKET);
     jj_consume_token(RANGE);
     range = VarOrTime();
     jj_consume_token(STEP);
     step = VarOrTime();
     jj_consume_token(RBRACKET);
-    getQuery().addNamedWindow(new ElementNamedWindow(windowIri, streamIri, range, step)) ;
+    getQuery().addNamedWindow(new ElementNamedWindow(windowIri, stream, range, step)) ;
   }
 
   final public String SourceSelector() throws ParseException {

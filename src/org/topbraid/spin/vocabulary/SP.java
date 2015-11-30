@@ -355,8 +355,8 @@ public class SP {
 	// RSP related propterties and types
     public final static Resource NamedWindow = ResourceFactory.createResource(NS + "NamedWindow");
 	public static Property fromNamedWindow =  ResourceFactory.createProperty(NS + "fromNamedWindow");
-    public static Property windowIRI = ResourceFactory.createProperty(NS + "windowIRI");
-    public static Property streamIRI = ResourceFactory.createProperty(NS + "streamIRI");
+    public static Property windowIri = ResourceFactory.createProperty(NS + "windowIRI");
+    public static Property stream = ResourceFactory.createProperty(NS + "streamIRI");
 	public static Property windowRange =  ResourceFactory.createProperty(NS + "range");
 	public static Property windowStep =  ResourceFactory.createProperty(NS + "step");
 	public static Property windowNameNode = ResourceFactory.createProperty(NS + "windowNameNode");

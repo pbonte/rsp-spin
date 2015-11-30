@@ -256,12 +256,12 @@ void NamedGraphClause() : { String iri ; }
     getQuery().addNamedGraphURI(iri) ;
   }
 }
-void NamedWindowClause() : { String windowIri ; String streamIri ; Object range ; Object step ;}
+void NamedWindowClause() : { String windowIri ; Object stream ; Object range ; Object step ;}
 {
   <WINDOW>
   windowIri = SourceSelector()
   <ON>
-  streamIri = SourceSelector()
+  stream = VarOrIri()
   <LBRACKET>
   <RANGE>
   range = VarOrTime()
@@ -269,7 +269,7 @@ void NamedWindowClause() : { String windowIri ; String streamIri ; Object range 
   step = VarOrTime()
   <RBRACKET>
   {
-    getQuery().addNamedWindow(new ElementNamedWindow(windowIri, streamIri, range, step)) ;
+    getQuery().addNamedWindow(new ElementNamedWindow(windowIri, stream, range, step)) ;
   }
 }
 String SourceSelector() : { String iri ; }

@@ -293,19 +293,31 @@ public class ARQ2SPIN {
 	}
 	
 	private void addNamedWindowClauses(Query arq, Resource spinQuery) {
-		Iterator<ElementNamedWindow> windowURIs = arq.getNamedWindows().iterator();
-		while(windowURIs.hasNext()) {
-			ElementNamedWindow window = windowURIs.next(); // TODO: can be vars
+		Iterator<ElementNamedWindow> windows = arq.getNamedWindows().iterator();
+		while(windows.hasNext()) {
+			ElementNamedWindow window = windows.next();
 
 			// Window node
 			Resource windowNode = model.createResource();
 			windowNode.addProperty(RDF.type, SP.NamedWindow);
 			
+			// window iri
 			spinQuery.addProperty(SP.fromNamedWindow, windowNode);
-			// Add iri, range, step
-			windowNode.addProperty(SP.windowIRI, model.getResource(window.getWindowIri()));
-			windowNode.addProperty(SP.streamIRI, model.getResource(window.getStreamIri()));
+
+			// stream
+			windowNode.addProperty(SP.windowIri, model.getResource(window.getWindowIri()));
 			
+			// stream
+			Node stream = (Node) window.getStream();
+			if(stream.isVariable()){
+				String varName = stream.getName();
+				Resource variable = getVariable(varName);
+				windowNode.addProperty(SP.stream, variable);
+			} else {
+				windowNode.addProperty(SP.stream, stream.toString());
+			}
+			
+			// range
 			Object range = window.getRange();
 			if(range instanceof Node){
 				String varName = ((Node) range).getName();
@@ -315,6 +327,7 @@ public class ARQ2SPIN {
 				windowNode.addProperty(SP.windowRange, range.toString());
 			}
 			
+			// step
 			Object step = window.getStep();
 			if(step instanceof Node){
 				String varName = ((Node) step).getName();

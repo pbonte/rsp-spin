@@ -22,13 +22,13 @@ import com.hp.hpl.jena.sparql.util.NodeIsomorphismMap;
 
 public class ElementNamedWindow extends Element {
 	private String windowIri;
-	private String streamIri;
+	private Object stream;
 	private Object range;
 	private Object step;
 
-	public ElementNamedWindow(String windowIri, String streamIri, Object range, Object step) {
+	public ElementNamedWindow(String windowIri, Object stream, Object range, Object step) {
 		this.windowIri = windowIri;
-		this.streamIri = streamIri;
+		this.stream = stream;
 		this.step = step;
 		this.range = range;
 	}
@@ -37,8 +37,8 @@ public class ElementNamedWindow extends Element {
 		return windowIri;
 	}
 
-	public String getStreamIri() {
-		return streamIri;
+	public Object getStream() {
+		return stream;
 	}
 
 	public Object getRange() {
@@ -61,7 +61,7 @@ public class ElementNamedWindow extends Element {
 
 	@Override
 	public int hashCode() {
-		return windowIri.hashCode() ^ streamIri.hashCode();
+		return windowIri.hashCode() ^ stream.hashCode();
 	}
 
 	@Override

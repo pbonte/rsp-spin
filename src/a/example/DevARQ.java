@@ -20,8 +20,9 @@ public class DevARQ {
 		
 		String qString = "PREFIX : <http://test#> "
 				+ "CONSTRUCT {?a ?b ?c } "
-				+ "FROM NAMED <http://static1> "
-				+ "FROM NAMED WINDOW :w1 ON :stream1 [RANGE ?theRange STEP ?theStep] "
+				+ "FROM <http://somesome> "
+				+ "FROM NAMED WINDOW :w1 ON <http://fixed/stable/stream> [RANGE PT10s STEP PT1s] "
+				+ "FROM NAMED WINDOW :w2 ON ?streamVariable [RANGE ?range STEP PT1s] "
 				+ "WHERE { "
 				+ "WINDOW :w1 { "
 				+ "   ?a ?b ?c . "
@@ -46,10 +47,16 @@ public class DevARQ {
 		ARQ2SPIN arq2SPIN = new ARQ2SPIN(model);
 		arq2SPIN.createQuery(query, "http://query1");
 		model.write(System.out,"TTL");
-		//System.out.println();
+		System.out.println();
+
+		
+		System.err.println("-------------------");
+		
+		
 		
 		// Get the query from the model
 		System.out.println("Get query from model");
+		model.removeNsPrefix("");
 		org.topbraid.spin.model.Query q = SPINFactory.asQuery(model.getResource("http://query1"));
 		System.out.println(q.toString());
 		System.out.println();

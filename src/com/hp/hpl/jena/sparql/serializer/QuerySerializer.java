@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.jena.atlas.io.IndentedWriter;
+import org.topbraid.spin.vocabulary.SP;
 
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Query;
@@ -151,13 +152,21 @@ public class QuerySerializer implements QueryVisitor {
 		if (query.getNamedWindows() != null && query.getNamedWindows().size() != 0) {
 			for (ElementNamedWindow window : query.getNamedWindows()) {
 				// One per line
-				String windowUri = FmtUtils.stringForURI(window.getWindowIri(), query);
-				String streamUri = FmtUtils.stringForURI(window.getStreamIri(), query);
-				out.print("FROM NAMED WINDOW " + windowUri + " ON " + streamUri + " ");
+
+				String windowIri = FmtUtils.stringForURI(window.getWindowIri(), query);
+				out.print(String.format("FROM NAMED WINDOW %s ON ", windowIri));
+
+				Node stream = (Node) window.getStream();
+				if (stream.isURI()) {
+					String streamIri = FmtUtils.stringForURI(stream.getURI(), query);
+					out.print(String.format("%s ", streamIri));
+				} else {
+					out.print(String.format("%s ", stream.toString()));
+				}
 
 				String range = window.getRange().toString();
 				String step = window.getStep().toString();
-				
+
 				out.print(String.format("[RANGE %s STEP %s]", range, step));
 				out.newline();
 			}

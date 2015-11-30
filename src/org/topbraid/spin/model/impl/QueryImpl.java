@@ -21,6 +21,7 @@ import org.topbraid.spin.vocabulary.SP;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.Node_Blank;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -28,7 +29,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.core.Var;
+import com.hp.hpl.jena.sparql.serializer.Serializer;
 import com.hp.hpl.jena.sparql.syntax.ElementNamedWindow;
 import com.hp.hpl.jena.vocabulary.RDF;
 
@@ -50,14 +51,14 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 		LinkedList<ElementNamedWindow> windows = new LinkedList<>();
 		NodeIterator iter = getModel().listObjectsOfProperty(this, SP.fromNamedWindow);
 		while (iter.hasNext()) {
-			Resource res = iter.next().asResource(); // How to get the element
-														// from the resource
-														// neatly?
-			String windowIRI = res.getProperty(SP.windowIRI).getObject().toString();
-			String streamIRI = res.getProperty(SP.streamIRI).getObject().toString();
+			Resource res = iter.next().asResource();
+			String windowIRI = res.getProperty(SP.windowIri).getObject().toString();
+
+			Object stream = res.getProperty(SP.stream).getObject();
 			Object range = res.getProperty(SP.windowRange).getObject();
 			Object step = res.getProperty(SP.windowStep).getObject();
-			ElementNamedWindow window = new ElementNamedWindow(windowIRI, streamIRI, range, step);
+
+			ElementNamedWindow window = new ElementNamedWindow(windowIRI, stream, range, step);
 			windows.add(window);
 		}
 
@@ -143,34 +144,37 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 			context.print(">");
 		}
 		for (ElementNamedWindow window : getFromNamedWindow()) {
-			// Note that prefixes can be supported by parsing the string into
-			// ARQ
 			context.println();
-			context.printKeyword("FROM NAMED WINDOW ");
-			context.print(String.format("<%s> ", window.getWindowIri()));
-			context.printKeyword("ON ");
-			context.print(String.format("<%s> ", window.getStreamIri()));
-
-			// Range
-			String range;
-			RDFNode r = (RDFNode) window.getRange();
-			if (r instanceof Resource && ((Resource) r).hasProperty(SP.varName)) {
-				range = "?" + r.as(Variable.class).getName();
-			} else {
-				range = r.toString();
-			}			
+			context.printKeyword(String.format("FROM NAMED WINDOW <%s> ON ", window.getWindowIri()));
 			
-			// Step
-			String step;
-			RDFNode s = (RDFNode) window.getStep();
-			if (s instanceof Resource && ((Resource) s).hasProperty(SP.varName)) {
-				step = "?" + s.as(Variable.class).getName();
+			// stream
+			RDFNode streamNode = (RDFNode) window.getStream();
+			if (streamNode instanceof Resource && ((Resource) streamNode).hasProperty(SP.varName)) {
+				context.print(String.format("?%s ", streamNode.as(Variable.class).getName()));
 			} else {
-				step = s.toString();
+				String streamIri = streamNode.toString();
+				context.print(String.format("<%s> ", streamIri));
+			}
+			
+			// range
+			String range;
+			RDFNode rangeNode = (RDFNode) window.getRange();
+			if (rangeNode instanceof Resource && ((Resource) rangeNode).hasProperty(SP.varName)) {
+				range = "?" + rangeNode.as(Variable.class).getName();
+			} else {
+				range = rangeNode.toString();
 			}
 
-			System.out.println(String.format("[RANGE %s STEP %s]", range, step));
-			context.print(String.format("[RANGE %s STEP %s]", range, step));
+			// step
+			String step;
+			RDFNode stepNode = (RDFNode) window.getStep();
+			if (stepNode instanceof Resource && ((Resource) stepNode).hasProperty(SP.varName)) {
+				step = "?" + stepNode.as(Variable.class).getName();
+			} else {
+				step = stepNode.toString();
+			}
+			
+			context.print(String.format("[RANGE %s STEP %s]", range.toString(), step.toString()));
 		}
 	}
 
