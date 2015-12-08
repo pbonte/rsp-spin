@@ -15,15 +15,14 @@ public class DevARQ {
 	public static void main(String[] args) {
 		// Initialize system functions and templates
 		SPINModuleRegistry.get().init();
-		
-		
-		
+
 		String qString = ""
 				+ "PREFIX : <http://test#> "
 				+ "REGISTER STREAM ?generatedStream AS "
-				+ "SELECT ?a ?b ?c  "
+				+ "CONSTRUCT RSTREAM { ?a ?b ?c } "
 				+ "FROM NAMED WINDOW :w ON :s [RANGE PT10s STEP PT1s] "
 				+ "WHERE { "
+				+ "   {SELECT * WHERE { ?a ?b ?c }}"
 				+ "   WINDOW :w { "
 				+ "      GRAPH ?g { ?a ?b ?c }"
 				+ "      ?a ?b ?c . "
@@ -41,26 +40,26 @@ public class DevARQ {
 		System.out.println("Parsing query as ARQ query");
 		Query query = QueryFactory.create(qString, Syntax.syntaxARQ);
 		System.out.println("\nParsed as ARQ:");
-		System.err.println(query);
+		System.out.println(query);
 		System.out.println();
 
 		System.out.println("\nConverting ARQ query to SPIN");
 		ARQ2SPIN arq2SPIN = new ARQ2SPIN(model);
 		arq2SPIN.createQuery(query, "http://query1");
-		model.write(System.err, "TTL");
+		model.write(System.out, "TTL");
 		System.err.println();
 		
 		// Get the query from the model
 		System.out.println("Get query from model");
 		model.removeNsPrefix("");
 		org.topbraid.spin.model.Query q = SPINFactory.asQuery(model.getResource("http://query1"));
-		System.err.println(q.toString());
-		System.err.println();
+		System.out.println(q.toString());
+		System.out.println();
 		
 		System.out.println("Try parsing it back into ARQ");
 		Query secondParse = QueryFactory.create(q.toString(), Syntax.syntaxARQ);
 		secondParse.setPrefix("", "http://test#");
-		System.err.println(secondParse);
+		System.out.println(secondParse);
 	
 	}
 }

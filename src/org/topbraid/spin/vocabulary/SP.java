@@ -352,8 +352,11 @@ public class SP {
 	
 	private static Model model;
 
-	// RSP related propterties and types
+	// RSP related properties and types
     public final static Resource NamedWindow = ResourceFactory.createResource(NS + "NamedWindow");
+    public final static Resource Rstream = ResourceFactory.createResource(NS + "Rstream");
+    public final static Resource Istream = ResourceFactory.createResource(NS + "Istream");
+    public final static Resource Dstream = ResourceFactory.createResource(NS + "Dstream");
 	public static Property fromNamedWindow =  ResourceFactory.createProperty(NS + "fromNamedWindow");
     public static Property windowIri = ResourceFactory.createProperty(NS + "windowIRI");
     public static Property stream = ResourceFactory.createProperty(NS + "streamIRI");
@@ -361,6 +364,7 @@ public class SP {
 	public static Property windowStep =  ResourceFactory.createProperty(NS + "step");
 	public static Property windowNameNode = ResourceFactory.createProperty(NS + "windowNameNode");
 	public static Property registerAs = ResourceFactory.createProperty(NS + "registerAs");
+	public static Property windowToStreamOperator = ResourceFactory.createProperty(NS + "windowToStreamOperator");
     
 
 	/**

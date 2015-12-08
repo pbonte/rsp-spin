@@ -270,4 +270,18 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 		p.printKeyword("WHERE");
 		printNestedElementList(p, SP.where);
 	}
+	
+	protected void printStreamType(PrintContext p) {
+		Statement stmt = getProperty(SP.windowToStreamOperator);
+		if (stmt != null) {
+			Resource resource = getProperty(SP.windowToStreamOperator).getObject().asResource();
+			if (resource.equals(SP.Rstream)) {
+				p.printKeyword("RSTREAM ");
+			} else if (resource.equals(SP.Istream)) {
+				p.printKeyword("ISTREAM ");
+			} else if (resource.equals(SP.Dstream)) {
+				p.printKeyword("DSTREAM ");
+			}
+		}
+	}
 }

@@ -981,8 +981,8 @@ public class ARQ2SPIN {
 	public org.topbraid.spin.model.Query createQuery(Query arq, String uri) {
 
 		Resource spinQuery = model.createResource(uri);
-		
 		addRegisterAs(arq, spinQuery);
+		addStreamType(arq, spinQuery);
 		addNamedGraphClauses(arq, spinQuery);
 		addNamedWindowClauses(arq, spinQuery);
 		
@@ -1022,6 +1022,23 @@ public class ARQ2SPIN {
 	}
 	
 	
+	private void addStreamType(Query arq, Resource spinQuery) {
+		if(arq.getStreamType() != null){
+			switch(arq.getStreamType()){
+			case "ISTREAM":
+				spinQuery.addProperty(SP.windowToStreamOperator, SP.Istream);
+				break;
+			case "RSTREAM":
+				spinQuery.addProperty(SP.windowToStreamOperator, SP.Rstream);
+				break;
+			case "DSTREAM":
+				spinQuery.addProperty(SP.windowToStreamOperator, SP.Dstream);
+				break;
+			}
+		}
+	}
+
+
 	private Modify createModify(UpdateModify arq, String uri) {
 		Modify result = model.createResource(uri, SP.Modify).as(Modify.class);
 

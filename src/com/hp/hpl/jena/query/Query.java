@@ -119,6 +119,9 @@ public class Query extends Prologue implements Cloneable, Printable {
 	protected List<Node> resultNodes = new ArrayList<Node>(); // Type in list:
 																// Node
 
+	// DSTREAM/ISTREAM/RSTREAM
+	protected String streamType = null;
+	
 	/**
 	 * Creates a new empty query
 	 */
@@ -1010,4 +1013,18 @@ public class Query extends Prologue implements Cloneable, Printable {
 	public void serialize(IndentedWriter writer, Syntax outSyntax) {
 		Serializer.serialize(this, writer, outSyntax);
 	}
+
+	public void setIstream() {
+		streamType = "ISTREAM";
+	}
+	public void setRstream() {
+		streamType = "RSTREAM";
+	}
+	public void setDstream() {
+		streamType = "DSTREAM";
+	}
+	public String getStreamType(){
+		return streamType;
+	}
+	
 }

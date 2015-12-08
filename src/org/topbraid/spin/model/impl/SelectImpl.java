@@ -27,100 +27,88 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
-
 public class SelectImpl extends QueryImpl implements Select {
-	
+
 	public SelectImpl(Node node, EnhGraph eh) {
 		super(node, eh);
 	}
-	
-	
+
 	public List<String> getResultVariableNames() {
-		if(hasProperty(SP.resultVariables)) {
+		if (hasProperty(SP.resultVariables)) {
 			List<String> results = new LinkedList<String>();
-			for(Resource item : getResultVariables()) {
-				if(item instanceof Variable) {
-					results.add(((Variable)item).getName());
-				}
-				else {
+			for (Resource item : getResultVariables()) {
+				if (item instanceof Variable) {
+					results.add(((Variable) item).getName());
+				} else {
 					results.add(null);
 				}
 			}
 			return results;
-		}
-		else {
+		} else {
 			String text = ARQ2SPIN.getTextOnly(this);
-			if(text != null) {
+			if (text != null) {
 				com.hp.hpl.jena.query.Query arqQuery = ARQFactory.get().createQuery(this);
 				return arqQuery.getResultVars();
-			}
-			else {
+			} else {
 				return Collections.emptyList();
 			}
 		}
 	}
 
-	
 	public List<Resource> getResultVariables() {
 		List<Resource> results = new LinkedList<Resource>();
-		for(RDFNode node : getList(SP.resultVariables)) {
+		for (RDFNode node : getList(SP.resultVariables)) {
 			RDFNode e = SPINFactory.asExpression(node);
-			results.add((Resource)e);
+			results.add((Resource) e);
 		}
 		return results;
 	}
 
-
 	public boolean isDistinct() {
 		return hasProperty(SP.distinct, getModel().createTypedLiteral(true));
 	}
-	
-	
+
 	public boolean isReduced() {
 		return hasProperty(SP.reduced, getModel().createTypedLiteral(true));
 	}
-
 
 	public void printSPINRDF(PrintContext p) {
 		printComment(p);
 		printPrefixes(p);
 		printRegisterAs(p);
-		
+
 		p.printIndentation(p.getIndentation());
 		p.printKeyword("SELECT");
+		printStreamType(p);
 		p.print(" ");
-		if(isDistinct()) {
+		if (isDistinct()) {
 			p.printKeyword("DISTINCT");
 			p.print(" ");
 		}
-		if(isReduced()) {
+		if (isReduced()) {
 			p.printKeyword("REDUCED");
 			p.print(" ");
 		}
 		List<Resource> vars = getResultVariables();
-		if(vars.isEmpty()) {
+		if (vars.isEmpty()) {
 			p.print("*");
-		}
-		else {
-			for(Iterator<Resource> vit = vars.iterator(); vit.hasNext(); ) {
+		} else {
+			for (Iterator<Resource> vit = vars.iterator(); vit.hasNext();) {
 				Resource var = vit.next();
-				if(var instanceof Variable) {
-					if(var.hasProperty(SP.expression)) {
+				if (var instanceof Variable) {
+					if (var.hasProperty(SP.expression)) {
 						printProjectExpression(p, (Variable) var);
+					} else {
+						((Variable) var).print(p);
 					}
-					else {
-						((Variable)var).print(p);
-					}
-				}
-				else if(var instanceof Aggregation) {
-					((Printable)var).print(p);
-				}
-				else {
+				} else if (var instanceof Aggregation) {
+					((Printable) var).print(p);
+				} else {
 					p.print("(");
-					((Printable)var).print(p);
+					((Printable) var).print(p);
 					p.print(")");
 				}
-				if(vit.hasNext()) {
+				if (vit.hasNext()) {
 					p.print(" ");
 				}
 			}
@@ -133,18 +121,17 @@ public class SelectImpl extends QueryImpl implements Select {
 		printSolutionModifiers(p);
 		printValues(p);
 	}
-	
-	
+
 	private void printGroupBy(PrintContext p) {
 		Statement groupByS = getProperty(SP.groupBy);
-		if(groupByS != null) {
+		if (groupByS != null) {
 			RDFList list = groupByS.getObject().as(RDFList.class);
 			ExtendedIterator<RDFNode> it = list.iterator();
-			if(it.hasNext()) {
+			if (it.hasNext()) {
 				p.println();
 				p.printIndentation(p.getIndentation());
 				p.printKeyword("GROUP BY");
-				while(it.hasNext()) {
+				while (it.hasNext()) {
 					p.print(" ");
 					RDFNode node = it.next();
 					printNestedExpressionString(p, node);
@@ -152,18 +139,17 @@ public class SelectImpl extends QueryImpl implements Select {
 			}
 		}
 	}
-	
-	
+
 	private void printHaving(PrintContext p) {
 		Statement havingS = getProperty(SP.having);
-		if(havingS != null) {
+		if (havingS != null) {
 			RDFList list = havingS.getObject().as(RDFList.class);
 			ExtendedIterator<RDFNode> it = list.iterator();
-			if(it.hasNext()) {
+			if (it.hasNext()) {
 				p.println();
 				p.printIndentation(p.getIndentation());
 				p.printKeyword("HAVING");
-				while(it.hasNext()) {
+				while (it.hasNext()) {
 					p.print(" ");
 					RDFNode node = it.next();
 					printNestedExpressionString(p, node);
@@ -171,8 +157,7 @@ public class SelectImpl extends QueryImpl implements Select {
 			}
 		}
 	}
-	
-	
+
 	private void printProjectExpression(PrintContext p, Variable var) {
 		p.print("((");
 		RDFNode expr = var.getProperty(SP.expression).getObject();

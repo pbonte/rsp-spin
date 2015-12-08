@@ -43,8 +43,9 @@ public class ConstructImpl extends QueryImpl implements Construct {
 		printRegisterAs(context);
 		
 		context.printIndentation(context.getIndentation());
-		context.printKeyword("CONSTRUCT");
-		context.print(" {");
+		context.printKeyword("CONSTRUCT ");
+		printStreamType(context);
+		context.print("{");
 		context.println();
 		for(TripleTemplate template : getTemplates()) {
 			context.printIndentation(context.getIndentation() + 1);
