@@ -187,4 +187,7 @@ public class QueryCompare implements QueryVisitor
     }
 
     public boolean isTheSame() { return result ; }
+
+	@Override
+	public void visitRegisterAs(Query query) {}
 }

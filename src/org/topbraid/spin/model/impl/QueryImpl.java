@@ -146,7 +146,7 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 		for (ElementNamedWindow window : getFromNamedWindow()) {
 			context.println();
 			context.printKeyword(String.format("FROM NAMED WINDOW <%s> ON ", window.getWindowIri()));
-			
+
 			// stream
 			RDFNode streamNode = (RDFNode) window.getStream();
 			if (streamNode instanceof Resource && ((Resource) streamNode).hasProperty(SP.varName)) {
@@ -155,7 +155,7 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 				String streamIri = streamNode.toString();
 				context.print(String.format("<%s> ", streamIri));
 			}
-			
+
 			// range
 			String range;
 			RDFNode rangeNode = (RDFNode) window.getRange();
@@ -173,9 +173,26 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 			} else {
 				step = stepNode.toString();
 			}
-			
+
 			context.print(String.format("[RANGE %s STEP %s]", range.toString(), step.toString()));
 		}
+	}
+
+	protected void printRegisterAs(PrintContext context) {
+		RDFNode n = getRDFNode(SP.registerAs);
+		if(n == null) {
+			return;
+		}
+		context.printKeyword("REGISTER STREAM ");
+		
+		if (n instanceof Resource && ((Resource) n).hasProperty(SP.varName)) {
+			context.print("?" + n.as(Variable.class).getName());
+		} else {
+			context.print("<" + n.toString() + ">");
+		}
+		context.printKeyword(" AS");
+		context.println();
+		context.println();
 	}
 
 	protected void printSolutionModifiers(PrintContext context) {

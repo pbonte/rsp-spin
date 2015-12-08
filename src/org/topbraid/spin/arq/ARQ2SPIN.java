@@ -277,7 +277,19 @@ public class ARQ2SPIN {
 		}
 	}
 
-
+	private void addRegisterAs(Query arq, Resource spinQuery){
+		// Register as
+		Node node = arq.getRegisterAs();
+		if(node == null) return;
+		if(node.isVariable()){
+			String varName = node.getName();
+			Resource variable = getVariable(varName);
+			spinQuery.addProperty(SP.registerAs, variable);
+		} else {
+			spinQuery.addProperty(SP.registerAs, model.getResource(node.getURI()));
+		}
+	}
+	
 	private void addNamedGraphClauses(Query arq, Resource spinQuery) {
 		Iterator<String> graphURIs = arq.getGraphURIs().iterator();
 		while(graphURIs.hasNext()) {
@@ -970,6 +982,7 @@ public class ARQ2SPIN {
 
 		Resource spinQuery = model.createResource(uri);
 		
+		addRegisterAs(arq, spinQuery);
 		addNamedGraphClauses(arq, spinQuery);
 		addNamedWindowClauses(arq, spinQuery);
 		

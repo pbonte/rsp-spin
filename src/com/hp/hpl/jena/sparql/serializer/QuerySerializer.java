@@ -76,6 +76,20 @@ public class QuerySerializer implements QueryVisitor {
 		if (row1 != row2)
 			out.newline();
 	}
+	
+	@Override
+	public void visitRegisterAs(Query query) {
+		Node n = query.getRegisterAs();
+		if(n == null) return;
+		if (n.isURI()) {
+			String iri = FmtUtils.stringForURI(n.getURI(), query);
+			out.print(String.format("REGISTER STREAM %s AS ", iri));
+		} else {
+			out.print(String.format("REGISTER STREAM %s AS ", n.toString()));
+		}
+		out.newline();
+		out.newline();
+	}
 
 	@Override
 	public void visitSelectResultForm(Query query) {
@@ -96,12 +110,6 @@ public class QuerySerializer implements QueryVisitor {
 	@Override
 	public void visitConstructResultForm(Query query) {
 		out.print("CONSTRUCT ");
-		// if ( query.isQueryResultStar() )
-		// {
-		// out.print("*") ;
-		// out.newline() ;
-		// }
-		// else
 		{
 			out.incIndent(BLOCK_INDENT);
 			out.newline();

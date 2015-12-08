@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hp.hpl.jena.sparql.lang.arq ;
 
 /**
@@ -631,4 +632,4 @@ class JavaCharStream
   }
 
 }
-/* JavaCC - OriginalChecksum=8657a0c1739dcc9a24f078f8b8d765e9 (do not edit this line) */
+/* JavaCC - OriginalChecksum=306cae2e06acc2be8dcbf523a14b2bf5 (do not edit this line) */

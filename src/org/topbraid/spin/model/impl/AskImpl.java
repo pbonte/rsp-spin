@@ -21,6 +21,8 @@ public class AskImpl extends QueryImpl implements Ask {
 	public void printSPINRDF(PrintContext context) {
 		printComment(context);
 		printPrefixes(context);
+		printRegisterAs(context);
+		
 		context.printIndentation(context.getIndentation());
 		context.printKeyword("ASK");
 		printStringFrom(context);

@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hp.hpl.jena.sparql.lang.arq ;
 
 /**
@@ -145,4 +146,4 @@ public class Token implements java.io.Serializable {
   }
 
 }
-/* JavaCC - OriginalChecksum=ea172162311f70f07a19fba4615363b8 (do not edit this line) */
+/* JavaCC - OriginalChecksum=c1b0c00844f69e0142953e95a8b2a3da (do not edit this line) */

@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.topbraid.spin.model.Construct;
+import org.topbraid.spin.model.SPINFactory;
 import org.topbraid.spin.model.TripleTemplate;
 import org.topbraid.spin.model.print.PrintContext;
 import org.topbraid.spin.vocabulary.SP;
@@ -15,6 +16,7 @@ import org.topbraid.spin.vocabulary.SP;
 import com.hp.hpl.jena.enhanced.EnhGraph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 
 public class ConstructImpl extends QueryImpl implements Construct {
@@ -38,6 +40,8 @@ public class ConstructImpl extends QueryImpl implements Construct {
 	public void printSPINRDF(PrintContext context) {
 		printComment(context);
 		printPrefixes(context);
+		printRegisterAs(context);
+		
 		context.printIndentation(context.getIndentation());
 		context.printKeyword("CONSTRUCT");
 		context.print(" {");

@@ -44,4 +44,5 @@ public interface QueryVisitor
     public void visitValues(Query query) ;
     
     public void finishVisit(Query query) ;
+	public void visitRegisterAs(Query query);
 }

@@ -84,6 +84,8 @@ public class SelectImpl extends QueryImpl implements Select {
 	public void printSPINRDF(PrintContext p) {
 		printComment(p);
 		printPrefixes(p);
+		printRegisterAs(p);
+		
 		p.printIndentation(p.getIndentation());
 		p.printKeyword("SELECT");
 		p.print(" ");

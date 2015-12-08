@@ -141,5 +141,8 @@ public class QueryHashCode
         {}
 
         public int  calculatedHashCode() { return x ; }
+
+		@Override
+		public void visitRegisterAs(Query query) {}
     }
 }

@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hp.hpl.jena.sparql.lang.arq ;
 
 /**
@@ -201,4 +202,4 @@ public class ParseException extends Exception {
    }
 
 }
-/* JavaCC - OriginalChecksum=6c685e169c464d91a2dc04ce893e7f9c (do not edit this line) */
+/* JavaCC - OriginalChecksum=82111a29c5ad0206210866ac68218648 (do not edit this line) */

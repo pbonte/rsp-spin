@@ -360,6 +360,7 @@ public class SP {
 	public static Property windowRange =  ResourceFactory.createProperty(NS + "range");
 	public static Property windowStep =  ResourceFactory.createProperty(NS + "step");
 	public static Property windowNameNode = ResourceFactory.createProperty(NS + "windowNameNode");
+	public static Property registerAs = ResourceFactory.createProperty(NS + "registerAs");
     
 
 	/**

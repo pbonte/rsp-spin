@@ -19,17 +19,9 @@
 // ARQ/SPARQL 1.1 Grammar - native syntax for the query engine
 options
 {
-      // \ u processed in the input stream
-      // SPARQL 1.0
     JAVA_UNICODE_ESCAPE = true ;
     UNICODE_INPUT = false ;
-//       // \ u processed after parsing.
-//       // strings, prefix names, IRIs
-//       JAVA_UNICODE_ESCAPE   = false ;
-//       UNICODE_INPUT         = true ;
-  STATIC = false ;
-//  DEBUG_PARSER          = true ;
-//  DEBUG_TOKEN_MANAGER   = true ;
+    STATIC = false ;
 }
 PARSER_BEGIN(ARQParser)
 /**
@@ -49,6 +41,7 @@ PARSER_BEGIN(ARQParser)
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hp.hpl.jena.sparql.lang.arq ;
 import com.hp.hpl.jena.graph.* ;
 import com.hp.hpl.jena.query.* ;
@@ -59,34 +52,28 @@ import com.hp.hpl.jena.sparql.path.* ;
 import com.hp.hpl.jena.sparql.expr.aggregate.* ;
 import com.hp.hpl.jena.update.* ;
 import com.hp.hpl.jena.sparql.modify.request.* ;
+
 public class ARQParser extends ARQParserBase
 {
     boolean allowAggregatesInExpressions = false ;
 }
+
 PARSER_END(ARQParser)
-// // Common top for single entry point.
-// void Top(): {}
-// {
-//     ( Query() | Update() )
-//     <EOF>
-// }
-// Query only entry point
+
 void QueryUnit(): { }
 {
   { startQuery() ; }
   Query() <EOF>
   { finishQuery() ; }
 }
+
 void Query() : { }
 {
   Prologue()
-  ( SelectQuery() | ConstructQuery() | DescribeQuery() | AskQuery()
-// #ifdef ARQ
-//   | JsonTemplateQuery()
-// #endif
-  )
+  ( SelectQuery() | ConstructQuery() | DescribeQuery() | AskQuery() )
   ValuesClause()
 }
+
 void UpdateUnit() : {}
 {
   { startUpdateRequest() ; }
@@ -97,19 +84,28 @@ void UpdateUnit() : {}
 void Prologue() : {}
 {
   ( BaseDecl() | PrefixDecl() )*
+  ( Register() ) *
 }
+
 void BaseDecl() : { String iri ; }
 {
   <BASE> iri = IRIREF()
   { getPrologue().setBaseURI(iri) ; }
 }
+
 void PrefixDecl() : { Token t ; String iri ; }
 {
     <PREFIX> t = <PNAME_NS> iri = IRIREF()
       { String s = fixupPrefix(t.image, t.beginLine, t.beginColumn) ;
         getPrologue().setPrefix(s, iri) ; }
 }
-// ---- Query type clauses
+
+void Register() : { Node name ; }
+{
+    <REGISTER> name = VarOrIri() <AS>
+    { getQuery().setRegisterAs( name) ; }
+}
+
 void SelectQuery() : { }
 {
   SelectClause()
@@ -117,6 +113,7 @@ void SelectQuery() : { }
   WhereClause()
   SolutionModifier()
 }
+
 void SubSelect() :{ }
 {
   SelectClause()
@@ -124,6 +121,7 @@ void SubSelect() :{ }
   SolutionModifier()
   ValuesClause()
 }
+
 void SelectClause() : { Var v ; Expr expr ; Node n ; }
 {
   <SELECT>
@@ -165,18 +163,9 @@ void SelectClause() : { Var v ; Expr expr ; Node n ; }
   )
   { allowAggregatesInExpressions = false ; }
 }
-void ConstructQuery() : { Template t ;
-                          TripleCollectorBGP acc = new TripleCollectorBGP() ; }
+
+void ConstructQuery() : { Template t ; TripleCollectorBGP acc = new TripleCollectorBGP() ; }
 {
-// #ifndef ARQ
-//   <CONSTRUCT>
-//      { getQuery().setQueryConstructType() ; }
-//   t = ConstructTemplate() 
-//     { getQuery().setConstructTemplate(t) ; }
-//   ( DatasetClause() )*
-//   WhereClause()
-//   SolutionModifier()
-// #else
  <CONSTRUCT>
    { getQuery().setQueryConstructType() ; }
  (
@@ -205,8 +194,8 @@ void ConstructQuery() : { Template t ;
       getQuery().setQueryPattern(elg) ;
     }
  )
-//#endif
 }
+
 void DescribeQuery() : { Node n ; }
 {
   <DESCRIBE>
@@ -222,6 +211,7 @@ void DescribeQuery() : { Node n ; }
   ( WhereClause() )?
   SolutionModifier()
 }
+
 void AskQuery() : {}
 {
   <ASK> { getQuery().setQueryAskType() ; }
@@ -229,12 +219,13 @@ void AskQuery() : {}
   WhereClause()
   SolutionModifier()
 }
-// ----
+
 void DatasetClause() : {}
 {
   <FROM>
   ( DefaultGraphClause() | NamedClause() )
 }
+
 void DefaultGraphClause() : { String iri ; }
 {
   iri = SourceSelector()
@@ -243,11 +234,13 @@ void DefaultGraphClause() : { String iri ; }
     getQuery().addGraphURI(iri) ;
   }
 }
+
 void NamedClause() : { String iri ; }
 {
   <NAMED>
   ( NamedWindowClause() | NamedGraphClause() )
 }
+
 void NamedGraphClause() : { String iri ; }
 {
   iri = SourceSelector()
@@ -256,6 +249,7 @@ void NamedGraphClause() : { String iri ; }
     getQuery().addNamedGraphURI(iri) ;
   }
 }
+
 void NamedWindowClause() : { String windowIri ; Object stream ; Object range ; Object step ;}
 {
   <WINDOW>
@@ -272,10 +266,12 @@ void NamedWindowClause() : { String windowIri ; Object stream ; Object range ; O
     getQuery().addNamedWindow(new ElementNamedWindow(windowIri, stream, range, step)) ;
   }
 }
+
 String SourceSelector() : { String iri ; }
 {
   iri = iri() { return iri ; }
 }
+
 void WhereClause() : { Element el ; }
 {
    (<WHERE>)?
@@ -283,6 +279,7 @@ void WhereClause() : { Element el ; }
    el = GroupGraphPattern() { getQuery().setQueryPattern(el) ; }
    { finishWherePattern() ; }
 }
+
 void SolutionModifier() : { }
 {
   ( GroupClause() )?
@@ -290,10 +287,12 @@ void SolutionModifier() : { }
   ( OrderClause() )?
   ( LimitOffsetClauses() )?
 }
+
 void GroupClause() : { }
 {
   <GROUP> <BY> ( GroupCondition() )+
 }
+
 void GroupCondition() : { Var v = null ; Expr expr = null ; }
 {
   ( expr = BuiltInCall() { getQuery().addGroupBy((Var)null, expr) ; }
@@ -308,23 +307,27 @@ void GroupCondition() : { Var v = null ; Expr expr = null ; }
     { getQuery().addGroupBy(v) ; }
   )
 }
+
 void HavingClause() : { }
 {
     { allowAggregatesInExpressions = true ; }
     <HAVING> (HavingCondition())+
     { allowAggregatesInExpressions = false ; }
 }
+
 void HavingCondition() : { Expr c ; }
 {
   c = Constraint()
   { getQuery().addHavingCondition(c) ; }
 }
+
 void OrderClause() : { }
 {
   { allowAggregatesInExpressions = true ; }
   <ORDER> <BY> ( OrderCondition() )+
   { allowAggregatesInExpressions = false ; }
 }
+
 void OrderCondition() :
 { int direction = 0 ; Expr expr = null ; Node v = null ; }
 {
@@ -345,6 +348,7 @@ void OrderCondition() :
       else
           getQuery().addOrderBy(v, direction) ; }
 }
+
 void LimitOffsetClauses() : { }
 {
   // SPARQL does not care about the order here.
@@ -356,16 +360,19 @@ void LimitOffsetClauses() : { }
     OffsetClause() (LimitClause())?
   )
 }
+
 void LimitClause() : { Token t ; }
 {
   <LIMIT> t = <INTEGER>
     { getQuery().setLimit(integerValue(t.image)) ; }
 }
+
 void OffsetClause() : { Token t ; }
 {
   <OFFSET> t = <INTEGER>
     { getQuery().setOffset(integerValue(t.image)) ; }
 }
+
 void ValuesClause() : { Token t ; }
 {
   (
@@ -375,8 +382,7 @@ void ValuesClause() : { Token t ; }
     { finishValuesClause(t.beginLine, t.beginColumn) ; }
   )?
 }
-// SPARQL Update + transitional extensions for SPARQL/Update (the W3C submission)
-// Update only entry point
+
 void Update() : { }
 {
   // Rewrite for no recursion - grammar is not LL(1)
@@ -1763,6 +1769,7 @@ TOKEN [IGNORE_CASE] :
 // Dataset
 | < NAMED: "named" >
 | < FROM: "from" >
+| < REGISTER: "register stream" > // RSP 'REGISTER STREAM ' 
 | < WINDOW: "window" >    // RSP 'WINDOW'
 | < ON: "on" >            // RSP 'ON'
 | < RANGE: "range" >      // RSP 'RANGE'
