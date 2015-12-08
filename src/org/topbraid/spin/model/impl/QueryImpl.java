@@ -47,7 +47,7 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 		return getStringList(SP.fromNamed);
 	}
 
-	public List<ElementNamedWindow> getFromNamedWindow() {
+	public List<ElementNamedWindow> getFromNamedWindows() {
 		LinkedList<ElementNamedWindow> windows = new LinkedList<>();
 		NodeIterator iter = getModel().listObjectsOfProperty(this, SP.fromNamedWindow);
 		while (iter.hasNext()) {
@@ -61,7 +61,6 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 			ElementNamedWindow window = new ElementNamedWindow(windowIRI, stream, range, step);
 			windows.add(window);
 		}
-
 		return windows;
 	}
 
@@ -143,7 +142,7 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 			context.print(fromNamed);
 			context.print(">");
 		}
-		for (ElementNamedWindow window : getFromNamedWindow()) {
+		for (ElementNamedWindow window : getFromNamedWindows()) {
 			context.println();
 			context.printKeyword(String.format("FROM NAMED WINDOW <%s> ON ", window.getWindowIri()));
 

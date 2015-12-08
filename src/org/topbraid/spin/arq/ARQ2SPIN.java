@@ -313,10 +313,10 @@ public class ARQ2SPIN {
 			Resource windowNode = model.createResource();
 			windowNode.addProperty(RDF.type, SP.NamedWindow);
 			
-			// window iri
+			// window node
 			spinQuery.addProperty(SP.fromNamedWindow, windowNode);
 
-			// stream
+			// window iri
 			windowNode.addProperty(SP.windowIri, model.getResource(window.getWindowIri()));
 			
 			// stream
@@ -326,7 +326,8 @@ public class ARQ2SPIN {
 				Resource variable = getVariable(varName);
 				windowNode.addProperty(SP.stream, variable);
 			} else {
-				windowNode.addProperty(SP.stream, stream.toString());
+				Resource r = model.createResource(stream.toString());
+				windowNode.addProperty(SP.stream, r);
 			}
 			
 			// range
