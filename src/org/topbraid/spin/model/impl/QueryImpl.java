@@ -1,7 +1,10 @@
 /*******************************************************************************
  * Copyright (c) 2009 TopQuadrant, Inc.
  * All rights reserved. 
- *******************************************************************************/
+ ******************************************************************************
+ * Modified by Robin Keskisarkka in accordance with the Apache License Version 2.0 
+ * distribution of SPIN API (http://topbraid.org/spin/api/)
+ */
 package org.topbraid.spin.model.impl;
 
 import java.util.LinkedList;
@@ -30,6 +33,12 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sparql.syntax.ElementNamedWindow;
 import com.hp.hpl.jena.vocabulary.RDF;
+
+/**
+ * @author Robin Keskisarkka (https://github.com/keski)
+ * Modified to support RSP-QL in accordance with the Apache License Version 2.0 
+ * distribution of SPIN API (http://topbraid.org/spin/api/)
+ */
 
 public abstract class QueryImpl extends AbstractSPINResourceImpl implements SolutionModifierQuery {
 

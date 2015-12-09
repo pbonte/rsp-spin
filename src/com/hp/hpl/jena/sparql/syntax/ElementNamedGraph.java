@@ -15,6 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * @author Robin Keskisarkka (https://github.com/keski)
+ */
 
 package com.hp.hpl.jena.sparql.syntax;
 

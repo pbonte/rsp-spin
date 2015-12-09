@@ -16,6 +16,12 @@
  * limitations under the License.
  */
 
+/**
+ * @author Robin Keskisarkka (https://github.com/keski)
+ * Modified to support RSP-QL in accordance with the Apache License Version 2.0 
+ * distribution of SPIN API (http://topbraid.org/spin/api/)
+ */
+
 package com.hp.hpl.jena.sparql.serializer;
 
 import java.io.OutputStream;
@@ -38,8 +44,9 @@ import com.hp.hpl.jena.sparql.syntax.ElementNamedWindow;
 import com.hp.hpl.jena.sparql.syntax.Template;
 import com.hp.hpl.jena.sparql.util.FmtUtils;
 
-/** Serialize a query into SPARQL or ARQ formats */
 
+
+/** Serialize a query into SPARQL or ARQ formats */
 public class QuerySerializer implements QueryVisitor {
 	static final int BLOCK_INDENT = 2;
 	protected FormatterTemplate fmtTemplate;

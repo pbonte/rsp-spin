@@ -1,7 +1,15 @@
 /*******************************************************************************
  * Copyright (c) 2009 TopQuadrant, Inc.
  * All rights reserved. 
- *******************************************************************************/
+ *******************************************************************************
+ * 
+ */
+
+/**
+ * @author Robin Keskisarkka (https://github.com/keski)
+ * Modified to support RSP-QL in accordance with the Apache License Version 2.0 
+ * distribution of SPIN API (http://topbraid.org/spin/api/)
+ */
 package org.topbraid.spin.arq;
 
 import java.util.ArrayList;

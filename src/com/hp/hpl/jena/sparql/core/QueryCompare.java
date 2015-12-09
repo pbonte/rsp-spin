@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+/**
+ * @author Robin Keskisarkka (https://github.com/keski)
+ */
+
 package com.hp.hpl.jena.sparql.core ;
 
 import org.apache.jena.atlas.lib.Lib ;

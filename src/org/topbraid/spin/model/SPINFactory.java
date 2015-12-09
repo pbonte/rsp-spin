@@ -48,7 +48,11 @@ import com.hp.hpl.jena.vocabulary.RDF;
  * SPIN API resources, and to do corresponding tests.
  * 
  * @author Holger Knublauch
+ * @author Robin Keskisarkka (https://github.com/keski)
+ * Modified to support RSP-QL in accordance with the Apache License Version 2.0 
+ * distribution of SPIN API (http://topbraid.org/spin/api/)
  */
+
 @SuppressWarnings("deprecation")
 public class SPINFactory {
 	
