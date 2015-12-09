@@ -21,7 +21,6 @@ import org.topbraid.spin.vocabulary.SP;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Node_Blank;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -29,7 +28,6 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.serializer.Serializer;
 import com.hp.hpl.jena.sparql.syntax.ElementNamedWindow;
 import com.hp.hpl.jena.vocabulary.RDF;
 
@@ -52,13 +50,13 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 		NodeIterator iter = getModel().listObjectsOfProperty(this, SP.fromNamedWindow);
 		while (iter.hasNext()) {
 			Resource res = iter.next().asResource();
-			String windowIRI = res.getProperty(SP.windowIri).getObject().toString();
+			String windowIri = res.getProperty(SP.windowIri).getObject().toString();
 
-			Object stream = res.getProperty(SP.stream).getObject();
+			Object streamIri = res.getProperty(SP.stream).getObject();
 			Object range = res.getProperty(SP.windowRange).getObject();
 			Object step = res.getProperty(SP.windowStep).getObject();
 
-			ElementNamedWindow window = new ElementNamedWindow(windowIRI, stream, range, step);
+			ElementNamedWindow window = new ElementNamedWindow(windowIri, streamIri, range, step);
 			windows.add(window);
 		}
 		return windows;

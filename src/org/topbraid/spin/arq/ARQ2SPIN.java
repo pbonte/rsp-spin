@@ -311,7 +311,7 @@ public class ARQ2SPIN {
 
 			// Window node
 			Resource windowNode = model.createResource();
-			windowNode.addProperty(RDF.type, SP.NamedWindow);
+			windowNode.addProperty(RDF.type, SP.Window);
 			
 			// window node
 			spinQuery.addProperty(SP.fromNamedWindow, windowNode);

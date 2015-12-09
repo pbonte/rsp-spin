@@ -90,7 +90,6 @@ public class QuerySerializer implements QueryVisitor {
 		}
 		out.newline();
 		out.newline();
-		System.out.println("tooowhit tohoooo");
 	}
 
 	@Override
