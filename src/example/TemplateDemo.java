@@ -1,4 +1,4 @@
-package a.example;
+package example;
 
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.system.SPINModuleRegistry;
