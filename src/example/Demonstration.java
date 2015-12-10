@@ -19,7 +19,6 @@ import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 
 public class Demonstration {
 	public static void main(String[] args) {
-		//if(true) return;
 		// Prefixes
 		PrefixMapping nsMap = new PrefixMappingImpl();
 		nsMap.setNsPrefix("", "http://example.org/");
