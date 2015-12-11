@@ -7,6 +7,7 @@
  */
 package org.topbraid.spin.model.impl;
 
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,13 +32,15 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.syntax.ElementLogicalWindow;
 import com.hp.hpl.jena.sparql.syntax.ElementNamedWindow;
+import com.hp.hpl.jena.sparql.syntax.ElementPhysicalWindow;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
- * @author Robin Keskisarkka (https://github.com/keski)
- * Modified to support RSP-QL in accordance with the Apache License Version 2.0 
- * distribution of SPIN API (http://topbraid.org/spin/api/)
+ * @author Robin Keskisarkka (https://github.com/keski) Modified to support
+ *         RSP-QL in accordance with the Apache License Version 2.0 distribution
+ *         of SPIN API (http://topbraid.org/spin/api/)
  */
 
 public abstract class QueryImpl extends AbstractSPINResourceImpl implements SolutionModifierQuery {
@@ -58,15 +61,28 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 		LinkedList<ElementNamedWindow> windows = new LinkedList<>();
 		NodeIterator iter = getModel().listObjectsOfProperty(this, SP.fromNamedWindow);
 		while (iter.hasNext()) {
-			Resource res = iter.next().asResource();
-			String windowIri = res.getProperty(SP.windowIri).getObject().toString();
+			Resource window = iter.next().asResource();
+			String windowIri = window.getProperty(SP.windowIri).getObject().toString();
+			Object streamIri = window.getProperty(SP.streamIri).getObject();
 
-			Object streamIri = res.getProperty(SP.stream).getObject();
-			Object range = res.getProperty(SP.windowRange).getObject();
-			Object step = res.getProperty(SP.windowStep).getObject();
-
-			ElementNamedWindow window = new ElementNamedWindow(windowIri, streamIri, range, step);
-			windows.add(window);
+			// Logical or physical window
+			Resource type = window.getProperty(RDF.type).getResource();
+			if (type.equals(SP.LogicalWindow)) {
+				System.out.println("Interpretted " + window.getClass() + " as logical");
+				Object range = window.getProperty(SP.windowRange).getObject();
+				Object step = null;
+				if (window.getProperty(SP.windowStep) != null) {
+					step = window.getProperty(SP.windowStep).getObject();
+				}
+				windows.add(new ElementLogicalWindow(windowIri, streamIri, range, step));
+			} else if (type.equals(SP.PhysicalWindow)) {
+				Object size = window.getProperty(SP.windowSize).getObject();
+				Object step = null;
+				if (window.getProperty(SP.windowStep) != null) {
+					step = window.getProperty(SP.windowStep).getObject();
+				}
+				windows.add(new ElementPhysicalWindow(windowIri, streamIri, size, step));
+			}
 		}
 		return windows;
 	}
@@ -151,46 +167,69 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 		}
 		for (ElementNamedWindow window : getFromNamedWindows()) {
 			context.println();
-			context.printKeyword(String.format("FROM NAMED WINDOW <%s> ON ", window.getWindowIri()));
-
-			// stream
+			// Window iri and stream iri
+			String windowIri = "<" + window.getWindowIri() + ">";
 			RDFNode streamNode = (RDFNode) window.getStream();
+			String streamIri = "<" + streamNode.toString() + ">";
 			if (streamNode instanceof Resource && ((Resource) streamNode).hasProperty(SP.varName)) {
 				context.print(String.format("?%s ", streamNode.as(Variable.class).getName()));
-			} else {
-				String streamIri = streamNode.toString();
-				context.print(String.format("<%s> ", streamIri));
 			}
+			context.printKeyword(String.format("FROM NAMED WINDOW %s ON %s ", windowIri, streamIri));
 
-			// range
-			String range;
-			RDFNode rangeNode = (RDFNode) window.getRange();
-			if (rangeNode instanceof Resource && ((Resource) rangeNode).hasProperty(SP.varName)) {
-				range = "?" + rangeNode.as(Variable.class).getName();
-			} else {
-				range = rangeNode.toString();
-			}
-
-			// step
-			String step;
-			RDFNode stepNode = (RDFNode) window.getStep();
-			if (stepNode instanceof Resource && ((Resource) stepNode).hasProperty(SP.varName)) {
-				step = "?" + stepNode.as(Variable.class).getName();
-			} else {
-				step = stepNode.toString();
-			}
-
-			context.print(String.format("[RANGE %s STEP %s]", range.toString(), step.toString()));
+			// Logical or pysical window
+			if (window.getClass().equals(ElementLogicalWindow.class)) {
+				ElementLogicalWindow logicalWindow = (ElementLogicalWindow) window;
+				// Get logical range
+				RDFNode rangeNode = (RDFNode) logicalWindow.getRange();
+				String range = rangeNode.toString();
+				if (rangeNode instanceof Resource && ((Resource) rangeNode).hasProperty(SP.varName)) {
+					range = "?" + rangeNode.as(Variable.class).getName();
+				}
+				// Get step (optional)
+				RDFNode stepNode = (RDFNode) logicalWindow.getStep();
+				if (stepNode != null) {
+					String step = stepNode.toString();
+					if (stepNode instanceof Resource && ((Resource) stepNode).hasProperty(SP.varName)) {
+						step = "?" + stepNode.as(Variable.class).getName();
+					}
+					context.print(String.format("[RANGE %s STEP %s]", range, step));
+				} else {
+					context.print(String.format("[RANGE %s]", range));
+				}
+			} else if (window.getClass().equals(ElementPhysicalWindow.class)) {
+					ElementPhysicalWindow physicalWindow= (ElementPhysicalWindow) window;
+					// Get physical size
+					RDFNode sizeNode = (RDFNode) physicalWindow.getSize();
+					String size;
+					if (sizeNode instanceof Resource && ((Resource) sizeNode).hasProperty(SP.varName)) {
+						size = "?" + sizeNode.as(Variable.class).getName();
+					} else {
+						size = Integer.toString(sizeNode.asLiteral().getInt());
+					}
+					// Get step (optional)
+					RDFNode stepNode = (RDFNode) physicalWindow.getStep();
+					if (stepNode != null) {
+						String step;
+						if (stepNode instanceof Resource && ((Resource) stepNode).hasProperty(SP.varName)) {
+							step = "?" + stepNode.as(Variable.class).getName();
+						} else {
+							step = Integer.toString(stepNode.asLiteral().getInt());
+						}
+						context.print(String.format("[ITEM %s STEP %s]", size, step));
+					} else {
+						context.print(String.format("[ITEM %s]", size));
+					}
+				}
 		}
 	}
 
 	protected void printRegisterAs(PrintContext context) {
 		RDFNode n = getRDFNode(SP.registerAs);
-		if(n == null) {
+		if (n == null) {
 			return;
 		}
 		context.printKeyword("REGISTER STREAM ");
-		
+
 		if (n instanceof Resource && ((Resource) n).hasProperty(SP.varName)) {
 			context.print("?" + n.as(Variable.class).getName());
 		} else {
@@ -276,7 +315,7 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 		p.printKeyword("WHERE");
 		printNestedElementList(p, SP.where);
 	}
-	
+
 	protected void printStreamType(PrintContext p) {
 		Statement stmt = getProperty(SP.windowToStreamOperator);
 		if (stmt != null) {

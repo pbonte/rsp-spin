@@ -3,6 +3,8 @@ package example;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.Calendar;
 
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.model.SPINFactory;
@@ -50,10 +52,10 @@ public class Demonstration {
 		
 		System.out.println("# Original parsed");
 		parsedQuery.setPrefixMapping(pm);
-		System.out.println(parsedQuery);
+		//System.out.println(parsedQuery);
 		System.out.println("# Reparsed");
 		reparsedQuery.setPrefixMapping(pm);
-		System.out.println(reparsedQuery);
+		//System.out.println(reparsedQuery);
 		
 		System.out.println("##############################");		
 	}

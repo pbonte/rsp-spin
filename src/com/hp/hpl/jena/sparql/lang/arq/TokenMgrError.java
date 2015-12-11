@@ -17,8 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.hp.hpl.jena.sparql.lang.arq ;
+package com.hp.hpl.jena.sparql.lang.arq;
 
 /** Token Manager Error. */
 public class TokenMgrError extends Error
@@ -162,4 +161,4 @@ public class TokenMgrError extends Error
     this(LexicalError(EOFSeen, lexState, errorLine, errorColumn, errorAfter, curChar), reason);
   }
 }
-/* JavaCC - OriginalChecksum=5f9183822c251ae1c1f675debc1ee4e4 (do not edit this line) */
+/* JavaCC - OriginalChecksum=34286272b98a5dd3a6f9db37101c2961 (do not edit this line) */

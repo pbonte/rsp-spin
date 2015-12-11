@@ -24,16 +24,17 @@ package com.hp.hpl.jena.sparql.syntax;
 import com.hp.hpl.jena.sparql.util.NodeIsomorphismMap;
 
 public class ElementNamedWindow extends Element {
+	private String LOGICAL_WINDOW = "logical";
+	private String PHYSICAL_WINDOW = "physical";
 	private String windowIri;
-	private Object stream;
-	private Object range;
+	private Object streamIri;
+	private Object size;
 	private Object step;
+	private String type;
 
-	public ElementNamedWindow(String windowIri, Object stream, Object range, Object step) {
+	public ElementNamedWindow(String windowIri, Object streamIri) {
 		this.windowIri = windowIri;
-		this.stream = stream;
-		this.step = step;
-		this.range = range;
+		this.streamIri = streamIri;
 	}
 
 	public String getWindowIri() {
@@ -41,15 +42,7 @@ public class ElementNamedWindow extends Element {
 	}
 
 	public Object getStream() {
-		return stream;
-	}
-
-	public Object getRange() {
-		return range;
-	}
-
-	public Object getStep() {
-		return step;
+		return streamIri;
 	}
 
 	@Override
@@ -64,7 +57,7 @@ public class ElementNamedWindow extends Element {
 
 	@Override
 	public int hashCode() {
-		return windowIri.hashCode() ^ stream.hashCode();
+		return windowIri.hashCode() ^ streamIri.hashCode();
 	}
 
 	@Override

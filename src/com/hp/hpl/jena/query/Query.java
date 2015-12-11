@@ -123,7 +123,7 @@ public class Query extends Prologue implements Cloneable, Printable {
 
 	// DSTREAM/ISTREAM/RSTREAM
 	protected String streamType = null;
-	
+
 	/**
 	 * Creates a new empty query
 	 */
@@ -171,8 +171,8 @@ public class Query extends Prologue implements Cloneable, Printable {
 	public int getQueryType() {
 		return queryType;
 	}
-	
-	public Node getRegisterAs(){
+
+	public Node getRegisterAs() {
 		return registerAs;
 	}
 
@@ -378,15 +378,12 @@ public class Query extends Prologue implements Cloneable, Printable {
 	}
 
 	/**
-	 * Data represented as a window (substream).
+	 * Data represented as a named window (logical or physical).
 	 * 
 	 * @param uri
 	 */
 	public void addNamedWindow(ElementNamedWindow windowElement) {
-		if (namedWindows == null)
-			namedWindows = new ArrayList<ElementNamedWindow>();
-		else
-			namedWindows.add(windowElement);
+		namedWindows.add(windowElement);
 	}
 
 	/**
@@ -431,7 +428,7 @@ public class Query extends Prologue implements Cloneable, Printable {
 	}
 
 	/**
-	 * Return named window URIs.
+	 * Return named window IRIs.
 	 * 
 	 * @return
 	 */
@@ -1019,14 +1016,17 @@ public class Query extends Prologue implements Cloneable, Printable {
 	public void setIstream() {
 		streamType = "ISTREAM";
 	}
+
 	public void setRstream() {
 		streamType = "RSTREAM";
 	}
+
 	public void setDstream() {
 		streamType = "DSTREAM";
 	}
-	public String getStreamType(){
+
+	public String getStreamType() {
 		return streamType;
 	}
-	
+
 }

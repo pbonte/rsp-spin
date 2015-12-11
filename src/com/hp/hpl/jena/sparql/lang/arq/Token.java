@@ -17,8 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.hp.hpl.jena.sparql.lang.arq ;
+package com.hp.hpl.jena.sparql.lang.arq;
 
 /**
  * Describes the input token stream.
@@ -146,4 +145,4 @@ public class Token implements java.io.Serializable {
   }
 
 }
-/* JavaCC - OriginalChecksum=c1b0c00844f69e0142953e95a8b2a3da (do not edit this line) */
+/* JavaCC - OriginalChecksum=b9efc6403769a33e1124c578c0b1823b (do not edit this line) */

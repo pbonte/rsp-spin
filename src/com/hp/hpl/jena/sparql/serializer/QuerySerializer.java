@@ -40,7 +40,9 @@ import com.hp.hpl.jena.sparql.core.VarExprList;
 import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.syntax.Element;
+import com.hp.hpl.jena.sparql.syntax.ElementLogicalWindow;
 import com.hp.hpl.jena.sparql.syntax.ElementNamedWindow;
+import com.hp.hpl.jena.sparql.syntax.ElementPhysicalWindow;
 import com.hp.hpl.jena.sparql.syntax.Template;
 import com.hp.hpl.jena.sparql.util.FmtUtils;
 
@@ -172,23 +174,36 @@ public class QuerySerializer implements QueryVisitor {
 		}
 		if (query.getNamedWindows() != null && query.getNamedWindows().size() != 0) {
 			for (ElementNamedWindow window : query.getNamedWindows()) {
-				// One per line
-
+				// Window iri and stream iri
 				String windowIri = FmtUtils.stringForURI(window.getWindowIri(), query);
-				out.print(String.format("FROM NAMED WINDOW %s ON ", windowIri));
-
 				Node stream = (Node) window.getStream();
+				String streamIri = stream.toString();
 				if (stream.isURI()) {
-					String streamIri = FmtUtils.stringForURI(stream.getURI(), query);
-					out.print(String.format("%s ", streamIri));
-				} else {
-					out.print(String.format("%s ", stream.toString()));
+					streamIri = FmtUtils.stringForURI(stream.getURI(), query);
 				}
-
-				String range = window.getRange().toString();
-				String step = window.getStep().toString();
-
-				out.print(String.format("[RANGE %s STEP %s]", range, step));
+				out.print(String.format("FROM NAMED WINDOW %s ON %s ", windowIri, streamIri));
+				// Logical or physical window
+				if(window.getClass().equals(ElementLogicalWindow.class)){
+					ElementLogicalWindow logicalWindow = (ElementLogicalWindow) window;
+					String range = logicalWindow.getRange().toString();
+					if(logicalWindow.getStep() != null){
+						String step = logicalWindow.getStep().toString();
+						out.print(String.format("[RANGE %s STEP %s]", range, step));
+					} else {
+						out.print(String.format("[RANGE %s]", range));
+					}
+	
+				} else if(window.getClass().equals(ElementPhysicalWindow.class)){
+					ElementPhysicalWindow physicalWindow = (ElementPhysicalWindow) window;
+					String range = physicalWindow.getSize().toString();
+					if(physicalWindow.getStep() != null){
+						String step = physicalWindow.getStep().toString();
+						out.print(String.format("[ITEM %s STEP %s]", range, step));
+					} else {
+						out.print(String.format("[ITEM %s]", range));
+					}
+	
+				}
 				out.newline();
 			}
 		}

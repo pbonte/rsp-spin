@@ -17,8 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.hp.hpl.jena.sparql.lang.arq ;
+package com.hp.hpl.jena.sparql.lang.arq;
 
 /**
  * An implementation of interface CharStream, where the stream is assumed to
@@ -632,4 +631,4 @@ class JavaCharStream
   }
 
 }
-/* JavaCC - OriginalChecksum=306cae2e06acc2be8dcbf523a14b2bf5 (do not edit this line) */
+/* JavaCC - OriginalChecksum=2cc4a0c1ced6f10d230ffaeeef2a07ef (do not edit this line) */
