@@ -19,9 +19,14 @@ public class TestRSPQLParser {
 				+ "REGISTER STREAM :s1 AS "
 				+ "CONSTRUCT ISTREAM { ?a ?b ?c } "
 				+ "FROM NAMED WINDOW :w ON :s [RANGE PT1m] "
-				+ "WHERE { GRAPH :g { ?a ?b ?c } WINDOW :w { ?a ?b ?c }}";
+				+ "WHERE { "
+				+ "   GRAPH :g { ?a ?b ?c } "
+				+ "   WINDOW :w { "
+				+ "      GRAPH { ?a ?b ?c } "
+				+ "   }"
+				+ "}";
 		Query query = QueryFactory.create(q, ParserRSPQL.rspqlSPARQLSyntax);
-		System.out.println(query);
+		//System.out.println(query);
 		
 	}
 }

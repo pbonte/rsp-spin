@@ -59,7 +59,6 @@ public class ElementNamedWindow extends Element {
 
 	@Override
 	public void visit(ElementVisitor v) {
-		// TODO Auto-generated method stub
 		
 	}
 }

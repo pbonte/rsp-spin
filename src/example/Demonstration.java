@@ -6,6 +6,8 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Calendar;
 
+import org.rsp.lang.ParserRSPQL;
+import org.rsp.lang.rspql.RSPQLParser;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.model.SPINFactory;
 import org.topbraid.spin.model.print.StringPrintContext;
@@ -36,6 +38,7 @@ public class Demonstration {
 			Model model = ModelFactory.createDefaultModel();
 			model.setNsPrefix("","http://example.org/");
 			testQueryParsing(query, "http://example.org/q" + i, model);
+			if(true) break;
 			i++;
 		}
 	}
@@ -44,18 +47,25 @@ public class Demonstration {
 		// Initialize SPIN system functions and templates
 		SPINModuleRegistry.get().init();
 
-		Query parsedQuery = QueryFactory.create(query, Syntax.syntaxARQ);
-		Query reparsedQuery = parseSPINReparse(query, handle, model);
+		// Register the RSP-QL parser
+		ParserRSPQL.register();
+		
+		Query parsedQuery = QueryFactory.create(query, ParserRSPQL.rspqlSPARQLSyntax);
+		
+		Query reparsedQuery = null;//parseSPINReparse(query, handle, model);
+		
+		
+		if(true) return;
 		
 		PrefixMapping pm = new PrefixMappingImpl();
 		pm.setNsPrefixes(model.getNsPrefixMap());
 		
 		System.out.println("# Original parsed");
 		parsedQuery.setPrefixMapping(pm);
-		//System.out.println(parsedQuery);
+		System.out.println(parsedQuery);
 		System.out.println("# Reparsed");
 		reparsedQuery.setPrefixMapping(pm);
-		//System.out.println(reparsedQuery);
+		System.out.println(reparsedQuery);
 		
 		System.out.println("##############################");		
 	}
