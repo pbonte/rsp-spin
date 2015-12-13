@@ -28,7 +28,9 @@ import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.jena.atlas.io.IndentedWriter;
-import org.topbraid.spin.vocabulary.SP;
+import org.rspql.syntax.ElementLogicalWindow;
+import org.rspql.syntax.ElementNamedWindow;
+import org.rspql.syntax.ElementPhysicalWindow;
 
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Query;
@@ -40,15 +42,12 @@ import com.hp.hpl.jena.sparql.core.VarExprList;
 import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.syntax.Element;
-import com.hp.hpl.jena.sparql.syntax.ElementLogicalWindow;
-import com.hp.hpl.jena.sparql.syntax.ElementNamedWindow;
-import com.hp.hpl.jena.sparql.syntax.ElementPhysicalWindow;
 import com.hp.hpl.jena.sparql.syntax.Template;
 import com.hp.hpl.jena.sparql.util.FmtUtils;
 
 
 
-/** Serialize a query into SPARQL or ARQ formats */
+/** Serialize a query into SPARQL or ARQ formats or RSP-QL*/
 public class QuerySerializer implements QueryVisitor {
 	static final int BLOCK_INDENT = 2;
 	protected FormatterTemplate fmtTemplate;
@@ -412,5 +411,4 @@ public class QuerySerializer implements QueryVisitor {
 			first = false;
 		}
 	}
-
 }

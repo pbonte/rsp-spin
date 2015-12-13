@@ -18,185 +18,199 @@
 
 package com.hp.hpl.jena.sparql.serializer;
 
-import java.io.OutputStream ;
+import java.io.OutputStream;
 
-import org.apache.jena.atlas.io.IndentedLineBuffer ;
-import org.apache.jena.atlas.io.IndentedWriter ;
-import org.apache.jena.atlas.logging.Log ;
+import org.apache.jena.atlas.io.IndentedLineBuffer;
+import org.apache.jena.atlas.io.IndentedWriter;
+import org.apache.jena.atlas.logging.Log;
+import org.rsp.lang.ParserRSPQL;
 
-import com.hp.hpl.jena.query.Query ;
-import com.hp.hpl.jena.query.Syntax ;
-
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.sparql.core.Prologue;
-import com.hp.hpl.jena.sparql.util.NodeToLabelMapBNode ;
+import com.hp.hpl.jena.sparql.util.NodeToLabelMapBNode;
 
+public class Serializer {
+	static final int BLOCK_INDENT = 2;
 
-public class Serializer
-{
-    static final int BLOCK_INDENT = 2 ;
-    /** Output the query
-     * 
-     * @param query  The query
-     * @param out    OutputStream
-     */
-    static public void serialize(Query query, OutputStream out)
-    {
-        serialize(query, out, null) ;
-    }
-    
-    /** Output the query
-     * 
-     * @param query  The query
-     * @param out     OutputStream
-     * @param syntax  Syntax URI
-     */
-    
-    static public void serialize(Query query, OutputStream out, Syntax syntax)
-    {
-        IndentedWriter writer = new IndentedWriter(out) ;
-        serialize(query, writer, syntax) ;
-        writer.flush() ;
-        try { out.flush() ; } catch (Exception ex) { }
-    }
-    
-    /** Format the query into the buffer
-     * @param query  The query
-     * @param buff    IndentedLineBuffer
-     */
-    
-    static public void serialize(Query query, IndentedLineBuffer buff)
-    {
-        Syntax s = query.getSyntax() ;
-        if ( s == null )
-            s = Syntax.defaultQuerySyntax ;
-        serialize(query, buff, s) ;
-    }
-    
-    /** Format the query
-     * 
-     * @param query      The query
-     * @param buff       IndentedLineBuffer in which to place the unparsed query
-     * @param outSyntax  Syntax URI
-     */
-    
-    static public void serialize(Query query, IndentedLineBuffer buff, Syntax outSyntax)
-    {
-        _serialize(query, buff, outSyntax) ;
-    }
-    
-    /** Format the query
-     * @param query   The query
-     * @param writer  IndentedWriter
-     */
-    
-    static public void serialize(Query query, IndentedWriter writer)
-    {
-        Syntax s = query.getSyntax() ;
-        if ( s == null )
-            s = Syntax.defaultQuerySyntax ;
-        serialize(query, writer, s) ;
-    }
-    
-    /** Format the query
-     * 
-     * @param writer     IndentedWriter
-     * @param outSyntax  Syntax URI
-     */
-    
-    static public void serialize(Query query, IndentedWriter writer, Syntax outSyntax)
-    {
-        _serialize(query, writer, outSyntax) ;
-    }
-    
-    static private void _serialize(Query query, IndentedWriter writer, Syntax outSyntax)
-    {
-        if ( outSyntax == null )
-            outSyntax = Syntax.defaultQuerySyntax ;
-        
-        if ( outSyntax.equals(Syntax.syntaxARQ) )
-        {
-            serializeARQ(query, writer) ;
-            writer.flush() ;
-            return ;
-        }
-        
-        if (outSyntax.equals(Syntax.syntaxSPARQL_10))
-        {
-            serializeSPARQL_10(query, writer) ;
-            writer.flush() ;
-            return ;
-        }
+	/**
+	 * Output the query
+	 * 
+	 * @param query
+	 *            The query
+	 * @param out
+	 *            OutputStream
+	 */
+	static public void serialize(Query query, OutputStream out) {
+		serialize(query, out, null);
+	}
 
-        if (outSyntax.equals(Syntax.syntaxSPARQL_11))
-        {
-            serializeSPARQL_11(query, writer) ;
-            writer.flush() ;
-            return ;
-        }
-        
-//        if (outSyntax.equals(Syntax.syntaxSPARQL_X))
-//        {
-//            serializeSPARQL_X(query, writer) ;
-//            writer.flush() ;
-//            return ;
-//        }
-        
-        Log.warn(Serializer.class, "Unknown syntax: "+outSyntax) ;
-    }
-    
-    static public void serializeARQ(Query query, Prologue p, IndentedWriter writer)
-    {
-        // For the query pattern
-        SerializationContext cxt1 = new SerializationContext(p, new NodeToLabelMapBNode("b", false) ) ;
-        // For the construct pattern
-        SerializationContext cxt2 = new SerializationContext(p, new NodeToLabelMapBNode("c", false)  ) ;
-        
-        Prologue orig = null;
-        if ( query != p) {
-        	orig = query.copy();
-        	query.usePrologueFrom(p);
-        }
-        
-        serializeARQ(query, writer, 
-                     new FormatterElement(writer, cxt1),
-                     new FmtExprSPARQL(writer, cxt1),
-                     new FmtTemplate(writer, cxt2)) ;
-        
-        if (orig != null) query.usePrologueFrom(orig);
-    }
-     
-    static public void serializeARQ(Query query, IndentedWriter writer)
-    {
-    	serializeARQ(query, query, writer);
-    }
-    
-    static void serializeARQ(Query query, 
-                             IndentedWriter writer, 
-                             FormatterElement eltFmt,
-                             FmtExprSPARQL    exprFmt,
-                             FormatterTemplate templateFmt)
-    {
-        QuerySerializer serilizer = new QuerySerializer(writer, eltFmt, exprFmt, templateFmt) ;
-        query.visit(serilizer) ;
-    }
+	/**
+	 * Output the query
+	 * 
+	 * @param query
+	 *            The query
+	 * @param out
+	 *            OutputStream
+	 * @param syntax
+	 *            Syntax URI
+	 */
 
-    static public void serializeSPARQL_10(Query query, IndentedWriter writer)
-    {
-        // ARQ is a superset of SPARQL.
-        serializeARQ(query, writer) ;
-    }
+	static public void serialize(Query query, OutputStream out, Syntax syntax) {
+		IndentedWriter writer = new IndentedWriter(out);
+		serialize(query, writer, syntax);
+		writer.flush();
+		try {
+			out.flush();
+		} catch (Exception ex) {
+		}
+	}
 
-    static public void serializeSPARQL_11(Query query, IndentedWriter writer)
-    {
-        // ARQ is a superset of SPARQL.
-        serializeARQ(query, writer) ;
-    }
+	/**
+	 * Format the query into the buffer
+	 * 
+	 * @param query
+	 *            The query
+	 * @param buff
+	 *            IndentedLineBuffer
+	 */
 
+	static public void serialize(Query query, IndentedLineBuffer buff) {
+		Syntax s = query.getSyntax();
+		if (s == null)
+			s = Syntax.defaultQuerySyntax;
+		serialize(query, buff, s);
+	}
 
-    //    static public void serializeSPARQL_X(Query query, IndentedWriter writer)
-//    {
-//        SerializationContext cxt = new SerializationContext(query, null ) ;
-//        QuerySerializerXML serilizer = new QuerySerializerXML(writer, cxt) ;
-//        query.visit(serilizer) ;
-//    }
+	/**
+	 * Format the query
+	 * 
+	 * @param query
+	 *            The query
+	 * @param buff
+	 *            IndentedLineBuffer in which to place the unparsed query
+	 * @param outSyntax
+	 *            Syntax URI
+	 */
+
+	static public void serialize(Query query, IndentedLineBuffer buff, Syntax outSyntax) {
+		_serialize(query, buff, outSyntax);
+	}
+
+	/**
+	 * Format the query
+	 * 
+	 * @param query
+	 *            The query
+	 * @param writer
+	 *            IndentedWriter
+	 */
+
+	static public void serialize(Query query, IndentedWriter writer) {
+		Syntax s = query.getSyntax();
+		if (s == null)
+			s = Syntax.defaultQuerySyntax;
+		serialize(query, writer, s);
+	}
+
+	/**
+	 * Format the query
+	 * 
+	 * @param writer
+	 *            IndentedWriter
+	 * @param outSyntax
+	 *            Syntax URI
+	 */
+
+	static public void serialize(Query query, IndentedWriter writer, Syntax outSyntax) {
+		_serialize(query, writer, outSyntax);
+	}
+
+	static private void _serialize(Query query, IndentedWriter writer, Syntax outSyntax) {
+		if (outSyntax == null)
+			outSyntax = Syntax.defaultQuerySyntax;
+
+		if (outSyntax.equals(Syntax.syntaxARQ)) {
+			serializeARQ(query, writer);
+			writer.flush();
+			return;
+		}
+
+		if (outSyntax.equals(Syntax.syntaxSPARQL_10)) {
+			serializeSPARQL_10(query, writer);
+			writer.flush();
+			return;
+		}
+
+		if (outSyntax.equals(Syntax.syntaxSPARQL_11)) {
+			serializeSPARQL_11(query, writer);
+			writer.flush();
+			return;
+		}
+		
+		if (outSyntax.equals(ParserRSPQL.rspqlSPARQLSyntax)) {
+			serializeRSPQL(query, writer);
+			writer.flush();
+			return;
+		}
+
+		// if (outSyntax.equals(Syntax.syntaxSPARQL_X))
+		// {
+		// serializeSPARQL_X(query, writer) ;
+		// writer.flush() ;
+		// return ;
+		// }
+		Log.warn(Serializer.class, "Unknown syntax: " + outSyntax);
+	}
+
+	static public void serializeARQ(Query query, Prologue p, IndentedWriter writer) {
+		// For the query pattern
+		SerializationContext cxt1 = new SerializationContext(p, new NodeToLabelMapBNode("b", false));
+		// For the construct pattern
+		SerializationContext cxt2 = new SerializationContext(p, new NodeToLabelMapBNode("c", false));
+
+		Prologue orig = null;
+		if (query != p) {
+			orig = query.copy();
+			query.usePrologueFrom(p);
+		}
+
+		serializeARQ(query, writer, new FormatterElement(writer, cxt1), new FmtExprSPARQL(writer, cxt1),
+				new FmtTemplate(writer, cxt2));
+
+		if (orig != null)
+			query.usePrologueFrom(orig);
+	}
+
+	static public void serializeARQ(Query query, IndentedWriter writer) {
+		serializeARQ(query, query, writer);
+	}
+
+	static void serializeARQ(Query query, IndentedWriter writer, FormatterElement eltFmt, FmtExprSPARQL exprFmt,
+			FormatterTemplate templateFmt) {
+		QuerySerializer serilizer = new QuerySerializer(writer, eltFmt, exprFmt, templateFmt);
+		query.visit(serilizer);
+	}
+
+	static public void serializeSPARQL_10(Query query, IndentedWriter writer) {
+		// ARQ is a superset of SPARQL.
+		serializeARQ(query, writer);
+	}
+
+	static public void serializeSPARQL_11(Query query, IndentedWriter writer) {
+		// ARQ is a superset of SPARQL.
+		serializeARQ(query, writer);
+	}
+	
+	private static void serializeRSPQL(Query query, IndentedWriter writer) {
+		// ARQ has been extended to a superset of SPARQL.
+		serializeARQ(query, writer);
+	}
+
+	// static public void serializeSPARQL_X(Query query, IndentedWriter writer)
+	// {
+	// SerializationContext cxt = new SerializationContext(query, null ) ;
+	// QuerySerializerXML serilizer = new QuerySerializerXML(writer, cxt) ;
+	// query.visit(serilizer) ;
+	// }
 }

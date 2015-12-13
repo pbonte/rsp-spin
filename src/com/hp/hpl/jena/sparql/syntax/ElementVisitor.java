@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.hp.hpl.jena.sparql.syntax;
+
+import org.rspql.syntax.ElementWindow;
 
 public interface ElementVisitor
 {
@@ -30,14 +31,12 @@ public interface ElementVisitor
     public void visit(ElementOptional el) ;
     public void visit(ElementGroup el) ;
     public void visit(ElementDataset el) ;
-    public void visit(ElementNamedGraph el) ;
-    
-    public void visit(ElementNamedWindow el) ; // RSP window
-	public void visit(ElementWindow el);
-	
+    public void visit(ElementNamedGraph el) ;	
     public void visit(ElementExists el) ;
     public void visit(ElementNotExists el) ;
     public void visit(ElementMinus el) ;
     public void visit(ElementService el) ;
     public void visit(ElementSubQuery el) ;
+    // RSP_QL
+    public void visit(ElementWindow el) ;
 }

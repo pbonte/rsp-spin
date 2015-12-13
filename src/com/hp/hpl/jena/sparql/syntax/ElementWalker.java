@@ -18,6 +18,8 @@
 
 package com.hp.hpl.jena.sparql.syntax;
 
+import org.rspql.syntax.ElementWindow;
+
 /**
  * An element visitor that walks the graph pattern tree, applying a visitor at
  * each Element traversed. Does not (NOT)EXISTS in filters. These will need to
@@ -184,13 +186,6 @@ public class ElementWalker {
 
 		@Override
 		public void visit(ElementPathBlock el) {
-			before(el);
-			proc.visit(el);
-			after(el);
-		}
-
-		@Override
-		public void visit(ElementNamedWindow el) {
 			before(el);
 			proc.visit(el);
 			after(el);

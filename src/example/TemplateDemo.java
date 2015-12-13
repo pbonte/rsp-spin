@@ -44,7 +44,7 @@ public class TemplateDemo {
 		model.setNsPrefix("sp", SP.NS);
 		model.setNsPrefix("spl", SPL.NS);
 		model.setNsPrefix("spin", SPIN.NS);
-		model.setNsPrefix("rsp", SP.RSP);
+		//model.setNsPrefix("rsp", SP.RSP);
 		model.setNsPrefix("rdfs", RDFS.getURI());
 		model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
 
