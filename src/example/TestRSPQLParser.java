@@ -16,15 +16,16 @@ public class TestRSPQLParser {
 		ParserRSPQL.register();
 
 		String q = ""
-				+ "PREFIX : <http://test#> "
-				+ "REGISTER STREAM :s1 AS "
-				+ "CONSTRUCT ISTREAM { ?a ?b ?c } "
-				+ "FROM NAMED WINDOW :w ON :s [RANGE PT1m] "
-				+ "WHERE { "
-				+ "   GRAPH :g { ?a ?b ?c } "
-				+ "   WINDOW :w { "
-				+ "      GRAPH { ?a ?b ?c } "
-				+ "   }"
+				+ "PREFIX : <http://test#> \n"
+				+ "REGISTER STREAM :s1 AS \n"
+				+ "CONSTRUCT ISTREAM { ?a ?b ?c } \n"
+				+ "FROM NAMED WINDOW :w ON :s [RANGE PT1m] \n"
+				+ "WHERE { \n"
+				+ "   WINDOW :w { \n"
+				+ "      ?a ?b ?c . \n"
+				+ "      WINDOW :w { ?a ?b ?c } \n"
+				+ "      GRAPH :g { ?a ?b ?c . }\n"
+				+ "   }\n"
 				+ "}";
 		Query query = QueryFactory.create(q, ParserRSPQL.rspqlSPARQLSyntax);
 		System.out.println(query);

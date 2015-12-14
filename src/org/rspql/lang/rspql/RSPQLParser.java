@@ -20,7 +20,6 @@ package org.rspql.lang.rspql;
 import org.rspql.syntax.ElementLogicalWindow;
 import org.rspql.syntax.ElementPhysicalWindow;
 import org.rspql.syntax.ElementWindow;
-
 import com.hp.hpl.jena.graph.*;
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.sparql.core.Var;
@@ -1779,13 +1778,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     throw new Error("Missing return statement in function");
   }
 
-// #ifdef ARQ
-// void Meta() : { QuadDataAccSink qd = new QuadDataAccSink() ; }
-// {
-//    <META> 
-//    QuadData(qd)
-// }
-// #endif
   final public void InsertData() throws ParseException {
   QuadDataAccSink qd = createInsertDataSink();
   Token t;
@@ -2352,11 +2344,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   Element el = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case LBRACE:
-      //    el = GroupGraphPattern()
-          //  |
-          //    el = UnionGraphPattern()
-          //  |
-          el = GroupOrUnionGraphPattern();
+      el = GroupOrUnionGraphPattern();
       break;
     case OPTIONAL:
       el = OptionalGraphPattern();
@@ -2424,7 +2412,9 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   Node n;
     jj_consume_token(WINDOW);
     n = VarOrIri();
-    el = GroupGraphPattern();
+    jj_consume_token(LBRACE);
+    el = GroupGraphPatternSub();
+    jj_consume_token(RBRACE);
     {if (true) return new ElementWindow(n, el);}
     throw new Error("Missing return statement in function");
   }
@@ -5773,6 +5763,18 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     finally { jj_save(4, xla); }
   }
 
+  private boolean jj_3_3() {
+    if (jj_scan_token(DOT)) return true;
+    if (jj_3R_45()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_115() {
+    if (jj_scan_token(NOT)) return true;
+    if (jj_scan_token(EXISTS)) return true;
+    return false;
+  }
+
   private boolean jj_3R_114() {
     if (jj_scan_token(EXISTS)) return true;
     if (jj_3R_129()) return true;
@@ -5827,11 +5829,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
-  private boolean jj_3R_167() {
-    if (jj_scan_token(PNAME_NS)) return true;
-    return false;
-  }
-
   private boolean jj_3_2() {
     if (jj_scan_token(SEMICOLON)) return true;
     if (jj_3R_44()) return true;
@@ -5877,6 +5874,11 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     }
     }
     }
+    return false;
+  }
+
+  private boolean jj_3R_167() {
+    if (jj_scan_token(PNAME_NS)) return true;
     return false;
   }
 
@@ -6071,6 +6073,11 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
+  private boolean jj_3_1() {
+    if (jj_3R_43()) return true;
+    return false;
+  }
+
   private boolean jj_3R_183() {
     if (jj_scan_token(DOUBLE_NEGATIVE)) return true;
     return false;
@@ -6084,11 +6091,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
 
   private boolean jj_3R_182() {
     if (jj_scan_token(DECIMAL_NEGATIVE)) return true;
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_3R_43()) return true;
     return false;
   }
 
@@ -6367,6 +6369,13 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
+  private boolean jj_3R_118() {
+    if (jj_scan_token(REGISTER)) return true;
+    if (jj_3R_132()) return true;
+    if (jj_scan_token(AS)) return true;
+    return false;
+  }
+
   private boolean jj_3R_148() {
     if (jj_3R_155()) return true;
     return false;
@@ -6389,13 +6398,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
-  private boolean jj_3R_118() {
-    if (jj_scan_token(REGISTER)) return true;
-    if (jj_3R_132()) return true;
-    if (jj_scan_token(AS)) return true;
-    return false;
-  }
-
   private boolean jj_3R_146() {
     if (jj_3R_153()) return true;
     return false;
@@ -6404,6 +6406,13 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   private boolean jj_3R_64() {
     if (jj_scan_token(UCASE)) return true;
     if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_131() {
+    if (jj_scan_token(PREFIX)) return true;
+    if (jj_scan_token(PNAME_NS)) return true;
+    if (jj_3R_137()) return true;
     return false;
   }
 
@@ -6445,13 +6454,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
-  private boolean jj_3R_131() {
-    if (jj_scan_token(PREFIX)) return true;
-    if (jj_scan_token(PNAME_NS)) return true;
-    if (jj_3R_137()) return true;
-    return false;
-  }
-
   private boolean jj_3R_128() {
     if (jj_scan_token(LPAREN)) return true;
     return false;
@@ -6459,6 +6461,12 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
 
   private boolean jj_3R_61() {
     if (jj_3R_111()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_130() {
+    if (jj_scan_token(BASE)) return true;
+    if (jj_3R_137()) return true;
     return false;
   }
 
@@ -6488,31 +6496,13 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
-  private boolean jj_3R_59() {
-    if (jj_scan_token(ROUND)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_130() {
-    if (jj_scan_token(BASE)) return true;
-    if (jj_3R_137()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_58() {
-    if (jj_scan_token(FLOOR)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
   private boolean jj_3R_104() {
     if (jj_3R_118()) return true;
     return false;
   }
 
-  private boolean jj_3R_57() {
-    if (jj_scan_token(CEIL)) return true;
+  private boolean jj_3R_59() {
+    if (jj_scan_token(ROUND)) return true;
     if (jj_scan_token(LPAREN)) return true;
     return false;
   }
@@ -6537,8 +6527,8 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
-  private boolean jj_3R_56() {
-    if (jj_scan_token(ABS)) return true;
+  private boolean jj_3R_58() {
+    if (jj_scan_token(FLOOR)) return true;
     if (jj_scan_token(LPAREN)) return true;
     return false;
   }
@@ -6553,6 +6543,18 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       xsp = jj_scanpos;
       if (jj_3R_104()) { jj_scanpos = xsp; break; }
     }
+    return false;
+  }
+
+  private boolean jj_3R_57() {
+    if (jj_scan_token(CEIL)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_56() {
+    if (jj_scan_token(ABS)) return true;
+    if (jj_scan_token(LPAREN)) return true;
     return false;
   }
 
@@ -6920,18 +6922,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
 
   private boolean jj_3R_129() {
     if (jj_scan_token(LBRACE)) return true;
-    return false;
-  }
-
-  private boolean jj_3_3() {
-    if (jj_scan_token(DOT)) return true;
-    if (jj_3R_45()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_115() {
-    if (jj_scan_token(NOT)) return true;
-    if (jj_scan_token(EXISTS)) return true;
     return false;
   }
 
