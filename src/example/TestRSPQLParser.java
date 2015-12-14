@@ -23,8 +23,7 @@ public class TestRSPQLParser {
 				+ "WHERE { \n"
 				+ "   WINDOW :w { \n"
 				+ "      ?a ?b ?c . \n"
-				+ "      WINDOW :w { ?a ?b ?c } \n"
-				+ "      GRAPH :g { ?a ?b ?c . }\n"
+				+ "      GRAPH :g { ?a ?b ?c . } \n"
 				+ "   }\n"
 				+ "}";
 		Query query = QueryFactory.create(q, ParserRSPQL.rspqlSPARQLSyntax);
