@@ -1,6 +1,6 @@
 package example;
 
-import org.rsp.lang.ParserRSPQL;
+import org.rspql.lang.ParserRSPQL;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.system.SPINModuleRegistry;
 

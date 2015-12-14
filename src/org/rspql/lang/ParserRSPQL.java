@@ -1,12 +1,12 @@
-package org.rsp.lang;
+package org.rspql.lang;
 
 import java.io.Reader;
 import java.io.StringReader;
 
 import org.apache.jena.atlas.logging.Log;
-import org.rsp.lang.rspql.ParseException;
-import org.rsp.lang.rspql.RSPQLParser;
-import org.rsp.lang.rspql.TokenMgrError;
+import org.rspql.lang.rspql.ParseException;
+import org.rspql.lang.rspql.RSPQLParser;
+import org.rspql.lang.rspql.TokenMgrError;
 
 import com.hp.hpl.jena.query.Query;
 //import com.hp.hpl.jena.query.Query;

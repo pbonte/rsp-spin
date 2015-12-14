@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.rsp.lang.rspql;
+package org.rspql.lang.rspql;
 import org.apache.jena.atlas.json.io.JSONHandler ;
 import org.apache.jena.atlas.json.io.JSONHandlerBase ;
 import org.apache.jena.atlas.lib.NotImplemented ;

@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.rsp.lang.rspql;
+package org.rspql.lang.rspql;
 
 /**
  * This exception is thrown when parse errors are encountered.
@@ -201,4 +201,4 @@ public class ParseException extends Exception {
    }
 
 }
-/* JavaCC - OriginalChecksum=607a529e33960c36bd6710c7287f25aa (do not edit this line) */
+/* JavaCC - OriginalChecksum=e995a6c8d80febc7c82c038c55da1e6e (do not edit this line) */

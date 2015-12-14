@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.rsp.lang.rspql;
+package org.rspql.lang.rspql;
 
 /**
  * An implementation of interface CharStream, where the stream is assumed to
@@ -631,4 +631,4 @@ class JavaCharStream
   }
 
 }
-/* JavaCC - OriginalChecksum=2cc4a0c1ced6f10d230ffaeeef2a07ef (do not edit this line) */
+/* JavaCC - OriginalChecksum=be585afc758b6ace05de5aa1b36b3a94 (do not edit this line) */

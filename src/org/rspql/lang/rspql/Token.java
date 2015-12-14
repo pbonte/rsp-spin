@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.rsp.lang.rspql;
+package org.rspql.lang.rspql;
 
 /**
  * Describes the input token stream.
@@ -145,4 +145,4 @@ public class Token implements java.io.Serializable {
   }
 
 }
-/* JavaCC - OriginalChecksum=b9efc6403769a33e1124c578c0b1823b (do not edit this line) */
+/* JavaCC - OriginalChecksum=642e39481f01f4f548e533e5c2e9d87b (do not edit this line) */

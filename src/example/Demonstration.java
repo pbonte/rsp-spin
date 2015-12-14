@@ -6,8 +6,8 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Calendar;
 
-import org.rsp.lang.ParserRSPQL;
-import org.rsp.lang.rspql.RSPQLParser;
+import org.rspql.lang.ParserRSPQL;
+import org.rspql.lang.rspql.RSPQLParser;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.model.SPINFactory;
 import org.topbraid.spin.model.print.StringPrintContext;

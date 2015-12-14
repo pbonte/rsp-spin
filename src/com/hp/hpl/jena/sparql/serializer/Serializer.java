@@ -23,7 +23,7 @@ import java.io.OutputStream;
 import org.apache.jena.atlas.io.IndentedLineBuffer;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.atlas.logging.Log;
-import org.rsp.lang.ParserRSPQL;
+import org.rspql.lang.ParserRSPQL;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.Syntax;

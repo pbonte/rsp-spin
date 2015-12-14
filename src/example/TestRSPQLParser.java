@@ -1,8 +1,9 @@
 package example;
 
+import org.rspql.lang.ParserRSPQL;
+
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
-import org.rsp.lang.ParserRSPQL;
 
 public class TestRSPQLParser {
 
@@ -26,7 +27,7 @@ public class TestRSPQLParser {
 				+ "   }"
 				+ "}";
 		Query query = QueryFactory.create(q, ParserRSPQL.rspqlSPARQLSyntax);
-		//System.out.println(query);
+		System.out.println(query);
 		
 	}
 }

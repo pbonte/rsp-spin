@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.rsp.lang.rspql;
+package org.rspql.lang.rspql;
 
 /** Token Manager Error. */
 public class TokenMgrError extends Error
@@ -161,4 +161,4 @@ public class TokenMgrError extends Error
     this(LexicalError(EOFSeen, lexState, errorLine, errorColumn, errorAfter, curChar), reason);
   }
 }
-/* JavaCC - OriginalChecksum=34286272b98a5dd3a6f9db37101c2961 (do not edit this line) */
+/* JavaCC - OriginalChecksum=7b749d2568fc7d543eaae072069f5e3c (do not edit this line) */
