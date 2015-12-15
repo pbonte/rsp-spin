@@ -91,11 +91,6 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 		out.println();
 		visitAsGroup(el.getElement());
 	}
-
-	
-	protected void visitWindowPattern(String label, Node node, Element subElement) {
-		visitAsGroup(subElement);
-	}
 	
 	public void setQuery(Query query) {
 		this.query = query;
