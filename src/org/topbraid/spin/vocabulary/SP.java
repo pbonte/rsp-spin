@@ -357,6 +357,7 @@ public class SP {
 	// RSP-QL related properties and classes
 	public final static String RSP = "https://w3id.org/rsp/spin#";
 	// Classes
+	public final static Resource Window = ResourceFactory.createResource(RSP + "Window");
 	public final static Resource LogicalWindow = ResourceFactory.createResource(RSP + "LogicalWindow");
 	public final static Resource PhysicalWindow = ResourceFactory.createResource(RSP + "PhysicalWindow");
 	public final static Resource NamedWindow = ResourceFactory.createResource(RSP + "NamedWindow");
