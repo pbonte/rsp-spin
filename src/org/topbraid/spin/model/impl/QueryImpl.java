@@ -36,11 +36,6 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-/**
- * @author Robin Keskisarkka (https://github.com/keski) Modified to support
- *         RSP-QL in accordance with the Apache License Version 2.0 distribution
- *         of SPIN API (http://topbraid.org/spin/api/)
- */
 
 public abstract class QueryImpl extends AbstractSPINResourceImpl implements SolutionModifierQuery {
 
@@ -195,29 +190,29 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 					context.print(String.format("[RANGE %s]", range));
 				}
 			} else if (window.getClass().equals(ElementPhysicalWindow.class)) {
-					ElementPhysicalWindow physicalWindow= (ElementPhysicalWindow) window;
-					// Get physical size
-					RDFNode sizeNode = (RDFNode) physicalWindow.getSize();
-					String size;
-					if (sizeNode instanceof Resource && ((Resource) sizeNode).hasProperty(SP.varName)) {
-						size = "?" + sizeNode.as(Variable.class).getName();
-					} else {
-						size = Integer.toString(sizeNode.asLiteral().getInt());
-					}
-					// Get step (optional)
-					RDFNode stepNode = (RDFNode) physicalWindow.getStep();
-					if (stepNode != null) {
-						String step;
-						if (stepNode instanceof Resource && ((Resource) stepNode).hasProperty(SP.varName)) {
-							step = "?" + stepNode.as(Variable.class).getName();
-						} else {
-							step = Integer.toString(stepNode.asLiteral().getInt());
-						}
-						context.print(String.format("[ITEM %s STEP %s]", size, step));
-					} else {
-						context.print(String.format("[ITEM %s]", size));
-					}
+				ElementPhysicalWindow physicalWindow = (ElementPhysicalWindow) window;
+				// Get physical size
+				RDFNode sizeNode = (RDFNode) physicalWindow.getSize();
+				String size;
+				if (sizeNode instanceof Resource && ((Resource) sizeNode).hasProperty(SP.varName)) {
+					size = "?" + sizeNode.as(Variable.class).getName();
+				} else {
+					size = Integer.toString(sizeNode.asLiteral().getInt());
 				}
+				// Get step (optional)
+				RDFNode stepNode = (RDFNode) physicalWindow.getStep();
+				if (stepNode != null) {
+					String step;
+					if (stepNode instanceof Resource && ((Resource) stepNode).hasProperty(SP.varName)) {
+						step = "?" + stepNode.as(Variable.class).getName();
+					} else {
+						step = Integer.toString(stepNode.asLiteral().getInt());
+					}
+					context.print(String.format("[ITEM %s STEP %s]", size, step));
+				} else {
+					context.print(String.format("[ITEM %s]", size));
+				}
+			}
 		}
 	}
 
