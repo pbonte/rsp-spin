@@ -1,12 +1,9 @@
-package org.rspql.lang;
+package org.rspql.lang.rspql;
 
 import java.io.Reader;
 import java.io.StringReader;
 
 import org.apache.jena.atlas.logging.Log;
-import org.rspql.lang.rspql.ParseException;
-import org.rspql.lang.rspql.RSPQLParser;
-import org.rspql.lang.rspql.TokenMgrError;
 
 import com.hp.hpl.jena.query.Query;
 //import com.hp.hpl.jena.query.Query;
@@ -22,7 +19,7 @@ import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.Template;
 
 public class ParserRSPQL extends ParserARQ {
-	final static public Syntax rspqlSPARQLSyntax = new Syntax("rspql", "https://w3id.org/rsp/spin/rspql");
+	final static public Syntax rspqlSyntax = new Syntax("rspql", "https://w3id.org/rsp/spin/rspql");
 
 	static class Syntax extends com.hp.hpl.jena.query.Syntax {
 		protected Syntax(String lookupName, String uri) {
@@ -34,9 +31,9 @@ public class ParserRSPQL extends ParserARQ {
 	/** Registers a parser factory for this parser. */
 	static public void register() {
 		// register this parser for the tSPARQL syntax
-		SPARQLParserRegistry.addFactory(ParserRSPQL.rspqlSPARQLSyntax, new SPARQLParserFactory() {
+		SPARQLParserRegistry.addFactory(ParserRSPQL.rspqlSyntax, new SPARQLParserFactory() {
 			public boolean accept(com.hp.hpl.jena.query.Syntax syntax) {
-				return syntax.equals(rspqlSPARQLSyntax);
+				return syntax.equals(rspqlSyntax);
 			}
 
 			public SPARQLParser create(com.hp.hpl.jena.query.Syntax syntax) {
@@ -50,7 +47,7 @@ public class ParserRSPQL extends ParserARQ {
 	}
 
 	protected Query parse$(final Query query, String queryString) {
-		query.setSyntax(rspqlSPARQLSyntax);
+		query.setSyntax(rspqlSyntax);
 
 		Action action = new Action() {
 			@Override

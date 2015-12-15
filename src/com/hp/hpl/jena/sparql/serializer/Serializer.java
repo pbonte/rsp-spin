@@ -23,7 +23,7 @@ import java.io.OutputStream;
 import org.apache.jena.atlas.io.IndentedLineBuffer;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.atlas.logging.Log;
-import org.rspql.lang.ParserRSPQL;
+import org.rspql.lang.rspql.ParserRSPQL;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.Syntax;
@@ -148,7 +148,7 @@ public class Serializer {
 			return;
 		}
 		
-		if (outSyntax.equals(ParserRSPQL.rspqlSPARQLSyntax)) {
+		if (outSyntax.equals(ParserRSPQL.rspqlSyntax)) {
 			serializeRSPQL(query, writer);
 			writer.flush();
 			return;
@@ -202,15 +202,14 @@ public class Serializer {
 		serializeARQ(query, writer);
 	}
 	
+	/**
+	 * Support for serialization of RSP-QL query. This uses an extended ARQ serializer 
+	 * @param query
+	 * @param writer
+	 */
 	private static void serializeRSPQL(Query query, IndentedWriter writer) {
 		// ARQ has been extended to a superset of SPARQL.
 		serializeARQ(query, writer);
 	}
 
-	// static public void serializeSPARQL_X(Query query, IndentedWriter writer)
-	// {
-	// SerializationContext cxt = new SerializationContext(query, null ) ;
-	// QuerySerializerXML serilizer = new QuerySerializerXML(writer, cxt) ;
-	// query.visit(serilizer) ;
-	// }
 }

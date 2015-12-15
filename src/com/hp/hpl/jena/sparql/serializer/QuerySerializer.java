@@ -47,7 +47,7 @@ import com.hp.hpl.jena.sparql.util.FmtUtils;
 
 
 
-/** Serialize a query into SPARQL or ARQ formats or RSP-QL*/
+/** Serialize a query into SPARQL, ARQ, or RSP-QL format*/
 public class QuerySerializer implements QueryVisitor {
 	static final int BLOCK_INDENT = 2;
 	protected FormatterTemplate fmtTemplate;
@@ -345,8 +345,6 @@ public class QuerySerializer implements QueryVisitor {
 		out.flush();
 	}
 
-	// ----
-
 	void appendVarList(Query query, IndentedWriter sb, List<String> vars) {
 		boolean first = true;
 		for (String varName : vars) {
@@ -367,22 +365,14 @@ public class QuerySerializer implements QueryVisitor {
 				sb.print(" ");
 
 			if (expr != null) {
-				// The following are safe to write without ()
-				// Compare/merge with fmtExpr.format
 				boolean needParens = true;
 
 				if (expr.isFunction())
 					needParens = false;
-				// else if ( expr instanceof E_Aggregator )
-				// // Aggregators are variables (the function maps to an
-				// internal variable
-				// // that is accesses by the E_Aggregator
-				// needParens = false ;
 				else if (expr.isVariable())
 					needParens = false;
 
 				if (!Var.isAllocVar(var))
-					// AS ==> need parens
 					needParens = true;
 
 				if (needParens)
