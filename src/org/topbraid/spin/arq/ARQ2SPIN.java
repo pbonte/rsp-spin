@@ -1,5 +1,4 @@
 /*******************************************************************************
- * Copyright (c) 2009 TopQuadrant, Inc.
  * All rights reserved. 
  *******************************************************************************
  * 
@@ -692,7 +691,6 @@ public class ARQ2SPIN {
 						}
 					}
 				}
-
 
 				@Override
 				public void visit(ElementWindow elementWindow) {

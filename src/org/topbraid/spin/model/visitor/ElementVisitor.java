@@ -57,4 +57,5 @@ public interface ElementVisitor {
 	void visit(Values values);
 
 	void visit(NamedWindow namedWindow);
+
 }
