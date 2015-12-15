@@ -68,7 +68,7 @@ public class CQELSSerializer implements QueryVisitor {
 		Node n = query.getRegisterAs();
 		if (n == null)
 			return;
-		System.err.println("WARNING: REGISTER AS is not supported in CQELS-QL and will be omitted");
+		System.err.println("WARNING: REGISTER AS is not supported in CQELS-QL and will be omitted.");
 	}
 
 	@Override
@@ -148,7 +148,7 @@ public class CQELSSerializer implements QueryVisitor {
 			out.newline();
 
 			Element el = query.getQueryPattern();
-			fmtElement.visitAsGroup(el, query.getNamedWindows());
+			fmtElement.visitAsGroup(el);
 			// el.visit(fmtElement) ;
 			out.decIndent(BLOCK_INDENT);
 			out.newline();

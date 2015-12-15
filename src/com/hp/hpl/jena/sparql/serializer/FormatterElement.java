@@ -326,7 +326,7 @@ public class FormatterElement extends FormatterBase implements ElementVisitor {
 		out.print("}");
 	}
 
-	private static boolean needsDotSeparator(Element el1, Element el2) {
+	public static boolean needsDotSeparator(Element el1, Element el2) {
 		return needsDotSeparator(el1) && needsDotSeparator(el2);
 	}
 
@@ -436,7 +436,7 @@ public class FormatterElement extends FormatterBase implements ElementVisitor {
 			out.print("{ ");
 			out.incIndent(INDENT);
 		}
-
+		
 		el.visit(this);
 
 		if (needBraces) {
