@@ -356,7 +356,7 @@ public class FormatterElement extends FormatterBase implements ElementVisitor {
 		visitNodePattern(x, el.getServiceNode(), el.getElement());
 	}
 
-	private void visitNodePattern(String label, Node node, Element subElement) {
+	protected void visitNodePattern(String label, Node node, Element subElement) {
 		int len = label.length();
 		out.print(label);
 		out.print(" ");

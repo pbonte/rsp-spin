@@ -23,6 +23,8 @@ import java.io.OutputStream;
 import org.apache.jena.atlas.io.IndentedLineBuffer;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.atlas.logging.Log;
+import org.rspql.lang.cqels.CQELSSerializer;
+import org.rspql.lang.cqels.ParserCQELS;
 import org.rspql.lang.rspql.ParserRSPQL;
 
 import com.hp.hpl.jena.query.Query;
@@ -153,13 +155,13 @@ public class Serializer {
 			writer.flush();
 			return;
 		}
+		
+		if (outSyntax.equals(ParserCQELS.cqelsSyntax)) {
+			serializeCQELS(query, writer);
+			writer.flush();
+			return;
+		}
 
-		// if (outSyntax.equals(Syntax.syntaxSPARQL_X))
-		// {
-		// serializeSPARQL_X(query, writer) ;
-		// writer.flush() ;
-		// return ;
-		// }
 		Log.warn(Serializer.class, "Unknown syntax: " + outSyntax);
 	}
 
@@ -203,7 +205,7 @@ public class Serializer {
 	}
 	
 	/**
-	 * Support for serialization of RSP-QL query. This uses an extended ARQ serializer 
+	 * Serialization of RSP-QL query. This uses the extended ARQ serializer 
 	 * @param query
 	 * @param writer
 	 */
@@ -211,5 +213,18 @@ public class Serializer {
 		// ARQ has been extended to a superset of SPARQL.
 		serializeARQ(query, writer);
 	}
+	
+	/**
+	 * Support for serializing RSP-QL as CQELS.
+	 * @param query
+	 * @param writer
+	 */
+	static public void serializeCQELS(Query query, IndentedWriter writer) {
+		SerializationContext cxt1 = new SerializationContext(query, new NodeToLabelMapBNode("b", false));
+		SerializationContext cxt2 = new SerializationContext(query, new NodeToLabelMapBNode("c", false));
+		CQELSSerializer serilizer = new CQELSSerializer(writer,  new org.rspql.lang.cqels.FormatterElement(writer, cxt1), new FmtExprSPARQL(writer, cxt1), new FmtTemplate(writer, cxt2));
+		query.visit(serilizer);
+	}
+	
 
 }
