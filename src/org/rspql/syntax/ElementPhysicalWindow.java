@@ -18,7 +18,7 @@ public class ElementPhysicalWindow extends ElementNamedWindow {
 	public ElementPhysicalWindow(String windowIri, Object streamIri, Object size, Object step) {
 		super(windowIri, streamIri);
 		this.size = size;
-		this.step = step;
+		this.step = step; 
 	}
 
 	/**
