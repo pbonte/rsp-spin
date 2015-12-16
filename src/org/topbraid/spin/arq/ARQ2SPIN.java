@@ -11,6 +11,7 @@
  */
 package org.topbraid.spin.arq;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.atlas.lib.StrUtils;
+import org.rspql.syntax.ElementLogicalPastWindow;
 import org.rspql.syntax.ElementLogicalWindow;
 import org.rspql.syntax.ElementNamedWindow;
 import org.rspql.syntax.ElementPhysicalWindow;
@@ -61,6 +63,7 @@ import org.topbraid.spin.vocabulary.SPIN;
 import org.topbraid.spin.vocabulary.SPL;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.datatypes.xsd.XSDDuration;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
@@ -333,18 +336,23 @@ public class ARQ2SPIN {
 				windowNode.addProperty(SP.streamIri, r);
 			}
 
-			// Logical or physical window
 			if (window.getClass().equals(ElementLogicalWindow.class)) {
+				// Standard logical window
 				ElementLogicalWindow logicalWindow = (ElementLogicalWindow) window;
 				windowNode.addProperty(RDF.type, SP.LogicalWindow);
 				// Add range
 				Object range = logicalWindow.getRange();
+				if (range.toString().equals("NOW")) {
+					windowNode.addProperty(SP.windowRange, SP.WindowNow);
+					continue;
+				}
 				if (range instanceof Node) {
 					String varName = ((Node) range).getName();
 					Resource variable = getVariable(varName);
 					windowNode.addProperty(SP.windowRange, variable);
 				} else {
-					windowNode.addProperty(SP.windowRange, range.toString());
+					Duration d = Duration.parse(range.toString());
+					windowNode.addProperty(SP.windowRange, d.toString(), XSDDatatype.XSDduration);
 				}
 				// Add step (optional)
 				Object step = logicalWindow.getStep();
@@ -357,11 +365,51 @@ public class ARQ2SPIN {
 						windowNode.addProperty(SP.windowStep, step.toString());
 					}
 				}
-			} else {
+			} else if (window.getClass().equals(ElementLogicalPastWindow.class)) {
+				// Standard logical window
+				ElementLogicalPastWindow logicalPastWindow = (ElementLogicalPastWindow) window;
+				windowNode.addProperty(RDF.type, SP.LogicalPastWindow);
+				// Add from
+				Object from = logicalPastWindow.getFrom();
+				if (from instanceof Node) {
+					String varName = ((Node) from).getName();
+					Resource variable = getVariable(varName);
+					windowNode.addProperty(SP.windowFrom, variable);
+				} else {
+					Duration d = Duration.parse(from.toString().replace("NOW-", ""));
+					windowNode.addProperty(SP.windowFrom, d.toString(), XSDDatatype.XSDduration);
+				}
+				// Add to
+				Object to = logicalPastWindow.getTo();
+				if (to instanceof Node) {
+					String varName = ((Node) to).getName();
+					Resource variable = getVariable(varName);
+					windowNode.addProperty(SP.windowTo, variable);
+				} else {
+					Duration d = Duration.parse(to.toString().replace("NOW-", ""));
+					windowNode.addProperty(SP.windowTo, d.toString(), XSDDatatype.XSDduration);
+				}
+				// Add step (optional)
+				Object step = logicalPastWindow.getStep();
+				if (step != null) {
+					if (step instanceof Node) {
+						String varName = ((Node) step).getName();
+						Resource variable = getVariable(varName);
+						windowNode.addProperty(SP.windowStep, variable);
+					} else {
+						windowNode.addProperty(SP.windowStep, step.toString());
+					}
+				}
+			} else if (window.getClass().equals(ElementPhysicalWindow.class)) {
+				// Physical window
 				ElementPhysicalWindow physicalWindow = (ElementPhysicalWindow) window;
 				windowNode.addProperty(RDF.type, SP.PhysicalWindow);
 				// Add range
 				Object size = physicalWindow.getSize();
+				if (size.toString().equals("ALL")) {
+					windowNode.addProperty(SP.windowSize, SP.WindowAll);
+					continue;
+				}
 				if (size instanceof Node) {
 					String varName = ((Node) size).getName();
 					Resource variable = getVariable(varName);
@@ -1215,37 +1263,5 @@ public class ARQ2SPIN {
 	 */
 	public void setVarNamespace(String value) {
 		this.varNamespace = value;
-	}
-	
-	public static void main(String[] args){
-		String queryString = "PREFIX : <http://test#> CONSTRUCT { ?a ?b?c } "
-				+ "FROM NAMED WINDOW :w ON :s [ ITEM ?items STEP ?step ] WHERE { ?a ?b ?c }";
-		String handle = "http://test#q1";
-		Model model = ModelFactory.createDefaultModel();
-		
-		
-		// Parse using ARQ
-		System.out.println("Parse using ARQ");
-		Query parsed = QueryFactory.create(queryString, Syntax.syntaxARQ);
-		System.out.println(parsed);
-		
-		// Convert to SPIN
-		System.out.println("Parse into SPIN");
-		ARQ2SPIN arq2SPIN = new ARQ2SPIN(model);
-		org.topbraid.spin.model.Query query = arq2SPIN.createQuery(parsed, handle);
-		
-		System.out.println("As model:");
-		model.setNsPrefix("sp", SP.NS);
-		model.setNsPrefix("xsd", XSD.getURI());
-		model.setNsPrefix("rsp", SP.RSP);
-		model.write(System.out, "TTL");
-		
-		System.out.println("As query:");
-		System.out.println(query);
-		
-		// Read SPIN query from the model
-		org.topbraid.spin.model.Query reparsed = SPINFactory.asQuery(model.getResource(handle));
-		System.out.println("Parsed from model:");
-		System.out.println(reparsed);
 	}
 }

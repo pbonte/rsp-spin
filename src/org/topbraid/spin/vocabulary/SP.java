@@ -358,12 +358,16 @@ public class SP {
 	public final static String RSP = "https://w3id.org/rsp/spin#";
 	// Classes
 	public final static Resource Window = ResourceFactory.createResource(RSP + "Window");
+	public final static Resource LogicalPastWindow = ResourceFactory.createResource(RSP + "LogicalPastWindow");
 	public final static Resource LogicalWindow = ResourceFactory.createResource(RSP + "LogicalWindow");
 	public final static Resource PhysicalWindow = ResourceFactory.createResource(RSP + "PhysicalWindow");
 	public final static Resource NamedWindow = ResourceFactory.createResource(RSP + "NamedWindow");
 	public final static Resource Rstream = ResourceFactory.createResource(RSP + "Rstream");
 	public final static Resource Istream = ResourceFactory.createResource(RSP + "Istream");
 	public final static Resource Dstream = ResourceFactory.createResource(RSP + "Dstream");
+	// Keywords
+	public final static Resource WindowAll = ResourceFactory.createResource(RSP + "ALL");
+	public final static Resource WindowNow = ResourceFactory.createResource(RSP + "NOW");
 	// Properties
 	public static Property fromNamedWindow = ResourceFactory.createProperty(RSP + "fromNamedWindow");
 	public static Property windowIri = ResourceFactory.createProperty(RSP + "windowIri");
@@ -371,6 +375,8 @@ public class SP {
 	public static Property windowRange = ResourceFactory.createProperty(RSP + "range");
 	public static Property windowSize = ResourceFactory.createProperty(RSP + "size");
 	public static Property windowStep = ResourceFactory.createProperty(RSP + "step");
+	public static Property windowFrom = ResourceFactory.createProperty(RSP + "from");
+	public static Property windowTo = ResourceFactory.createProperty(RSP + "to");
 	public static Property windowNameNode = ResourceFactory.createProperty(RSP + "windowNameNode");
 	public static Property registerAs = ResourceFactory.createProperty(RSP + "registerAs");
 	public static Property windowToStreamOperator = ResourceFactory.createProperty(RSP + "windowToStreamOperator");

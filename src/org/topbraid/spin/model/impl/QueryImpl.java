@@ -7,9 +7,11 @@
  */
 package org.topbraid.spin.model.impl;
 
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.rspql.syntax.ElementLogicalPastWindow;
 import org.rspql.syntax.ElementLogicalWindow;
 import org.rspql.syntax.ElementNamedWindow;
 import org.rspql.syntax.ElementPhysicalWindow;
@@ -36,7 +38,6 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-
 public abstract class QueryImpl extends AbstractSPINResourceImpl implements SolutionModifierQuery {
 
 	public QueryImpl(Node node, EnhGraph graph) {
@@ -59,15 +60,30 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 			String windowIri = window.getProperty(SP.windowIri).getObject().toString();
 			Object streamIri = window.getProperty(SP.streamIri).getObject();
 
-			// Logical or physical window
+			// Window types
 			Resource type = window.getProperty(RDF.type).getResource();
 			if (type.equals(SP.LogicalWindow)) {
 				Object range = window.getProperty(SP.windowRange).getObject();
+				System.out.println(range);
+				range = range instanceof Duration ? range.toString() : range;
 				Object step = null;
 				if (window.getProperty(SP.windowStep) != null) {
 					step = window.getProperty(SP.windowStep).getObject();
+					step = step instanceof Duration ? step.toString() : step;
 				}
 				windows.add(new ElementLogicalWindow(windowIri, streamIri, range, step));
+			} else if (type.equals(SP.LogicalPastWindow)) {
+				Object from = window.getProperty(SP.windowFrom).getObject();
+				Object to = window.getProperty(SP.windowTo).getObject();
+				from = from instanceof Duration ? from.toString() : from;
+				to = to instanceof Duration ? to.toString() : to;
+
+				Object step = null;
+				if (window.getProperty(SP.windowStep) != null) {
+					step = window.getProperty(SP.windowStep).getObject();
+					step = step instanceof Duration ? step.toString() : step;
+				}
+				windows.add(new ElementLogicalPastWindow(windowIri, streamIri, from, to, step));
 			} else if (type.equals(SP.PhysicalWindow)) {
 				Object size = window.getProperty(SP.windowSize).getObject();
 				Object step = null;
@@ -169,34 +185,78 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 			}
 			context.printKeyword(String.format("FROM NAMED WINDOW %s ON %s ", windowIri, streamIri));
 
-			// Logical or pysical window
+			// Window
 			if (window.getClass().equals(ElementLogicalWindow.class)) {
+				// Standard logical window
 				ElementLogicalWindow logicalWindow = (ElementLogicalWindow) window;
-				// Get logical range
+				String range;
 				RDFNode rangeNode = (RDFNode) logicalWindow.getRange();
-				String range = rangeNode.toString();
+				if (rangeNode.equals(SP.WindowNow)) {
+					context.print(String.format("[%s]", "NOW"));
+					continue;
+				}
 				if (rangeNode instanceof Resource && ((Resource) rangeNode).hasProperty(SP.varName)) {
 					range = "?" + rangeNode.as(Variable.class).getName();
+				} else {
+					range = rangeNode.asLiteral().getString();
 				}
+
 				// Get step (optional)
 				RDFNode stepNode = (RDFNode) logicalWindow.getStep();
 				if (stepNode != null) {
-					String step = stepNode.toString();
+					String step;
 					if (stepNode instanceof Resource && ((Resource) stepNode).hasProperty(SP.varName)) {
 						step = "?" + stepNode.as(Variable.class).getName();
+					} else {
+						step = stepNode.asLiteral().getString();
 					}
 					context.print(String.format("[RANGE %s STEP %s]", range, step));
 				} else {
 					context.print(String.format("[RANGE %s]", range));
 				}
+			} else if (window.getClass().equals(ElementLogicalPastWindow.class)) {
+				// Logical past window
+				ElementLogicalPastWindow logicalPastWindow = (ElementLogicalPastWindow) window;
+				String from;
+				RDFNode fromNode = (RDFNode) logicalPastWindow.getFrom();
+				if (fromNode instanceof Resource && ((Resource) fromNode).hasProperty(SP.varName)) {
+					from = "?" + fromNode.as(Variable.class).getName();
+				} else {
+					from = "NOW-" + fromNode.asLiteral().getString();
+				}
+				String to;
+				RDFNode toNode = (RDFNode) logicalPastWindow.getTo();
+				if (toNode instanceof Resource && ((Resource) toNode).hasProperty(SP.varName)) {
+					to = "?" + toNode.as(Variable.class).getName();
+				} else {
+					to = "NOW-" + toNode.asLiteral().getString();
+				}
+
+				// Get step (optional)
+				RDFNode stepNode = (RDFNode) logicalPastWindow.getStep();
+				if (stepNode != null) {
+					String step;
+					if (stepNode instanceof Resource && ((Resource) stepNode).hasProperty(SP.varName)) {
+						step = "?" + stepNode.as(Variable.class).getName();
+					} else {
+						step = stepNode.asLiteral().getString();
+					}
+					context.print(String.format("[FROM %s TO %s STEP %s]", from, to, step));
+				} else {
+					context.print(String.format("[FROM %s TO %s]", from, to));
+				}
 			} else if (window.getClass().equals(ElementPhysicalWindow.class)) {
+				// Physical window
 				ElementPhysicalWindow physicalWindow = (ElementPhysicalWindow) window;
-				// Get physical size
 				RDFNode sizeNode = (RDFNode) physicalWindow.getSize();
 				String size;
 				if (sizeNode instanceof Resource && ((Resource) sizeNode).hasProperty(SP.varName)) {
 					size = "?" + sizeNode.as(Variable.class).getName();
 				} else {
+					if (sizeNode.equals(SP.WindowAll)) {
+						context.print(String.format("[%s]", "ALL"));
+						continue;
+					}
 					size = Integer.toString(sizeNode.asLiteral().getInt());
 				}
 				// Get step (optional)
