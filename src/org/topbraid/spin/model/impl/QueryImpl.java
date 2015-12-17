@@ -8,6 +8,7 @@
 package org.topbraid.spin.model.impl;
 
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -174,8 +175,13 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 			context.print(fromNamed);
 			context.print(">");
 		}
-		for (ElementNamedWindow window : getFromNamedWindows()) {
+		List<ElementNamedWindow> windows = getFromNamedWindows();
+		windows.sort(null);
+		for (ElementNamedWindow window : windows) {
 			context.println();
+			
+			
+			
 			// Window iri and stream iri
 			String windowIri = "<" + window.getWindowIri() + ">";
 			RDFNode streamNode = (RDFNode) window.getStream();
