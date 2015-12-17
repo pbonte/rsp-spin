@@ -65,7 +65,6 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 			Resource type = window.getProperty(RDF.type).getResource();
 			if (type.equals(SP.LogicalWindow)) {
 				Object range = window.getProperty(SP.windowRange).getObject();
-				System.out.println(range);
 				range = range instanceof Duration ? range.toString() : range;
 				Object step = null;
 				if (window.getProperty(SP.windowStep) != null) {

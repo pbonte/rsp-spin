@@ -13,8 +13,8 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-public class ParseQueryToFromSPIN {
-
+public class TestConstructSPIN {
+	
 	// Physical windows tests
 	@Test
 	public void physicalWindow1() {
@@ -113,13 +113,76 @@ public class ParseQueryToFromSPIN {
 		validate(q, "Logical window queries (with 'NOW') do not match.");
 	}
 	
+	@Test
+	public void registerAs1(){
+		String q = ""
+				+ "PREFIX : <http://example.org#>\n"
+				+ "REGISTER STREAM :s AS\n"
+				+ "CONSTRUCT { ?a ?b ?c }\n"
+				+ "FROM NAMED WINDOW :w ON :stream [RANGE PT1H]\n"
+				+ "WHERE {\n"
+				+ "   WINDOW :w { GRAPH ?g { ?a ?b ?c } }"
+				+ "}";
+		validate(q, "Register as queries (no variable) do not match");
+	}
 	
+	@Test
+	public void registerAs2(){
+		String q = ""
+				+ "PREFIX : <http://example.org#>\n"
+				+ "REGISTER STREAM ?s AS\n"
+				+ "CONSTRUCT { ?a ?b ?c }\n"
+				+ "FROM NAMED WINDOW :w ON :stream [RANGE PT1H]\n"
+				+ "WHERE {\n"
+				+ "   WINDOW :w { GRAPH ?g {?a ?b ?c} }"
+				+ "}";
+		validate(q, "Register as queries (no variable) do not match");
+	}
 	
+	@Test
+	public void windowToStreamOp1(){
+		String q = ""
+				+ "PREFIX : <http://example.org#>\n"
+				+ "REGISTER STREAM :s AS\n"
+				+ "CONSTRUCT ISTREAM { ?a ?b ?c }\n"
+				+ "FROM NAMED WINDOW :w ON :stream [RANGE PT1H]\n"
+				+ "WHERE {\n"
+				+ "   WINDOW :w { GRAPH ?g { ?a ?b ?c } }"
+				+ "}";
+		validate(q, "ISTREAM queries do not match");
+	}
+	
+	@Test
+	public void windowToStreamOp2(){
+		String q = ""
+				+ "PREFIX : <http://example.org#>\n"
+				+ "REGISTER STREAM :s AS\n"
+				+ "CONSTRUCT RSTREAM { ?a ?b ?c }\n"
+				+ "FROM NAMED WINDOW :w ON :stream [RANGE PT1H]\n"
+				+ "WHERE {\n"
+				+ "   WINDOW :w { GRAPH ?g { ?a ?b ?c } }"
+				+ "}";
+		validate(q, "RSTREAM queries do not match");
+	}
+
+	@Test
+	public void windowToStreamOp3(){
+		String q = ""
+				+ "PREFIX : <http://example.org#>\n"
+				+ "REGISTER STREAM :s AS\n"
+				+ "CONSTRUCT DSTREAM { ?a ?b ?c }\n"
+				+ "FROM NAMED WINDOW :w ON :stream [RANGE PT1H]\n"
+				+ "WHERE {\n"
+				+ "   WINDOW :w { GRAPH ?g { ?a ?b ?c } }"
+				+ "}";
+		validate(q, "DSTREAM queries do not match");
+	}
 	
 	private void validate(String q, String message) {
 		// Register the parser
 		ParserRSPQL.register();
 		Query query = QueryFactory.create(q, ParserRSPQL.rspqlSyntax);
+		
 		// Parse to SPIN
 		SPINModuleRegistry.get().init();
 		Model model = ModelFactory.createDefaultModel();
