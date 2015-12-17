@@ -30,12 +30,13 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 
 		for (Element el : elGroup.getElements()) {
 			if (el instanceof ElementNamedGraph) {
-				System.err.println("WARNING: GRAPH blocks in streams is not supported in CQELS-QL. The triples will be added directly to the stream block.");
-				
+				System.err.println(
+						"WARNING: GRAPH blocks in streams is not supported in CQELS-QL. The triples will be added directly to the stream block.");
+
 				ElementGroup group = (ElementGroup) ((ElementNamedGraph) el).getElement();
-				for(Element e : group.getElements()){
+				for (Element e : group.getElements()) {
 					e.visit(this);
-					if(e instanceof ElementPathBlock){
+					if (e instanceof ElementPathBlock) {
 						out.print(" .");
 						out.println();
 					}
@@ -75,27 +76,36 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 		if (window.getClass().equals(ElementLogicalWindow.class)) {
 			ElementLogicalWindow logicalWindow = (ElementLogicalWindow) window;
 			String range = logicalWindow.getRange().toString();
-			// Duration needs to be converted into an integer
-			// (‘d’|‘h’|‘m’|‘s’|‘ms’|‘ns’)
-			if (!range.startsWith("?")) {
-				range = getCQELSFormattedDuration(range);
+			if(range.startsWith("NOW-")){
+				System.err.println(
+						"ERROR: Windows in the past are not supported in CQELS-QL.");
+				return;
 			}
-
-			if (logicalWindow.getStep() != null) {
-				String step = logicalWindow.getStep().toString();
-				if (!step.startsWith("?")) {
-					step = getCQELSFormattedDuration(step);
-				}
-				out.print(String.format("[RANGE %s STEP %s]", range, step));
+			if(range.equals("NOW")){
+				out.print(String.format("[NOW]"));
 			} else {
-				out.print(String.format("[RANGE %s]", range));
+				// Duration is converted into an integer (‘d’|‘h’|‘m’|‘s’|‘ms’|‘ns’)
+				if (!range.startsWith("?")) {
+					range = getCQELSFormattedDuration(range);
+				}
+				if (logicalWindow.getStep() != null) {
+					String step = logicalWindow.getStep().toString();
+					if (!step.startsWith("?")) {
+						step = getCQELSFormattedDuration(step);
+					}
+					out.print(String.format("[RANGE %s STEP %s]", range, step));
+				} else {
+					out.print(String.format("[RANGE %s]", range));
+				}
 			}
 		} else if (window.getClass().equals(ElementPhysicalWindow.class)) {
 			ElementPhysicalWindow physicalWindow = (ElementPhysicalWindow) window;
 			String range = physicalWindow.getSize().toString();
 			if (physicalWindow.getStep() != null) {
 				System.err.println(
-						"WARNING: SLIDE is not supported for logical windows in CQELS-QL and will be omitted.");
+						"WARNING: Only triple streams are supported in CQELS-QL. The window will be interpretted in terms of triples.");
+				System.err.println(
+						"WARNING: SLIDE is not supported for physical windows in CQELS-QL and will be omitted.");
 			}
 			out.print(String.format("[TRIPLES %s]", range));
 		}
@@ -107,6 +117,13 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 		this.query = query;
 	}
 
+	/**
+	 * Returns a duration formatted for CQELS. A single integer with a unit is
+	 * returned for simplicity.
+	 * 
+	 * @param duration
+	 * @return
+	 */
 	public String getCQELSFormattedDuration(String duration) {
 		Duration d = Duration.parse(duration);
 		// Use the largest possible unit
