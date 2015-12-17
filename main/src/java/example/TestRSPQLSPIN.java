@@ -1,6 +1,6 @@
 package example;
 
-import org.rspql.lang.ParserRSPQL;
+import org.rspql.lang.rspql.ParserRSPQL;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.system.SPINModuleRegistry;
@@ -45,7 +45,7 @@ public class TestRSPQLSPIN {
 				+ "   {GRAPH :g1 { ?a :foo :Bar }}\n"
 				+ "}\n"
 				+ "LIMIT 10";
-		Query query = QueryFactory.create(q, ParserRSPQL.rspqlSPARQLSyntax);
+		Query query = QueryFactory.create(q, ParserRSPQL.rspqlSyntax);
 		
 		// Initialize SPIN system functions and templates
 		SPINModuleRegistry.get().init();
@@ -61,7 +61,7 @@ public class TestRSPQLSPIN {
 		model.write(System.out, "TTL");
 		
 		System.out.println(spinQuery);
-		ARQFactory.get().setSyntax(ParserRSPQL.rspqlSPARQLSyntax);
+		ARQFactory.get().setSyntax(ParserRSPQL.rspqlSyntax);
 		Query reparsedQuery = ARQFactory.get().createQuery(spinQuery);
 		reparsedQuery.setPrefixMapping(query.getPrefixMapping());
 		System.err.println(reparsedQuery);

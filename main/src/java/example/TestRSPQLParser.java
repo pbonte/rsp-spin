@@ -1,6 +1,6 @@
 package example;
 
-import org.rspql.lang.ParserRSPQL;
+import org.rspql.lang.rspql.ParserRSPQL;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
@@ -43,7 +43,7 @@ public class TestRSPQLParser {
 				+ "   {GRAPH :g { ?a :foo :Bar }}\n"
 				+ "}\n"
 				+ "LIMIT 10";
-		Query query = QueryFactory.create(q, ParserRSPQL.rspqlSPARQLSyntax);
+		Query query = QueryFactory.create(q, ParserRSPQL.rspqlSyntax);
 		System.out.println(query);
 		
 	}

@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Calendar;
 
-import org.rspql.lang.ParserRSPQL;
+import org.rspql.lang.rspql.ParserRSPQL;
 import org.rspql.lang.rspql.RSPQLParser;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.model.SPINFactory;
@@ -50,7 +50,7 @@ public class Demonstration {
 		// Register the RSP-QL parser
 		ParserRSPQL.register();
 		
-		Query parsedQuery = QueryFactory.create(query, ParserRSPQL.rspqlSPARQLSyntax);
+		Query parsedQuery = QueryFactory.create(query, ParserRSPQL.rspqlSyntax);
 		
 		Query reparsedQuery = null;//parseSPINReparse(query, handle, model);
 		
