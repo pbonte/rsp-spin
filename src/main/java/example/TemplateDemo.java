@@ -2,6 +2,7 @@ package example;
 
 import java.util.List;
 
+import org.rspql.lang.rspql.ParserRSPQL;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.model.Argument;
@@ -29,6 +30,11 @@ public class TemplateDemo {
 	public static void main(String[] args) {
 		// Initialize system functions and templates
 		SPINModuleRegistry.get().init();
+		// Register the RSP-QL parser
+		ParserRSPQL.register();
+		// Set RSP-QL as the ARQ factory singleton syntax
+		ARQFactory.get().setSyntax(ParserRSPQL.rspqlSyntax);
+		
 
 		// Return all vehicles within a window
 		String qString = ""
@@ -49,7 +55,7 @@ public class TemplateDemo {
 		model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
 
 		// Add SPIN query
-		Query query = QueryFactory.create(qString, Syntax.syntaxARQ);
+		Query query = QueryFactory.create(qString, ParserRSPQL.rspqlSyntax);
 		ARQ2SPIN arq2SPIN = new ARQ2SPIN(model);
 		org.topbraid.spin.model.Query q = arq2SPIN.createQuery(query, "http://query1");
 		
