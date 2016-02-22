@@ -1,14 +1,10 @@
-/*******************************************************************************
- * Copyright (c) 2009 TopQuadrant, Inc.
- * All rights reserved. 
- *******************************************************************************/
 package org.topbraid.spin.model.impl;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.topbraid.spin.model.Construct;
-import org.topbraid.spin.model.SPINFactory;
+import org.topbraid.spin.model.Element;
 import org.topbraid.spin.model.TripleTemplate;
 import org.topbraid.spin.model.print.PrintContext;
 import org.topbraid.spin.vocabulary.SP;
@@ -16,8 +12,6 @@ import org.topbraid.spin.vocabulary.SP;
 import com.hp.hpl.jena.enhanced.EnhGraph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-
 
 public class ConstructImpl extends QueryImpl implements Construct {
 
@@ -26,6 +20,13 @@ public class ConstructImpl extends QueryImpl implements Construct {
 	}
 
 	
+	public List<Element> getGraphTemplates(){
+		return getElements(SP.templates);
+	}
+	
+	/**
+	 * No longer used.
+	 */
 	public List<TripleTemplate> getTemplates() {
 		List<TripleTemplate> results = new LinkedList<TripleTemplate>();
 		for(RDFNode next : getList(SP.templates)) {
@@ -47,12 +48,22 @@ public class ConstructImpl extends QueryImpl implements Construct {
 		printStreamType(context);
 		context.print("{");
 		context.println();
+		
+		for(Element template : getGraphTemplates()) {
+			context.printIndentation(context.getIndentation() + 1);
+			template.print(context);
+			context.print(" .");
+			context.println();
+		}
+		
+		/*
 		for(TripleTemplate template : getTemplates()) {
 			context.printIndentation(context.getIndentation() + 1);
 			template.print(context);
 			context.print(" .");
 			context.println();
 		}
+		*/
 		context.printIndentation(context.getIndentation());
 		context.print("}");
 		printStringFrom(context);

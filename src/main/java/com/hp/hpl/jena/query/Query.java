@@ -96,6 +96,7 @@ public class Query extends Prologue implements Cloneable, Printable {
 
 	// CONSTRUCT
 	protected Template constructTemplate = null;
+	protected Element graphElement = null;
 
 	// DESCRIBE
 	// Any URIs/QNames in the DESCRIBE clause
@@ -682,6 +683,16 @@ public class Query extends Prologue implements Cloneable, Printable {
 	/** Set triple patterns for a construct query */
 	public void setConstructTemplate(Template templ) {
 		constructTemplate = templ;
+	}
+	
+	/** Set quad patterns for a construct query */
+	public void setConstructGraphTemplate(Element el) {
+		graphElement = el;
+	}
+	
+	/** Get quad patterns for a construct query */
+	public Element getConstructGraphTemplate() {
+		return graphElement;
 	}
 
 	// ---- DESCRIBE

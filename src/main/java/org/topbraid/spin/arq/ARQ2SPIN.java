@@ -63,15 +63,11 @@ import org.topbraid.spin.vocabulary.SPIN;
 import org.topbraid.spin.vocabulary.SPL;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.datatypes.xsd.XSDDuration;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.SortCondition;
-import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFList;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -133,7 +129,6 @@ import com.hp.hpl.jena.sparql.syntax.ElementService;
 import com.hp.hpl.jena.sparql.syntax.ElementSubQuery;
 import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
 import com.hp.hpl.jena.sparql.syntax.ElementUnion;
-import com.hp.hpl.jena.sparql.syntax.Template;
 import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -928,20 +923,6 @@ public class ARQ2SPIN {
 		return params;
 	}
 
-	private Resource createHead(Template template) {
-		final List<Resource> members = new LinkedList<Resource>();
-		for (Triple triple : template.getTriples()) {
-			Resource tripleTemplate = model.createResource(); // No
-																// SP.TripleTemplate
-																// needed
-			tripleTemplate.addProperty(SP.subject, getNode(triple.getSubject()));
-			tripleTemplate.addProperty(SP.predicate, getNode(triple.getPredicate()));
-			tripleTemplate.addProperty(SP.object, getNode(triple.getObject()));
-			members.add(tripleTemplate);
-		}
-		return model.createList(members.iterator());
-	}
-
 	/**
 	 * Takes a list of Quads and turns it into an rdf:List consisting of plain
 	 * sp:Triples or GRAPH { ... } blocks for those adjacent Quads with the same
@@ -1019,9 +1000,9 @@ public class ARQ2SPIN {
 			addValues(arq, spinQuery);
 			return spinQuery.as(Ask.class);
 		} else if (arq.isConstructType()) {
-			Resource head = createHead(arq.getConstructTemplate());
 			spinQuery.addProperty(RDF.type, SP.Construct);
-			spinQuery.addProperty(SP.templates, head);
+			Resource template = createElementList(arq.getConstructGraphTemplate());
+			spinQuery.addProperty(SP.templates, template);
 			addSolutionModifiers(arq, spinQuery);
 			addValues(arq, spinQuery);
 			return spinQuery.as(Construct.class);

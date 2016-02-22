@@ -8,7 +8,6 @@
 package org.topbraid.spin.model.impl;
 
 import java.time.Duration;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 

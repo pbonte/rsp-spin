@@ -42,7 +42,6 @@ import com.hp.hpl.jena.sparql.core.VarExprList;
 import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.syntax.Element;
-import com.hp.hpl.jena.sparql.syntax.Template;
 import com.hp.hpl.jena.sparql.util.FmtUtils;
 
 
@@ -128,9 +127,14 @@ public class QuerySerializer implements QueryVisitor {
 
 		out.incIndent(BLOCK_INDENT);
 		out.newline();
-		Template t = query.getConstructTemplate();
-		fmtTemplate.format(t);
+		// Triples
+		//Template t = query.getConstructTemplate();
+		//fmtTemplate.format(t);
+		// Quads
+		Element el = query.getConstructGraphTemplate();
+		fmtElement.visitAsGroup(el);
 		out.decIndent(BLOCK_INDENT);
+		out.newline();
 	}
 
 	@Override
