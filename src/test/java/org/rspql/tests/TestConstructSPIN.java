@@ -14,6 +14,39 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public class TestConstructSPIN {
+	// Graph output tests
+	@Test
+	public void constructGraph1() {
+		String q = ""
+				+ "PREFIX : <http://example.org#>\n"
+				+ "CONSTRUCT { ?a ?b ?c . "
+				+ "   GRAPH :g { "
+				+ "      ?foo :isa ?bar2 "
+				+ "   } "
+				+ "}\n"
+				+ "FROM NAMED WINDOW :w ON ?stream [RANGE PT1s]\n"
+				+ "WHERE {\n"
+				+ "   WINDOW :w { ?foo :isa ?bar1 . }\n" 
+				+ "}";
+		validate(q, "Output graph queries (no variable) do not match.");
+	}
+	
+	@Test
+	public void constructGraph2() {
+		String q = ""
+				+ "PREFIX : <http://example.org#>\n"
+				+ "CONSTRUCT {\n"
+				+ "GRAPH ?bar1 {\n"
+				+ "   ?foo :isa ?bar2 "
+				+ "} "
+				+ "}\n"
+				+ "FROM NAMED WINDOW :w ON ?stream [RANGE PT1s]\n"
+				+ "WHERE {\n"
+				+ "   WINDOW :w { ?foo :isa ?bar1, ?bar2 . }\n" 
+				+ "}";
+		validate(q, "Output graph queries (no variable) do not match.");
+	}
+	
 	
 	// Physical windows tests
 	@Test
@@ -57,7 +90,7 @@ public class TestConstructSPIN {
 		String q = ""
 				+ "PREFIX : <http://example.org#>\n"
 				+ "CONSTRUCT { ?foo :isa ?bar }\n"
-				+ "FROM NAMED WINDOW :w ON ?stream [ALL]\n" 
+				+ "FROM NAMED WINDOW :w ON ?stream [ALL]\n" // Possibly use empty range/step for S2S
 				+ "WHERE {\n"
 				+ "   WINDOW :w { GRAPH ?g { ?foo :isa ?bar } }\n" 
 				+ "}";
@@ -106,7 +139,7 @@ public class TestConstructSPIN {
 		String q = ""
 				+ "PREFIX : <http://example.org#>\n"
 				+ "CONSTRUCT { ?foo :isa ?bar }\n"
-				+ "FROM NAMED WINDOW :w ON ?stream [NOW]\n" 
+				+ "FROM NAMED WINDOW :w ON ?stream [NOW]\n" // Possibly replace with minimal available range
 				+ "WHERE {\n"
 				+ "   WINDOW :w { GRAPH ?g { ?foo :isa ?bar } }\n" 
 				+ "}";
@@ -136,7 +169,7 @@ public class TestConstructSPIN {
 				+ "WHERE {\n"
 				+ "   WINDOW :w { GRAPH ?g {?a ?b ?c} }"
 				+ "}";
-		validate(q, "Register as queries (no variable) do not match");
+		validate(q, "Register as queries (with variable) do not match");
 	}
 	
 	@Test

@@ -17,6 +17,20 @@ public class TestRSPQLSPIN {
 		ParserRSPQL.register();
 
 		String q = ""
+				+ "PREFIX : <http://test#>\n"
+				+ "CONSTRUCT {\n"
+				+ "   GRAPH ?g { :a :b ?c ; :c :d .} . :a :b ?c ; :c :d .\n"
+				+ "   ?g :detectedAt ?t\n"
+				+ "}\n"
+				+ "FROM NAMED WINDOW :w ON :s [RANGE PT10s]"
+				+ "WHERE {\n"
+				+ "   WINDOW :w {\n"
+				+ "      GRAPH ?g { :a :b ?c }\n"
+				+ "      ?g :timestamp ?t"
+				+ "   }"
+				+ "}";
+		
+		String qBig = ""
 				+ "PREFIX : <http://test#> \n"
 				+ "REGISTER STREAM :s1 AS \n"
 				+ "CONSTRUCT ISTREAM { ?a :foo ?c } \n"

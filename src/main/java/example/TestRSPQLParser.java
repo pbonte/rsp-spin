@@ -18,7 +18,7 @@ public class TestRSPQLParser {
 		String q = ""
 				+ "PREFIX : <http://test#> \n"
 				+ "REGISTER STREAM :s1 AS \n"
-				+ "CONSTRUCT ISTREAM { ?a :foo ?c } \n"
+				+ "CONSTRUCT ISTREAM {  GRAPH ?g { ?a :foo ?c } . ?a ?b ?c . } \n"
 				+ "FROM NAMED WINDOW :w1 ON :s1 [RANGE PT1m10s STEP PT30s] \n"
 				+ "FROM NAMED WINDOW :w2 ON :s2 [RANGE PT1m10s] \n"
 				+ "FROM NAMED WINDOW :w3 ON ?s [RANGE ?range STEP ?step] \n"

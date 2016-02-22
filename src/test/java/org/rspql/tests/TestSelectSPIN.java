@@ -57,7 +57,7 @@ public class TestSelectSPIN {
 		String q = ""
 				+ "PREFIX : <http://example.org#>\n"
 				+ "SELECT ?foo ?bar\n"
-				+ "FROM NAMED WINDOW :w ON ?stream [ALL]\n" 
+				+ "FROM NAMED WINDOW :w ON ?stream [ALL]\n"  // Possibly use empty range/step for S2S
 				+ "WHERE {\n"
 				+ "   WINDOW :w { GRAPH ?g { ?foo :isa ?bar } }\n" 
 				+ "}";
@@ -106,7 +106,7 @@ public class TestSelectSPIN {
 		String q = ""
 				+ "PREFIX : <http://example.org#>\n"
 				+ "SELECT ?foo ?bar\n"
-				+ "FROM NAMED WINDOW :w ON ?stream [NOW]\n" 
+				+ "FROM NAMED WINDOW :w ON ?stream [NOW]\n"  // Possibly replace with minimal available range
 				+ "WHERE {\n"
 				+ "   WINDOW :w { GRAPH ?g { ?foo :isa ?bar } }\n" 
 				+ "}";
@@ -136,7 +136,7 @@ public class TestSelectSPIN {
 				+ "WHERE {\n"
 				+ "   WINDOW :w { GRAPH ?g {?a ?b ?c} }"
 				+ "}";
-		validate(q, "Register as queries (no variable) do not match");
+		validate(q, "Register as queries (with variable) do not match");
 	}
 	
 	@Test
@@ -144,7 +144,7 @@ public class TestSelectSPIN {
 		String q = ""
 				+ "PREFIX : <http://example.org#>\n"
 				+ "REGISTER STREAM :s AS\n"
-				+ "CONSTRUCT ISTREAM { ?a ?b ?c }\n"
+				+ "SELECT ISTREAM ?a ?b ?c\n"
 				+ "FROM NAMED WINDOW :w ON :stream [RANGE PT1H]\n"
 				+ "WHERE {\n"
 				+ "   WINDOW :w { GRAPH ?g { ?a ?b ?c } }"
@@ -157,7 +157,7 @@ public class TestSelectSPIN {
 		String q = ""
 				+ "PREFIX : <http://example.org#>\n"
 				+ "REGISTER STREAM :s AS\n"
-				+ "CONSTRUCT RSTREAM { ?a ?b ?c }\n"
+				+ "SELECT RSTREAM ?a ?b ?c\n"
 				+ "FROM NAMED WINDOW :w ON :stream [RANGE PT1H]\n"
 				+ "WHERE {\n"
 				+ "   WINDOW :w { GRAPH ?g { ?a ?b ?c } }"
@@ -170,7 +170,7 @@ public class TestSelectSPIN {
 		String q = ""
 				+ "PREFIX : <http://example.org#>\n"
 				+ "REGISTER STREAM :s AS\n"
-				+ "CONSTRUCT DSTREAM { ?a ?b ?c }\n"
+				+ "SELECT DSTREAM ?a ?b ?c\n"
 				+ "FROM NAMED WINDOW :w ON :stream [RANGE PT1H]\n"
 				+ "WHERE {\n"
 				+ "   WINDOW :w { GRAPH ?g { ?a ?b ?c } }"
