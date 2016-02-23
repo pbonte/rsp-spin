@@ -1,21 +1,30 @@
 package org.rspql.api;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.rspql.lang.rspql.ParserRSPQL;
+import org.rspql.spin.utils.TemplateUtils;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.model.SPINFactory;
 import org.topbraid.spin.system.SPINModuleRegistry;
-import org.topbraid.spin.vocabulary.SP;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+
+/**
+ * This class provides some basic functionality for RSPQL SPIN that can be
+ * imported in a project or used directly from the command line.
+ * 
+ * @author Robin Keskisarkka (robin.keskisarkka@liu.se)
+ *
+ */
 
 public class RSPQL {
 	static RSPQL api = new RSPQL();
@@ -43,7 +52,7 @@ public class RSPQL {
 	}
 
 	/**
-	 * Parse an RSP-QL query and return a query object.
+	 * Parse an RSP-QL query string and return a query object.
 	 * 
 	 * @param queryString
 	 * @return query
@@ -54,37 +63,32 @@ public class RSPQL {
 	}
 
 	/**
-	 * Serialize a query object as RDF.
+	 * Encode a query object as RDF.
 	 * 
 	 * @param query
-	 * @return
+	 * @param handle
+	 * @return rspqlSpin
 	 */
-	public String queryToRDF(Query query, String handle) {
+	public String queryToRdf(Query query, String handle) {
 		Model model = ModelFactory.createDefaultModel();
-		model.setNsPrefix("sp", SP.NS);
-		model.setNsPrefix("rsp", SP.RSP);
-		model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+		model.setNsPrefixes(TemplateUtils.getCommonPrefixes());
 		ARQ2SPIN arq2SPIN = new ARQ2SPIN(model);
 		arq2SPIN.createQuery(query, handle);
-
-		model.write(System.out, "TTL");
-		return "";
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		model.write(out, "TTL");
+		return out.toString();
 	}
 
 	/**
-	 * Serialize a query object as RDF.
+	 * Parse a query object from RDF.
 	 * 
-	 * @param query
-	 * @return
-	 * @throws IOException
+	 * @param input
+	 * @param handle
+	 * @return query
 	 */
-	public Query queryFromRDF(String input, String handle) throws IOException {
+	public Query queryFromRdf(String input, String handle) {
 		Model model = ModelFactory.createDefaultModel();
 		model.read(new ByteArrayInputStream((input).getBytes()), null, "TTL");
-		model.setNsPrefix("sp", SP.NS);
-		model.setNsPrefix("rsp", SP.RSP);
-		model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-
 		org.topbraid.spin.model.Query spinQuery = SPINFactory.asQuery(model.getResource(handle));
 		Query query = ARQFactory.get().createQuery(spinQuery);
 		return query;
@@ -147,11 +151,12 @@ public class RSPQL {
 		if (mode.equals("query")) {
 			RSPQL api = RSPQL.get();
 			Query parsedQuery = QueryFactory.create(in, ParserRSPQL.rspqlSyntax);
-			api.queryToRDF(parsedQuery, handle); // should write stream to string
+			api.queryToRdf(parsedQuery, handle); // should write stream to
+													// string
 		} else {
 			// Get query from RDF
 			RSPQL api = RSPQL.get();
-			Query query = api.queryFromRDF(in, handle);
+			Query query = api.queryFromRdf(in, handle);
 			System.out.println(query);
 		}
 	}

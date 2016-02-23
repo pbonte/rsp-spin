@@ -3,7 +3,7 @@ package examples;
 import java.time.Duration;
 
 import org.rspql.lang.rspql.ParserRSPQL;
-import org.rsqpql.spin.utils.TemplateUtils;
+import org.rspql.spin.utils.TemplateUtils;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.model.Template;
