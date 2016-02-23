@@ -1,14 +1,3 @@
-/*******************************************************************************
- * All rights reserved. 
- *******************************************************************************
- * 
- */
-
-/**
- * @author Robin Keskisarkka (https://github.com/keski)
- * Modified to support RSP-QL in accordance with the Apache License Version 2.0 
- * distribution of SPIN API (http://topbraid.org/spin/api/)
- */
 package org.topbraid.spin.arq;
 
 import java.time.Duration;
@@ -137,8 +126,10 @@ import com.hp.hpl.jena.vocabulary.XSD;
 /**
  * Takes a ARQ SPARQL Query as input and creates a corresponding SPIN RDF data
  * structure from it.
+ * Modified to support RSP-QL in accordance with the Apache License Version 2.0 
+ * distribution of SPIN API (http://topbraid.org/spin/api/)
  * 
- * @author Holger Knublauch
+ * @author Robin Keskisarkka (https://github.com/keski)
  */
 public class ARQ2SPIN {
 
@@ -337,10 +328,6 @@ public class ARQ2SPIN {
 				windowNode.addProperty(RDF.type, SP.LogicalWindow);
 				// Add range
 				Object range = logicalWindow.getRange();
-				if (range.toString().equals("NOW")) {
-					windowNode.addProperty(SP.windowRange, SP.WindowNow);
-					continue;
-				}
 				if (range instanceof Node) {
 					String varName = ((Node) range).getName();
 					Resource variable = getVariable(varName);
@@ -401,10 +388,6 @@ public class ARQ2SPIN {
 				windowNode.addProperty(RDF.type, SP.PhysicalWindow);
 				// Add range
 				Object size = physicalWindow.getSize();
-				if (size.toString().equals("ALL")) {
-					windowNode.addProperty(SP.windowSize, SP.WindowAll);
-					continue;
-				}
 				if (size instanceof Node) {
 					String varName = ((Node) size).getName();
 					Resource variable = getVariable(varName);

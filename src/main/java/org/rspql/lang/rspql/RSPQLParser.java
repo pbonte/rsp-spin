@@ -576,8 +576,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   }
 
   final public void ConstructQuery() throws ParseException {
-  Template t;
-  TripleCollectorBGP acc = new TripleCollectorBGP();
+  Element el;
     jj_consume_token(CONSTRUCT);
     getQuery().setQueryConstructType();
     label_6:
@@ -608,9 +607,8 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         throw new ParseException();
       }
     }
-    // Full form.
-      t = ConstructTemplate();
-    getQuery().setConstructTemplate(t);
+    el = GroupGraphPattern();
+    getQuery().setConstructGraphTemplate(el);
     label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -3061,8 +3059,8 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     throw new Error("Missing return statement in function");
   }
 
+// -------- Construct patterns
   final public Template ConstructTemplate() throws ParseException {
-  Element el;
   TripleCollectorBGP acc = new TripleCollectorBGP();
   Template t = new Template
   (
@@ -3071,8 +3069,38 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   ;
     setInConstructTemplate(true);
     jj_consume_token(LBRACE);
-    el = GroupGraphPatternSub();
-    getQuery().setConstructGraphTemplate(el);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case IRIref:
+    case PNAME_NS:
+    case PNAME_LN:
+    case BLANK_NODE_LABEL:
+    case VAR1:
+    case VAR2:
+    case TRUE:
+    case FALSE:
+    case INTEGER:
+    case DECIMAL:
+    case DOUBLE:
+    case INTEGER_POSITIVE:
+    case DECIMAL_POSITIVE:
+    case DOUBLE_POSITIVE:
+    case INTEGER_NEGATIVE:
+    case DECIMAL_NEGATIVE:
+    case DOUBLE_NEGATIVE:
+    case STRING_LITERAL1:
+    case STRING_LITERAL2:
+    case STRING_LITERAL_LONG1:
+    case STRING_LITERAL_LONG2:
+    case LPAREN:
+    case NIL:
+    case LBRACKET:
+    case ANON:
+      ConstructTriples(acc);
+      break;
+    default:
+      jj_la1[99] = jj_gen;
+      ;
+    }
     jj_consume_token(RBRACE);
     setInConstructTemplate(false);
     {if (true) return t;}
@@ -3096,7 +3124,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       jj_consume_token(DOT);
       break;
     default:
-      jj_la1[99] = jj_gen;
+      jj_la1[100] = jj_gen;
       ;
     }
   }
@@ -3140,7 +3168,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     insert(acc, tempAcc);
       break;
     default:
-      jj_la1[100] = jj_gen;
+      jj_la1[101] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3157,7 +3185,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       PropertyListNotEmpty(s, acc);
       break;
     default:
-      jj_la1[101] = jj_gen;
+      jj_la1[102] = jj_gen;
       ;
     }
   }
@@ -3173,7 +3201,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[102] = jj_gen;
+        jj_la1[103] = jj_gen;
         break label_28;
       }
       jj_consume_token(SEMICOLON);
@@ -3188,7 +3216,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ObjectList(s, p, null, acc);
         break;
       default:
-        jj_la1[103] = jj_gen;
+        jj_la1[104] = jj_gen;
         ;
       }
     }
@@ -3209,7 +3237,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       p = nRDFtype;
       break;
     default:
-      jj_la1[104] = jj_gen;
+      jj_la1[105] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3227,7 +3255,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[105] = jj_gen;
+        jj_la1[106] = jj_gen;
         break label_29;
       }
       jj_consume_token(COMMA);
@@ -3283,7 +3311,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     insert(acc, tempAcc);
       break;
     default:
-      jj_la1[106] = jj_gen;
+      jj_la1[107] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3306,7 +3334,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       PropertyListPathNotEmpty(s, acc);
       break;
     default:
-      jj_la1[107] = jj_gen;
+      jj_la1[108] = jj_gen;
       ;
     }
   }
@@ -3332,7 +3360,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       p = VerbSimple();
       break;
     default:
-      jj_la1[108] = jj_gen;
+      jj_la1[109] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3344,7 +3372,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[109] = jj_gen;
+        jj_la1[110] = jj_gen;
         break label_30;
       }
       jj_consume_token(SEMICOLON);
@@ -3381,14 +3409,14 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
           p = VerbSimple();
           break;
         default:
-          jj_la1[110] = jj_gen;
+          jj_la1[111] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         ObjectListPath(s, p, path, acc);
         break;
       default:
-        jj_la1[111] = jj_gen;
+        jj_la1[112] = jj_gen;
         ;
       }
     }
@@ -3421,7 +3449,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[112] = jj_gen;
+        jj_la1[113] = jj_gen;
         break label_31;
       }
       jj_consume_token(COMMA);
@@ -3466,7 +3494,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[113] = jj_gen;
+        jj_la1[114] = jj_gen;
         break label_32;
       }
       jj_consume_token(VBAR);
@@ -3488,7 +3516,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[114] = jj_gen;
+        jj_la1[115] = jj_gen;
         break label_33;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -3503,7 +3531,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       p1 = PathFactory.pathSeq(p1, new P_Inverse(p2));
         break;
       default:
-        jj_la1[115] = jj_gen;
+        jj_la1[116] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -3526,7 +3554,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       p = PathMod(p);
       break;
     default:
-      jj_la1[116] = jj_gen;
+      jj_la1[117] = jj_gen;
       ;
     }
     {if (true) return p;}
@@ -3556,7 +3584,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       p = PathFactory.pathInverse(p);
       break;
     default:
-      jj_la1[117] = jj_gen;
+      jj_la1[118] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3611,7 +3639,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
             {if (true) return PathFactory.pathMod(p, i1, i2);}
             break;
           default:
-            jj_la1[118] = jj_gen;
+            jj_la1[119] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -3621,7 +3649,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
           {if (true) return PathFactory.pathFixedLength(p, i1);}
           break;
         default:
-          jj_la1[119] = jj_gen;
+          jj_la1[120] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -3633,13 +3661,13 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         {if (true) return PathFactory.pathMod(p, PathFactory.UNSET, i2);}
         break;
       default:
-        jj_la1[120] = jj_gen;
+        jj_la1[121] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[121] = jj_gen;
+      jj_la1[122] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3693,7 +3721,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       jj_consume_token(RPAREN);
       break;
     default:
-      jj_la1[122] = jj_gen;
+      jj_la1[123] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3731,7 +3759,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
             ;
             break;
           default:
-            jj_la1[123] = jj_gen;
+            jj_la1[124] = jj_gen;
             break label_34;
           }
           jj_consume_token(VBAR);
@@ -3740,13 +3768,13 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         }
         break;
       default:
-        jj_la1[124] = jj_gen;
+        jj_la1[125] = jj_gen;
         ;
       }
       jj_consume_token(RPAREN);
       break;
     default:
-      jj_la1[125] = jj_gen;
+      jj_la1[126] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3784,13 +3812,13 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         {if (true) return new P_ReverseLink(nRDFtype);}
         break;
       default:
-        jj_la1[126] = jj_gen;
+        jj_la1[127] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[127] = jj_gen;
+      jj_la1[128] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3819,7 +3847,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return n;}
       break;
     default:
-      jj_la1[128] = jj_gen;
+      jj_la1[129] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3848,7 +3876,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return n;}
       break;
     default:
-      jj_la1[129] = jj_gen;
+      jj_la1[130] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3914,7 +3942,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[130] = jj_gen;
+        jj_la1[131] = jj_gen;
         break label_35;
       }
     }
@@ -3972,7 +4000,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[131] = jj_gen;
+        jj_la1[132] = jj_gen;
         break label_36;
       }
     }
@@ -4018,7 +4046,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return n;}
       break;
     default:
-      jj_la1[132] = jj_gen;
+      jj_la1[133] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4060,7 +4088,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return n;}
       break;
     default:
-      jj_la1[133] = jj_gen;
+      jj_la1[134] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4098,7 +4126,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       n = GraphTerm();
       break;
     default:
-      jj_la1[134] = jj_gen;
+      jj_la1[135] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4122,7 +4150,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       n = createNode(iri);
       break;
     default:
-      jj_la1[135] = jj_gen;
+      jj_la1[136] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4142,7 +4170,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ((Token) n).image = ((Token) n).image.toUpperCase();
       break;
     default:
-      jj_la1[136] = jj_gen;
+      jj_la1[137] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4152,17 +4180,18 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
 
   final public Object VarOrPastTime() throws ParseException {
   Object n = null;
+    jj_consume_token(1);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case VAR1:
     case VAR2:
       n = Var();
       break;
-    case PASTTIME:
-      n = jj_consume_token(PASTTIME);
+    case TIME:
+      n = jj_consume_token(TIME);
         ((Token) n).image = ((Token) n).image.toUpperCase();
       break;
     default:
-      jj_la1[137] = jj_gen;
+      jj_la1[138] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4181,7 +4210,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       n = jj_consume_token(INTEGER);
       break;
     default:
-      jj_la1[138] = jj_gen;
+      jj_la1[139] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4199,7 +4228,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       t = jj_consume_token(VAR2);
       break;
     default:
-      jj_la1[139] = jj_gen;
+      jj_la1[140] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4251,7 +4280,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return nRDFnil;}
       break;
     default:
-      jj_la1[140] = jj_gen;
+      jj_la1[141] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4276,7 +4305,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[141] = jj_gen;
+        jj_la1[142] = jj_gen;
         break label_37;
       }
       jj_consume_token(SC_OR);
@@ -4297,7 +4326,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[142] = jj_gen;
+        jj_la1[143] = jj_gen;
         break label_38;
       }
       jj_consume_token(SC_AND);
@@ -4371,13 +4400,13 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       expr1 = new E_NotOneOf(expr1, a);
         break;
       default:
-        jj_la1[143] = jj_gen;
+        jj_la1[144] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[144] = jj_gen;
+      jj_la1[145] = jj_gen;
       ;
     }
     {if (true) return expr1;}
@@ -4410,7 +4439,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[145] = jj_gen;
+        jj_la1[146] = jj_gen;
         break label_39;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -4448,7 +4477,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         addition = false;
           break;
         default:
-          jj_la1[146] = jj_gen;
+          jj_la1[147] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -4460,7 +4489,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
             ;
             break;
           default:
-            jj_la1[147] = jj_gen;
+            jj_la1[148] = jj_gen;
             break label_40;
           }
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -4475,7 +4504,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
           expr2 = new E_Divide(expr2, expr3);
             break;
           default:
-            jj_la1[148] = jj_gen;
+            jj_la1[149] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -4484,7 +4513,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       else expr1 = new E_Subtract(expr1, expr2);
         break;
       default:
-        jj_la1[149] = jj_gen;
+        jj_la1[150] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -4504,7 +4533,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         ;
         break;
       default:
-        jj_la1[150] = jj_gen;
+        jj_la1[151] = jj_gen;
         break label_41;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -4519,7 +4548,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       expr1 = new E_Divide(expr1, expr2);
         break;
       default:
-        jj_la1[151] = jj_gen;
+        jj_la1[152] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -4634,7 +4663,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return expr;}
       break;
     default:
-      jj_la1[152] = jj_gen;
+      jj_la1[153] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4751,7 +4780,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       {if (true) return asExpr(gn);}
       break;
     default:
-      jj_la1[153] = jj_gen;
+      jj_la1[154] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4849,7 +4878,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       {if (true) return new E_BNode();}
         break;
       default:
-        jj_la1[154] = jj_gen;
+        jj_la1[155] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -5102,7 +5131,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
           ;
           break;
         default:
-          jj_la1[155] = jj_gen;
+          jj_la1[156] = jj_gen;
           break label_42;
         }
         jj_consume_token(COMMA);
@@ -5199,7 +5228,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return expr;}
       break;
     default:
-      jj_la1[156] = jj_gen;
+      jj_la1[157] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5221,7 +5250,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       flagsExpr = Expression();
       break;
     default:
-      jj_la1[157] = jj_gen;
+      jj_la1[158] = jj_gen;
       ;
     }
     jj_consume_token(RPAREN);
@@ -5244,7 +5273,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       expr3 = Expression();
       break;
     default:
-      jj_la1[158] = jj_gen;
+      jj_la1[159] = jj_gen;
       ;
     }
     jj_consume_token(RPAREN);
@@ -5270,7 +5299,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       expr4 = Expression();
       break;
     default:
-      jj_la1[159] = jj_gen;
+      jj_la1[160] = jj_gen;
       ;
     }
     jj_consume_token(RPAREN);
@@ -5314,7 +5343,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       distinct = true;
         break;
       default:
-        jj_la1[160] = jj_gen;
+        jj_la1[161] = jj_gen;
         ;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -5411,7 +5440,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         expr = Expression();
         break;
       default:
-        jj_la1[161] = jj_gen;
+        jj_la1[162] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -5434,7 +5463,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       distinct = true;
         break;
       default:
-        jj_la1[162] = jj_gen;
+        jj_la1[163] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5450,7 +5479,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       distinct = true;
         break;
       default:
-        jj_la1[163] = jj_gen;
+        jj_la1[164] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5466,7 +5495,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       distinct = true;
         break;
       default:
-        jj_la1[164] = jj_gen;
+        jj_la1[165] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5482,7 +5511,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       distinct = true;
         break;
       default:
-        jj_la1[165] = jj_gen;
+        jj_la1[166] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5498,7 +5527,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       distinct = true;
         break;
       default:
-        jj_la1[166] = jj_gen;
+        jj_la1[167] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5514,7 +5543,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       distinct = true;
         break;
       default:
-        jj_la1[167] = jj_gen;
+        jj_la1[168] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5535,7 +5564,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
             ordered.add(expr2);
             break;
           default:
-            jj_la1[168] = jj_gen;
+            jj_la1[169] = jj_gen;
             ;
           }
         } else {
@@ -5548,21 +5577,21 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
           ordered.add(expr2);
             break;
           default:
-            jj_la1[169] = jj_gen;
+            jj_la1[170] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
         }
         break;
       default:
-        jj_la1[170] = jj_gen;
+        jj_la1[171] = jj_gen;
         ;
       }
       jj_consume_token(RPAREN);
       agg = AggregatorFactory.createGroupConcat(distinct, expr, sep, ordered);
       break;
     default:
-      jj_la1[171] = jj_gen;
+      jj_la1[172] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5587,7 +5616,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       a = ArgList();
       break;
     default:
-      jj_la1[172] = jj_gen;
+      jj_la1[173] = jj_gen;
       ;
     }
     if (a == null) {if (true) return asExpr(createNode(iri));}
@@ -5614,13 +5643,13 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         uri = iri();
         break;
       default:
-        jj_la1[173] = jj_gen;
+        jj_la1[174] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[174] = jj_gen;
+      jj_la1[175] = jj_gen;
       ;
     }
     {if (true) return createLiteral(lex, lang, uri);}
@@ -5646,7 +5675,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       n = NumericLiteralNegative();
       break;
     default:
-      jj_la1[175] = jj_gen;
+      jj_la1[176] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5670,7 +5699,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return createLiteralDouble(t.image);}
       break;
     default:
-      jj_la1[176] = jj_gen;
+      jj_la1[177] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5693,7 +5722,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return createLiteralDouble(t.image);}
       break;
     default:
-      jj_la1[177] = jj_gen;
+      jj_la1[178] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5716,7 +5745,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return createLiteralDouble(t.image);}
       break;
     default:
-      jj_la1[178] = jj_gen;
+      jj_la1[179] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5734,7 +5763,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return XSD_FALSE;}
       break;
     default:
-      jj_la1[179] = jj_gen;
+      jj_la1[180] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5762,7 +5791,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       lex = stripQuotes3(t.image);
       break;
     default:
-      jj_la1[180] = jj_gen;
+      jj_la1[181] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5784,7 +5813,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return iri;}
       break;
     default:
-      jj_la1[181] = jj_gen;
+      jj_la1[182] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5803,7 +5832,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       {if (true) return resolvePName(t.image, t.beginLine, t.beginColumn);}
       break;
     default:
-      jj_la1[182] = jj_gen;
+      jj_la1[183] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5823,7 +5852,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     {if (true) return createBNode(t.beginLine, t.beginColumn);}
       break;
     default:
-      jj_la1[183] = jj_gen;
+      jj_la1[184] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5870,6 +5899,12 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     try { return !jj_3_5(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(4, xla); }
+  }
+
+  private boolean jj_3R_95() {
+    if (jj_scan_token(IS_IRI)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
   }
 
   private boolean jj_3R_171() {
@@ -6023,6 +6058,54 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
+  private boolean jj_3_2() {
+    if (jj_scan_token(SEMICOLON)) return true;
+    if (jj_3R_44()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(141)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(142)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(149)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(144)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(145)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(146)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(143)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(154)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(137)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(136)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(155)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(138)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(139)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(140)) return true;
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    return false;
+  }
+
   private boolean jj_3R_87() {
     if (jj_scan_token(SHA512)) return true;
     if (jj_scan_token(LPAREN)) return true;
@@ -6032,54 +6115,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   private boolean jj_3R_86() {
     if (jj_scan_token(SHA384)) return true;
     if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_scan_token(SEMICOLON)) return true;
-    if (jj_3R_44()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(140)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(141)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(148)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(143)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(144)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(145)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(142)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(153)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(136)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(135)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(154)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(137)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(138)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(139)) return true;
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
     return false;
   }
 
@@ -6262,6 +6297,12 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
+  private boolean jj_3R_70() {
+    if (jj_scan_token(STRBEFORE)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
   private boolean jj_3R_105() {
     if (jj_3R_119()) return true;
     return false;
@@ -6274,12 +6315,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     jj_scanpos = xsp;
     if (jj_3R_106()) return true;
     }
-    return false;
-  }
-
-  private boolean jj_3R_70() {
-    if (jj_scan_token(STRBEFORE)) return true;
-    if (jj_scan_token(LPAREN)) return true;
     return false;
   }
 
@@ -6344,6 +6379,11 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
+  private boolean jj_3_1() {
+    if (jj_3R_43()) return true;
+    return false;
+  }
+
   private boolean jj_3R_146() {
     if (jj_3R_153()) return true;
     return false;
@@ -6352,11 +6392,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   private boolean jj_3R_64() {
     if (jj_scan_token(UCASE)) return true;
     if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_3R_43()) return true;
     return false;
   }
 
@@ -6412,9 +6447,9 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   private boolean jj_3R_140() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_scan_token(13)) {
+    if (jj_scan_token(14)) {
     jj_scanpos = xsp;
-    if (jj_scan_token(14)) return true;
+    if (jj_scan_token(15)) return true;
     }
     return false;
   }
@@ -6443,6 +6478,11 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
+  private boolean jj_3R_128() {
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
   private boolean jj_3R_55() {
     if (jj_scan_token(RAND)) return true;
     if (jj_scan_token(NIL)) return true;
@@ -6454,8 +6494,13 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
-  private boolean jj_3R_128() {
-    if (jj_scan_token(LPAREN)) return true;
+  private boolean jj_3R_110() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(176)) {
+    jj_scanpos = xsp;
+    if (jj_3R_128()) return true;
+    }
     return false;
   }
 
@@ -6467,16 +6512,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   private boolean jj_3_5() {
     if (jj_scan_token(SEMICOLON)) return true;
     if (jj_scan_token(SEPARATOR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_110() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(175)) {
-    jj_scanpos = xsp;
-    if (jj_3R_128()) return true;
-    }
     return false;
   }
 
@@ -6742,14 +6777,14 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
-  private boolean jj_3R_138() {
-    if (jj_3R_140()) return true;
-    return false;
-  }
-
   private boolean jj_3R_123() {
     if (jj_scan_token(MIN)) return true;
     if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_138() {
+    if (jj_3R_140()) return true;
     return false;
   }
 
@@ -6781,15 +6816,15 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
-  private boolean jj_3R_133() {
-    if (jj_3R_140()) return true;
-    return false;
-  }
-
   private boolean jj_3R_131() {
     if (jj_scan_token(PREFIX)) return true;
     if (jj_scan_token(PNAME_NS)) return true;
     if (jj_3R_137()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_133() {
+    if (jj_3R_140()) return true;
     return false;
   }
 
@@ -6963,6 +6998,11 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
+  private boolean jj_3R_129() {
+    if (jj_scan_token(LBRACE)) return true;
+    return false;
+  }
+
   private boolean jj_3R_101() {
     if (jj_3R_114()) return true;
     return false;
@@ -6970,11 +7010,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
 
   private boolean jj_3R_100() {
     if (jj_3R_113()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_129() {
-    if (jj_scan_token(LBRACE)) return true;
     return false;
   }
 
@@ -6986,6 +7021,12 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   private boolean jj_3R_99() {
     if (jj_scan_token(IS_NUMERIC)) return true;
     if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_3() {
+    if (jj_scan_token(DOT)) return true;
+    if (jj_3R_45()) return true;
     return false;
   }
 
@@ -7010,12 +7051,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     return false;
   }
 
-  private boolean jj_3_3() {
-    if (jj_scan_token(DOT)) return true;
-    if (jj_3R_45()) return true;
-    return false;
-  }
-
   private boolean jj_3R_97() {
     if (jj_scan_token(IS_BLANK)) return true;
     if (jj_scan_token(LPAREN)) return true;
@@ -7024,12 +7059,6 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
 
   private boolean jj_3R_96() {
     if (jj_scan_token(IS_URI)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_95() {
-    if (jj_scan_token(IS_IRI)) return true;
     if (jj_scan_token(LPAREN)) return true;
     return false;
   }
@@ -7045,7 +7074,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[184];
+  final private int[] jj_la1 = new int[185];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -7063,25 +7092,25 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
       jj_la1_init_6();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x7200000,0x180000,0x180000,0x0,0x0,0x0,0x0,0xc00000,0xc00000,0xe00,0x0,0x6e00,0x6e00,0x6e00,0x0,0x0,0x0,0x6e00,0x6e00,0x0,0x0,0x0,0xe00,0xe00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x20000000,0x18000000,0x6e00,0x0,0x6e00,0xe00,0x6e00,0x0,0x6e00,0x6e00,0x10000000,0x8000000,0x18000000,0x80000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe00,0x0,0xe00,0x0,0x7e00,0x0,0x0,0x7e00,0x7e00,0x0,0x200000,0x7e00,0x80000000,0x0,0x7e00,0x7e00,0x80000000,0x0,0x7e00,0x7e00,0x0,0x80000000,0x80000000,0x0,0x6000,0xe00,0x6000,0x0,0x0,0xe00,0x0,0xe00,0x0,0xe00,0x400000,0x0,0x0,0x0,0x0,0x0,0x7e00,0x46e00,0x0,0x46e00,0x46e00,0x0,0x7e00,0x446e00,0x446e00,0x0,0x446e00,0x446e00,0x0,0x0,0x0,0x0,0x0,0x440e00,0x0,0x0,0x0,0x0,0x440e00,0x0,0x40e00,0x40e00,0x40e00,0x40e00,0x0,0x0,0x7e00,0x7e00,0x7e00,0x7e00,0x7e00,0x6e00,0x6000,0x6000,0x6000,0x6000,0x1e00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6e00,0x6e00,0x0,0x0,0x0,0x0,0x0,0x0,0x400000,0x6e00,0x400000,0x400000,0x400000,0x400000,0x400000,0x400000,0x0,0x0,0x0,0x0,0x0,0x8000,0x8000,0x0,0x0,0x0,0x0,0x0,0x0,0xe00,0xc00,0x1000,};
+      jj_la1_0 = new int[] {0xe400000,0x300000,0x300000,0x0,0x0,0x0,0x0,0x1800000,0x1800000,0x1c00,0x0,0xdc00,0xdc00,0xdc00,0x0,0x0,0x0,0xdc00,0xdc00,0x0,0x0,0x0,0x1c00,0x1c00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x40000000,0x30000000,0xdc00,0x0,0xdc00,0x1c00,0xdc00,0x0,0xdc00,0xdc00,0x20000000,0x10000000,0x30000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1c00,0x0,0x1c00,0x0,0xfc00,0x0,0x0,0xfc00,0xfc00,0x0,0x400000,0xfc00,0x0,0x0,0xfc00,0xfc00,0x0,0x0,0xfc00,0xfc00,0x0,0x0,0x0,0x0,0xc000,0x1c00,0xc000,0x0,0x0,0x1c00,0x0,0x1c00,0x0,0x1c00,0x800000,0x0,0x0,0x0,0x0,0xfc00,0x0,0xfc00,0x8dc00,0x0,0x8dc00,0x8dc00,0x0,0xfc00,0x88dc00,0x88dc00,0x0,0x88dc00,0x88dc00,0x0,0x0,0x0,0x0,0x0,0x881c00,0x0,0x0,0x0,0x0,0x881c00,0x0,0x81c00,0x81c00,0x81c00,0x81c00,0x0,0x0,0xfc00,0xfc00,0xfc00,0xfc00,0xfc00,0xdc00,0xc000,0xc000,0xc000,0xc000,0x3c00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xdc00,0xdc00,0x0,0x0,0x0,0x0,0x0,0x0,0x800000,0xdc00,0x800000,0x800000,0x800000,0x800000,0x800000,0x800000,0x0,0x0,0x0,0x0,0x0,0x10000,0x10000,0x0,0x0,0x0,0x0,0x0,0x0,0x1c00,0x1800,0x2000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x20,0x10,0xe000,0xe000,0x0,0x0,0x0,0x8000000,0x6000000,0x6000000,0x6000000,0xe000,0xe000,0x10,0x0,0x0,0x10,0x10000,0x10,0x8,0x40,0x400,0x400,0x400,0x310,0x10000,0x10000000,0x20000000,0x0,0x0,0x6000000,0x8000000,0x6000000,0x6000000,0x6000006,0x6,0x6000000,0x6000006,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8,0x40000,0x40000,0x40008,0x0,0x40000,0x0,0x0,0x0,0x0,0x0,0x0,0x7ec0000,0x0,0x0,0x0,0x7ec0040,0x0,0x0,0x0,0x0,0x7ec0000,0x7ec0040,0x0,0x0,0x1,0x0,0x0,0x0,0x1,0x0,0x1,0x100000,0x6000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x800,0x1000,0x0,0x0,0x0,0x0,0x0,0x4000000,0x4000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6000000,0x6000000,0x0,0x0,0x6000000,0x0,0x0,0x0,0x0,0x6000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x40,0x20,0x1c000,0x1c000,0x0,0x0,0x0,0x10000000,0xc000000,0xc000000,0xc000000,0x1c000,0x1c000,0x20,0x0,0x0,0x20,0x20000,0x20,0x10,0x80,0x800,0x800,0x800,0x620,0x20000,0x20000000,0x40000000,0x0,0x0,0xc000000,0x10000000,0xc000000,0xc000000,0xc00000c,0xc,0xc000000,0xc00000c,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x10,0x80000,0x80000,0x80010,0x0,0x80000,0x0,0x0,0x0,0x0,0x0,0x0,0xfd80001,0x0,0x0,0x0,0xfd80081,0x0,0x0,0x0,0x0,0xfd80001,0xfd80081,0x0,0x0,0x2,0x0,0x0,0x0,0x2,0x0,0x2,0x200000,0xc000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1000,0x1000,0x0,0x0,0x0,0x0,0x0,0x8000000,0x8000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc000000,0xc000000,0x0,0x0,0xc000000,0x0,0x0,0x0,0x0,0xc000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfff2f6df,0xfff2f6df,0xfff2f6df,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfff2f6df,0x0,0xfff2f6df,0xfff2f6df,0xfff2f6df,0x0,0xfff2f6df,0xfff2f6df,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x100,0x0,0x0,0x0,0x100,0x0,0x0,0x0,0x0,0x100,0x100,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfff2f6df,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc0000,0xc0000,0x0,0xc0000,0xc0000,0x0,0x0,0x0,0x0,0x0,0xc0000,0x0,0x0,0x0,0x0,0xc0000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x800,0x800,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfff2f6df,0xfff2f6df,0x0,0x0,0xfff2f6df,0x0,0x0,0x0,0x0,0xfff2f6df,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xdf,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffe5edbe,0xffe5edbe,0xffe5edbe,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffe5edbe,0x0,0xffe5edbe,0xffe5edbe,0xffe5edbe,0x0,0xffe5edbe,0xffe5edbe,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x200,0x0,0x0,0x0,0x200,0x0,0x0,0x0,0x0,0x200,0x200,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffe5edbe,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x180000,0x180000,0x0,0x180000,0x180000,0x0,0x0,0x0,0x0,0x0,0x180000,0x0,0x0,0x0,0x0,0x180000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1000,0x1000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffe5edbe,0xffe5edbe,0x0,0x0,0xffe5edbe,0x0,0x0,0x0,0x0,0xffe5edbe,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1be,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_3() {
-      jj_la1_3 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0xffffffff,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x4000000,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0xffffffff,0xffffffff,0xffffffff,0x0,0xffffffff,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0xffffffff,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_3 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0xffffffff,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8000000,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0xffffffff,0xffffffff,0xffffffff,0x0,0xffffffff,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0xffffffff,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_4() {
-      jj_la1_4 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xf0000030,0x0,0xf000003e,0xf000003e,0xf000003e,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1000000,0x0,0x0,0x0,0x0,0x0,0xe,0x0,0xe,0xe,0xe,0x0,0xe,0xe,0x0,0x0,0x0,0x0,0x0,0x213ff80,0x213ff80,0x80000,0x200000,0x80000,0x80000,0x80000,0x80000,0x80000,0x80000,0x2000000,0x80,0x180,0x4000000,0x0,0x0,0x800000,0x1800000,0xf0000030,0x0,0x0,0xf0000030,0xf0000030,0x0,0x0,0xf0000030,0x0,0x0,0xf0000030,0xf0000030,0x0,0x0,0xf0000030,0xf0000030,0x0,0x0,0x0,0x80000,0x0,0xf0000030,0x0,0x0,0x0,0xf0000030,0x0,0xf0000030,0x0,0xe,0x0,0x0,0x0,0x0,0x0,0x0,0xf0000030,0x0,0x0,0x0,0x0,0x0,0xf0000030,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x10000000,0x0,0x10000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xf0000030,0xf0000030,0xf0000030,0xf0000030,0xf0000030,0x0,0x0,0x0,0x10000000,0x0,0xf0000030,0x0,0x0,0x0,0x0,0x80000000,0x80000000,0x0,0x0,0x80000000,0x0,0x0,0xf000003e,0xf000003e,0x0,0x0,0xe,0x0,0x0,0x0,0x0,0xf000003e,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xf0000000,0x70000000,0x80000000,0x0,0x30,0x0,0x0,0x0,0x0,};
+      jj_la1_4 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe0000060,0x0,0xe000007d,0xe000007d,0xe000007d,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2000000,0x0,0x0,0x0,0x0,0x0,0x1d,0x0,0x1d,0x1d,0x1d,0x0,0x1d,0x1d,0x0,0x0,0x0,0x0,0x0,0x427ff00,0x427ff00,0x100000,0x400000,0x100000,0x100000,0x100000,0x100000,0x100000,0x100000,0x4000000,0x100,0x300,0x8000000,0x0,0x0,0x1000000,0x3000000,0xe0000060,0x0,0x0,0xe0000060,0xe0000060,0x0,0x0,0xe0000060,0x0,0x0,0xe0000060,0xe0000060,0x0,0x0,0xe0000060,0xe0000060,0x0,0x0,0x0,0x100000,0x0,0xe0000060,0x0,0x0,0x0,0xe0000060,0x0,0xe0000060,0x0,0x1d,0x0,0x0,0x0,0x0,0x0,0xe0000060,0x0,0xe0000060,0x0,0x0,0x0,0x0,0x0,0xe0000060,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x20000000,0x0,0x20000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe0000060,0xe0000060,0xe0000060,0xe0000060,0xe0000060,0x0,0x0,0x0,0x20000000,0x0,0xe0000060,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe000007d,0xe000007d,0x0,0x0,0x1d,0x0,0x0,0x0,0x0,0xe000007d,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe0000000,0xe0000000,0x0,0x0,0x60,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_5() {
-      jj_la1_5 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1e1f,0x0,0x3e1f,0x3e1f,0x3e1f,0x0,0x0,0x0,0x0,0x0,0x0,0x10000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2000,0x0,0x2000,0x2000,0x2000,0x0,0x2000,0x2000,0x0,0x0,0x0,0x0,0x200000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x14be1f,0x0,0x800000,0x14be1f,0x14be1f,0x800000,0x0,0x14be1f,0x10000,0x800000,0x14be1f,0x14be1f,0x10000,0x800000,0x14be1f,0x14be1f,0x800000,0x10000,0x10000,0x0,0xa000,0x1e1f,0x0,0xa000,0xa000,0x1e1f,0xa000,0x1e1f,0x0,0x2000,0x0,0x400000,0xa000,0x400000,0xa000,0x800000,0x14be1f,0x0,0x200000,0x0,0x0,0x400000,0x14be1f,0x40002000,0x40002000,0x200000,0x40002000,0x40002000,0x400000,0x0,0x0,0x0,0x10000,0x40002000,0x20000,0x420000,0x400000,0x10000,0x40002000,0x0,0x0,0x2000,0x0,0x0,0x42000,0x42000,0x14be1f,0x14be1f,0x14be1f,0x14be1f,0x109e1f,0x0,0x0,0x0,0x0,0x0,0x109e1f,0x0,0x0,0x3f000000,0x3f000000,0x1f,0x1f,0x0,0x0,0x1f,0x0,0x0,0x40003e1f,0x3e1f,0xa000,0x400000,0x0,0x400000,0x400000,0x400000,0x0,0x40003e1f,0x0,0x0,0x0,0x0,0x0,0x0,0x200000,0x200000,0x200000,0x0,0xa000,0x0,0x0,0x1f,0x0,0x3,0x1c,0x0,0x1e00,0x0,0x0,0x100000,};
+      jj_la1_5 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3c3f,0x0,0x7c3f,0x7c3f,0x7c3f,0x0,0x0,0x0,0x0,0x0,0x0,0x20000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x4000,0x0,0x4000,0x4000,0x4000,0x0,0x4000,0x4000,0x0,0x0,0x0,0x0,0x400000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x297c3f,0x0,0x1000000,0x297c3f,0x297c3f,0x1000000,0x0,0x297c3f,0x20000,0x1000000,0x297c3f,0x297c3f,0x20000,0x1000000,0x297c3f,0x297c3f,0x1000000,0x20000,0x20000,0x0,0x14000,0x3c3f,0x0,0x14000,0x14000,0x3c3f,0x14000,0x3c3f,0x0,0x4000,0x0,0x800000,0x14000,0x800000,0x14000,0x297c3f,0x1000000,0x297c3f,0x0,0x400000,0x0,0x0,0x800000,0x297c3f,0x80004000,0x80004000,0x400000,0x80004000,0x80004000,0x800000,0x0,0x0,0x0,0x20000,0x80004000,0x40000,0x840000,0x800000,0x20000,0x80004000,0x0,0x0,0x4000,0x0,0x0,0x84000,0x84000,0x297c3f,0x297c3f,0x297c3f,0x297c3f,0x213c3f,0x0,0x0,0x0,0x0,0x0,0x213c3f,0x0,0x0,0x7e000000,0x7e000000,0x3f,0x3f,0x0,0x0,0x3f,0x0,0x0,0x80007c3f,0x7c3f,0x14000,0x800000,0x0,0x800000,0x800000,0x800000,0x0,0x80007c3f,0x0,0x0,0x0,0x0,0x0,0x0,0x400000,0x400000,0x400000,0x0,0x14000,0x0,0x0,0x3f,0x0,0x7,0x38,0x0,0x3c00,0x0,0x0,0x200000,};
    }
    private static void jj_la1_init_6() {
-      jj_la1_6 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x800,0x800,0x0,0x800,0x800,0x0,0x400,0x840,0x840,0x4028,0x800,0x0,0x0,0x28,0x4028,0x0,0x400,0x800,0x800,0x0,0x800,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x4,0x0,0x0,0x18,0x0,0x60,0x60,0x18,0x60,0x60,0x18,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x38,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x80,0x80,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_6 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x40,0x0,0x0,0x0,0x0,0x40,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1000,0x1000,0x0,0x1000,0x1000,0x0,0x800,0x1080,0x1080,0x8050,0x1000,0x0,0x0,0x50,0x8050,0x0,0x800,0x1000,0x1000,0x0,0x1000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x4,0x8,0x0,0x0,0x30,0x0,0xc0,0xc0,0x30,0xc0,0xc0,0x30,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x70,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x100,0x100,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[5];
   private boolean jj_rescan = false;
@@ -7098,7 +7127,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 184; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 185; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -7113,7 +7142,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 184; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 185; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -7124,7 +7153,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 184; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 185; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -7135,7 +7164,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 184; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 185; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -7145,7 +7174,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 184; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 185; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -7155,7 +7184,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 184; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 185; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -7267,12 +7296,12 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[218];
+    boolean[] la1tokens = new boolean[219];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 184; i++) {
+    for (int i = 0; i < 185; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -7299,7 +7328,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
         }
       }
     }
-    for (int i = 0; i < 218; i++) {
+    for (int i = 0; i < 219; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

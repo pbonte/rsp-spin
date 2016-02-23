@@ -49,21 +49,12 @@ public class ConstructImpl extends QueryImpl implements Construct {
 		context.print("{");
 		context.println();
 		
+		
 		for(Element template : getGraphTemplates()) {
 			context.printIndentation(context.getIndentation() + 1);
 			template.print(context);
-			context.print(" .");
-			context.println();
+			//context.println();
 		}
-		
-		/*
-		for(TripleTemplate template : getTemplates()) {
-			context.printIndentation(context.getIndentation() + 1);
-			template.print(context);
-			context.print(" .");
-			context.println();
-		}
-		*/
 		context.printIndentation(context.getIndentation());
 		context.print("}");
 		printStringFrom(context);

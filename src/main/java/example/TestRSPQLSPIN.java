@@ -29,6 +29,13 @@ public class TestRSPQLSPIN {
 				+ "      ?g :timestamp ?t"
 				+ "   }"
 				+ "}";
+		q = ""
+				+ "PREFIX : <http://test#> \n"
+				+ "CONSTRUCT { GRAPH :g1 { :a :b :c } GRAPH :g2 { :a :b :c } } \n"
+				//+ "FROM NAMED WINDOW :w1 ON :s1 [FROM NOW-PT1h TO NOW-?b STEP ?s] \n"
+				+ "WHERE {\n"
+				+ "   :a :b :c .\n"
+				+ "}";
 		
 		String qBig = ""
 				+ "PREFIX : <http://test#> \n"
@@ -59,6 +66,7 @@ public class TestRSPQLSPIN {
 				+ "   {GRAPH :g1 { ?a :foo :Bar }}\n"
 				+ "}\n"
 				+ "LIMIT 10";
+		
 		Query query = QueryFactory.create(q, ParserRSPQL.rspqlSyntax);
 		
 		// Initialize SPIN system functions and templates

@@ -365,9 +365,6 @@ public class SP {
 	public final static Resource Rstream = ResourceFactory.createResource(RSP + "Rstream");
 	public final static Resource Istream = ResourceFactory.createResource(RSP + "Istream");
 	public final static Resource Dstream = ResourceFactory.createResource(RSP + "Dstream");
-	// Keywords
-	public final static Resource WindowAll = ResourceFactory.createResource(RSP + "ALL");
-	public final static Resource WindowNow = ResourceFactory.createResource(RSP + "NOW");
 	// Properties
 	public static Property fromNamedWindow = ResourceFactory.createProperty(RSP + "fromNamedWindow");
 	public static Property windowIri = ResourceFactory.createProperty(RSP + "windowIri");

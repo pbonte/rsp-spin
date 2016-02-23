@@ -195,10 +195,6 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 				ElementLogicalWindow logicalWindow = (ElementLogicalWindow) window;
 				String range;
 				RDFNode rangeNode = (RDFNode) logicalWindow.getRange();
-				if (rangeNode.equals(SP.WindowNow)) {
-					context.print(String.format("[%s]", "NOW"));
-					continue;
-				}
 				if (rangeNode instanceof Resource && ((Resource) rangeNode).hasProperty(SP.varName)) {
 					range = "?" + rangeNode.as(Variable.class).getName();
 				} else {
@@ -226,14 +222,14 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 				if (fromNode instanceof Resource && ((Resource) fromNode).hasProperty(SP.varName)) {
 					from = "?" + fromNode.as(Variable.class).getName();
 				} else {
-					from = "NOW-" + fromNode.asLiteral().getString();
+					from = fromNode.asLiteral().getString();
 				}
 				String to;
 				RDFNode toNode = (RDFNode) logicalPastWindow.getTo();
 				if (toNode instanceof Resource && ((Resource) toNode).hasProperty(SP.varName)) {
 					to = "?" + toNode.as(Variable.class).getName();
 				} else {
-					to = "NOW-" + toNode.asLiteral().getString();
+					to = toNode.asLiteral().getString();
 				}
 
 				// Get step (optional)
@@ -245,9 +241,9 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 					} else {
 						step = stepNode.asLiteral().getString();
 					}
-					context.print(String.format("[FROM %s TO %s STEP %s]", from, to, step));
+					context.print(String.format("[FROM NOW-%s TO NOW-%s STEP %s]", from, to, step));
 				} else {
-					context.print(String.format("[FROM %s TO %s]", from, to));
+					context.print(String.format("[FROM NOW-%s TO NOW-%s]", from, to));
 				}
 			} else if (window.getClass().equals(ElementPhysicalWindow.class)) {
 				// Physical window
@@ -257,10 +253,6 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 				if (sizeNode instanceof Resource && ((Resource) sizeNode).hasProperty(SP.varName)) {
 					size = "?" + sizeNode.as(Variable.class).getName();
 				} else {
-					if (sizeNode.equals(SP.WindowAll)) {
-						context.print(String.format("[%s]", "ALL"));
-						continue;
-					}
 					size = Integer.toString(sizeNode.asLiteral().getInt());
 				}
 				// Get step (optional)

@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.jena.atlas.io.IndentedWriter;
+import org.rspql.syntax.ElementLogicalPastWindow;
 import org.rspql.syntax.ElementLogicalWindow;
 import org.rspql.syntax.ElementNamedWindow;
 import org.rspql.syntax.ElementPhysicalWindow;
@@ -44,9 +45,7 @@ import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.util.FmtUtils;
 
-
-
-/** Serialize a query into SPARQL, ARQ, or RSP-QL format*/
+/** Serialize a query into SPARQL, ARQ, or RSP-QL format */
 public class QuerySerializer implements QueryVisitor {
 	static final int BLOCK_INDENT = 2;
 	protected FormatterTemplate fmtTemplate;
@@ -127,10 +126,6 @@ public class QuerySerializer implements QueryVisitor {
 
 		out.incIndent(BLOCK_INDENT);
 		out.newline();
-		// Triples
-		//Template t = query.getConstructTemplate();
-		//fmtTemplate.format(t);
-		// Quads
 		Element el = query.getConstructGraphTemplate();
 		fmtElement.visitAsGroup(el);
 		out.decIndent(BLOCK_INDENT);
@@ -186,26 +181,35 @@ public class QuerySerializer implements QueryVisitor {
 				}
 				out.print(String.format("FROM NAMED WINDOW %s ON %s ", windowIri, streamIri));
 				// Logical or physical window
-				if(window.getClass().equals(ElementLogicalWindow.class)){
+				if (window.getClass().equals(ElementLogicalWindow.class)) {
 					ElementLogicalWindow logicalWindow = (ElementLogicalWindow) window;
 					String range = logicalWindow.getRange().toString();
-					if(logicalWindow.getStep() != null){
+					if (logicalWindow.getStep() != null) {
 						String step = logicalWindow.getStep().toString();
 						out.print(String.format("[RANGE %s STEP %s]", range, step));
 					} else {
 						out.print(String.format("[RANGE %s]", range));
 					}
-	
-				} else if(window.getClass().equals(ElementPhysicalWindow.class)){
+
+				} else if (window.getClass().equals(ElementPhysicalWindow.class)) {
 					ElementPhysicalWindow physicalWindow = (ElementPhysicalWindow) window;
 					String range = physicalWindow.getSize().toString();
-					if(physicalWindow.getStep() != null){
+					if (physicalWindow.getStep() != null) {
 						String step = physicalWindow.getStep().toString();
 						out.print(String.format("[ITEM %s STEP %s]", range, step));
 					} else {
 						out.print(String.format("[ITEM %s]", range));
 					}
-	
+				} else if (window.getClass().equals(ElementLogicalPastWindow.class)) {
+					ElementLogicalPastWindow w = (ElementLogicalPastWindow) window;
+					String from = w.getFrom().toString();
+					String to = w.getTo().toString();
+					if (w.getStep() != null) {
+						String step = w.getStep().toString();
+						out.print(String.format("[FROM NOW-%s TO NOW-%s STEP %s]", from, to, step));
+					} else {
+						out.print(String.format("[FROM NOW-%s TO NOW-%s]", from, to));
+					}
 				}
 				out.newline();
 			}
@@ -218,9 +222,7 @@ public class QuerySerializer implements QueryVisitor {
 			out.print("WHERE");
 			out.incIndent(BLOCK_INDENT);
 			out.newline();
-
 			Element el = query.getQueryPattern();
-
 			fmtElement.visitAsGroup(el);
 			// el.visit(fmtElement) ;
 			out.decIndent(BLOCK_INDENT);
