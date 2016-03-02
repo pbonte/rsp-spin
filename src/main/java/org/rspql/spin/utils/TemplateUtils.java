@@ -79,7 +79,7 @@ public class TemplateUtils {
 	 * @param template
 	 * @return argument
 	 */
-	public static Resource getArgument(Template template) {
+	public static Resource createArgument(Template template) {
 		// Define spl:Argument at the template
 		Model model = template.getModel();
 		Resource argument = model.createResource(SPL.Argument);
@@ -98,11 +98,11 @@ public class TemplateUtils {
 	 */
 	public static void createArgument(Template template, String varName, RDFNode valueType, boolean optional,
 			String comment) {
-		Resource arg = TemplateUtils.getArgument(template);
+		Resource arg = TemplateUtils.createArgument(template);
 		arg.addProperty(SPL.predicate, template.getModel().getProperty(ARG.NS + varName));
 		arg.addProperty(SPL.valueType, valueType);
 		arg.addProperty(SPL.optional, template.getModel().createTypedLiteral(optional));
-		arg.addProperty(RDFS.comment, "Range must be a time, e.g. PT10s");
+		arg.addProperty(RDFS.comment, comment);
 	}
 
 	/**
@@ -185,14 +185,13 @@ public class TemplateUtils {
 	}
 
 	/**
-	 * Cleans up a query string. Fixes formatting of named window durations.
+	 * Cleans up a query string. Fixes the printed type formatting of named window durations.
 	 * 
 	 * @param query
 	 * @return
 	 */
 	public static String clean(String query) {
 		// Fix durations in windows
-
 		query = query.replaceAll(
 				"(STEP|RANGE|FROM|TO)(.+?)\"([A-Z0-9]+?)\"\\^\\^<http://www\\.w3\\.org/2001/XMLSchema#duration>",
 				"$1$2$3");
