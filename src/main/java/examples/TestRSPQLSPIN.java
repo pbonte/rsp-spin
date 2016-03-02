@@ -1,4 +1,4 @@
-package example;
+package examples;
 
 import org.rspql.lang.rspql.ParserRSPQL;
 import org.topbraid.spin.arq.ARQ2SPIN;

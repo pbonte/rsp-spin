@@ -1,4 +1,4 @@
-package example;
+package examples;
 
 import org.rspql.lang.rspql.ParserRSPQL;
 import org.rspql.lang.cqels.ParserCQELS;
@@ -37,13 +37,12 @@ public class TestSerializers {
 				+ "LIMIT 10";
 		Query query = QueryFactory.create(q, ParserRSPQL.rspqlSyntax);
 		
-		//System.out.println("RSP-QL:");
+		System.out.println("RSP-QL:");
 		System.out.println(query);
 		
-
 		query.setSyntax(ParserCQELS.cqelsSyntax);
-		//System.out.println("\nCQELS-QL: " + query.getSyntax());
-		System.out.println(query);
+		System.out.println("\nCQELS-QL: " + query.getSyntax());
+		//System.out.println(query);
 		
 	}
 }
