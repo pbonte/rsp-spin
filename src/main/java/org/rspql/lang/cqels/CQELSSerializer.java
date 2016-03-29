@@ -25,10 +25,10 @@ import com.hp.hpl.jena.sparql.serializer.FormatterTemplate;
 import com.hp.hpl.jena.sparql.serializer.PrologueSerializer;
 import com.hp.hpl.jena.sparql.serializer.SerializationContext;
 import com.hp.hpl.jena.sparql.syntax.Element;
-import com.hp.hpl.jena.sparql.syntax.Template;
 import com.hp.hpl.jena.sparql.util.FmtUtils;
 
 /** Serialize a query into CQELS-QL. Note: This is only a proof of concept */
+
 public class CQELSSerializer implements QueryVisitor {
 	static final int BLOCK_INDENT = 2;
 	protected FormatterTemplate fmtTemplate;
@@ -104,8 +104,8 @@ public class CQELSSerializer implements QueryVisitor {
 
 		out.incIndent(BLOCK_INDENT);
 		out.newline();
-		Template t = query.getConstructTemplate();
-		fmtTemplate.format(t);
+		Element el = query.getConstructGraphTemplate();
+		fmtElement.visitAsGroup(el);
 		out.decIndent(BLOCK_INDENT);
 	}
 

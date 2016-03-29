@@ -15,6 +15,7 @@ import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.sparql.syntax.ElementNamedGraph;
 import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
+import com.hp.hpl.jena.sparql.syntax.ElementSubQuery;
 import com.hp.hpl.jena.sparql.util.FmtUtils;
 
 public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.FormatterElement {
@@ -153,5 +154,21 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 			}
 		}
 		return Integer.toString((int) time) + unit;
+	}
+	
+	public void visitAsGroup(Element el) {
+		boolean needBraces = !((el instanceof ElementGroup) || (el instanceof ElementSubQuery));
+
+		if (needBraces) {
+			out.print("{ ");
+			out.incIndent(INDENT);
+		}
+		
+		el.visit(this);
+
+		if (needBraces) {
+			out.decIndent(INDENT);
+			out.print("}");
+		}
 	}
 }

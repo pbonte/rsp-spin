@@ -377,7 +377,7 @@ public class SP {
 	public static Property windowNameNode = ResourceFactory.createProperty(RSP + "windowNameNode");
 	public static Property registerAs = ResourceFactory.createProperty(RSP + "registerAs");
 	public static Property windowToStreamOperator = ResourceFactory.createProperty(RSP + "windowToStreamOperator");
-	
+
 	/**
 	 * Gets a Model with the content of the SP namespace, from a file that is
 	 * bundled with this API.
@@ -445,7 +445,7 @@ public class SP {
 		p.add(Variable.class, new SimpleImplementation(Variable.asNode(), VariableImpl.class));
 		// RSP-QL
 		p.add(NamedWindow.class, new SimpleImplementation(NamedWindow.asNode(), NamedWindowImpl.class));
-		
+
 	}
 
 	/**
@@ -497,5 +497,15 @@ public class SP {
 				buffer.append(" .\n");
 			}
 		}
+	}
+
+	/**
+	 * Set the model externally. Simplifies use with e.g. web applications by
+	 * allowing the model to be read manually.
+	 * 
+	 * @param model
+	 */
+	public static void setModel(Model model) {
+		SP.model = model;
 	}
 }
