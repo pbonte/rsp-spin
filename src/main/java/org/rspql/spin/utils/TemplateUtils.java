@@ -96,13 +96,17 @@ public class TemplateUtils {
 	 * @param optional
 	 * @param comment
 	 */
-	public static void createArgument(Template template, String varName, RDFNode valueType, boolean optional,
-			String comment) {
+	public static void createArgument(Template template, String varName, RDFNode valueType, RDFNode defaultValue,
+			boolean optional, String comment) {
 		Resource arg = TemplateUtils.createArgument(template);
 		arg.addProperty(SPL.predicate, template.getModel().getProperty(ARG.NS + varName));
 		arg.addProperty(SPL.valueType, valueType);
+		if (defaultValue != null) {
+			arg.addProperty(SPL.defaultValue, defaultValue);
+		}
 		arg.addProperty(SPL.optional, template.getModel().createTypedLiteral(optional));
 		arg.addProperty(RDFS.comment, comment);
+
 	}
 
 	/**
@@ -177,7 +181,7 @@ public class TemplateUtils {
 	 * 
 	 * @param template
 	 * @param bindings
-	 * @return success
+	 * @return
 	 */
 	public static boolean validate(Template template, QuerySolutionMap bindings) {
 		List<Argument> arguments = template.getArguments(false);
@@ -185,7 +189,8 @@ public class TemplateUtils {
 	}
 
 	/**
-	 * Cleans up a query string. Fixes the printed type formatting of named window durations.
+	 * Cleans up a query string. Fixes the printed type formatting of named
+	 * window durations.
 	 * 
 	 * @param query
 	 * @return
