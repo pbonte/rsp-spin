@@ -28,12 +28,17 @@
 		</dependency>
 		
   </dependencies>-->
-  	<dependencies>
+	<dependencies>
     	<dependency>
-    		<groupId>org.topbraid</groupId>
-    		<artifactId>spin</artifactId>
+			<groupId>org.topbraid</groupId>
+			<artifactId>spin</artifactId>
     		<version>1.4.0</version>
-    	</dependency>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20160212</version>
+		</dependency>
 	</dependencies>
   
 	<repositories>
