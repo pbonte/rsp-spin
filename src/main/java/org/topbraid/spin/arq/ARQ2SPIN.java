@@ -342,9 +342,9 @@ public class ARQ2SPIN {
 					if (step instanceof Node) {
 						String varName = ((Node) step).getName();
 						Resource variable = getVariable(varName);
-						windowNode.addProperty(SP.windowStep, variable);
+						windowNode.addProperty(SP.windowLogicalStep, variable);
 					} else {
-						windowNode.addProperty(SP.windowStep, step.toString());
+						windowNode.addProperty(SP.windowLogicalStep, step.toString(), XSDDatatype.XSDduration);
 					}
 				}
 			} else if (window.getClass().equals(ElementLogicalPastWindow.class)) {
@@ -377,9 +377,9 @@ public class ARQ2SPIN {
 					if (step instanceof Node) {
 						String varName = ((Node) step).getName();
 						Resource variable = getVariable(varName);
-						windowNode.addProperty(SP.windowStep, variable);
+						windowNode.addProperty(SP.windowLogicalStep, variable);
 					} else {
-						windowNode.addProperty(SP.windowStep, step.toString());
+						windowNode.addProperty(SP.windowLogicalStep, step.toString(), XSDDatatype.XSDduration);
 					}
 				}
 			} else if (window.getClass().equals(ElementPhysicalWindow.class)) {
@@ -401,9 +401,9 @@ public class ARQ2SPIN {
 					if (step instanceof Node) {
 						String varName = ((Node) step).getName();
 						Resource variable = getVariable(varName);
-						windowNode.addProperty(SP.windowStep, variable);
+						windowNode.addProperty(SP.windowPhysicalStep, variable);
 					} else {
-						windowNode.addProperty(SP.windowStep, step.toString(), XSDDatatype.XSDinteger);
+						windowNode.addProperty(SP.windowPhysicalStep, step.toString(), XSDDatatype.XSDinteger);
 					}
 				}
 			}
@@ -1011,13 +1011,13 @@ public class ARQ2SPIN {
 		if (arq.getStreamType() != null) {
 			switch (arq.getStreamType()) {
 			case "ISTREAM":
-				spinQuery.addProperty(SP.windowToStreamOperator, SP.Istream);
+				spinQuery.addProperty(SP.streamOperator, SP.Istream);
 				break;
 			case "RSTREAM":
-				spinQuery.addProperty(SP.windowToStreamOperator, SP.Rstream);
+				spinQuery.addProperty(SP.streamOperator, SP.Rstream);
 				break;
 			case "DSTREAM":
-				spinQuery.addProperty(SP.windowToStreamOperator, SP.Dstream);
+				spinQuery.addProperty(SP.streamOperator, SP.Dstream);
 				break;
 			}
 		}

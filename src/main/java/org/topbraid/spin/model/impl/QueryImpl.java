@@ -66,8 +66,8 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 				Object range = window.getProperty(SP.windowRange).getObject();
 				range = range instanceof Duration ? range.toString() : range;
 				Object step = null;
-				if (window.getProperty(SP.windowStep) != null) {
-					step = window.getProperty(SP.windowStep).getObject();
+				if (window.getProperty(SP.windowLogicalStep) != null) {
+					step = window.getProperty(SP.windowLogicalStep).getObject();
 					step = step instanceof Duration ? step.toString() : step;
 				}
 				windows.add(new ElementLogicalWindow(windowIri, streamIri, range, step));
@@ -78,16 +78,16 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 				to = to instanceof Duration ? to.toString() : to;
 
 				Object step = null;
-				if (window.getProperty(SP.windowStep) != null) {
-					step = window.getProperty(SP.windowStep).getObject();
+				if (window.getProperty(SP.windowLogicalStep) != null) {
+					step = window.getProperty(SP.windowLogicalStep).getObject();
 					step = step instanceof Duration ? step.toString() : step;
 				}
 				windows.add(new ElementLogicalPastWindow(windowIri, streamIri, from, to, step));
 			} else if (type.equals(SP.PhysicalWindow)) {
 				Object size = window.getProperty(SP.windowSize).getObject();
 				Object step = null;
-				if (window.getProperty(SP.windowStep) != null) {
-					step = window.getProperty(SP.windowStep).getObject();
+				if (window.getProperty(SP.windowPhysicalStep) != null) {
+					step = window.getProperty(SP.windowPhysicalStep).getObject();
 				}
 				windows.add(new ElementPhysicalWindow(windowIri, streamIri, size, step));
 			}
@@ -366,9 +366,9 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 	}
 
 	protected void printStreamType(PrintContext p) {
-		Statement stmt = getProperty(SP.windowToStreamOperator);
+		Statement stmt = getProperty(SP.streamOperator);
 		if (stmt != null) {
-			Resource resource = getProperty(SP.windowToStreamOperator).getObject().asResource();
+			Resource resource = getProperty(SP.streamOperator).getObject().asResource();
 			if (resource.equals(SP.Rstream)) {
 				p.printKeyword("RSTREAM ");
 			} else if (resource.equals(SP.Istream)) {

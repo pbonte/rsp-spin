@@ -355,7 +355,7 @@ public class SP {
 	private static Model model;
 
 	// RSP-QL related properties and classes
-	public final static String RSP = "https://w3id.org/rsp/spin#";
+	public final static String RSP = "http://w3id.org/rsp/spin#";
 	// Classes
 	public final static Resource Window = ResourceFactory.createResource(RSP + "Window");
 	public final static Resource LogicalPastWindow = ResourceFactory.createResource(RSP + "LogicalPastWindow");
@@ -371,12 +371,13 @@ public class SP {
 	public static Property streamIri = ResourceFactory.createProperty(RSP + "streamIri");
 	public static Property windowRange = ResourceFactory.createProperty(RSP + "range");
 	public static Property windowSize = ResourceFactory.createProperty(RSP + "size");
-	public static Property windowStep = ResourceFactory.createProperty(RSP + "step");
+	public static Property windowLogicalStep = ResourceFactory.createProperty(RSP + "logicalStep");
+	public static Property windowPhysicalStep = ResourceFactory.createProperty(RSP + "physicalStep");
 	public static Property windowFrom = ResourceFactory.createProperty(RSP + "from");
 	public static Property windowTo = ResourceFactory.createProperty(RSP + "to");
 	public static Property windowNameNode = ResourceFactory.createProperty(RSP + "windowNameNode");
 	public static Property registerAs = ResourceFactory.createProperty(RSP + "registerAs");
-	public static Property windowToStreamOperator = ResourceFactory.createProperty(RSP + "windowToStreamOperator");
+	public static Property streamOperator = ResourceFactory.createProperty(RSP + "streamOperator");
 
 	/**
 	 * Gets a Model with the content of the SP namespace, from a file that is
