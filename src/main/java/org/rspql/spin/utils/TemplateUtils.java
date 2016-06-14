@@ -106,7 +106,6 @@ public class TemplateUtils {
 		}
 		arg.addProperty(SPL.optional, template.getModel().createTypedLiteral(optional));
 		arg.addProperty(RDFS.comment, comment);
-
 	}
 
 	/**

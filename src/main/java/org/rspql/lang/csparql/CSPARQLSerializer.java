@@ -2,11 +2,17 @@
  * @author Robin Keskisarkka (https://github.com/keski)
  */
 
-package org.rspql.lang.cqels;
+package org.rspql.lang.csparql;
 
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.jena.atlas.io.IndentedWriter;
+import org.rspql.syntax.ElementLogicalPastWindow;
+import org.rspql.syntax.ElementLogicalWindow;
+import org.rspql.syntax.ElementNamedWindow;
+import org.rspql.syntax.ElementPhysicalWindow;
 
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Query;
@@ -28,18 +34,16 @@ import com.hp.hpl.jena.sparql.util.FmtUtils;
 /**
  * Serialize a query into CQELS-QL. Disclaimer: This is meant as a proof of
  * concept only. If you find any bugs or errors please use the issue tracker.
- * Note that the CQELS keywords 'NOW' and 'ALL' for window range definitions is
- * not supported by RSP-QL.
  */
 
-public class CQELSSerializer implements QueryVisitor {
+public class CSPARQLSerializer implements QueryVisitor {
 	static final int BLOCK_INDENT = 2;
 	protected FormatterTemplate fmtTemplate;
 	protected FormatterElement fmtElement;
 	protected FmtExprSPARQL fmtExpr;
 	protected IndentedWriter out = null;
 
-	public CQELSSerializer(IndentedWriter iwriter, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
+	public CSPARQLSerializer(IndentedWriter iwriter, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
 			FormatterTemplate formatterTemplate) {
 		out = iwriter;
 		fmtTemplate = formatterTemplate;
@@ -71,7 +75,14 @@ public class CQELSSerializer implements QueryVisitor {
 		Node n = query.getRegisterAs();
 		if (n == null)
 			return;
-		System.err.println("WARNING: REGISTER AS is not supported in CQELS-QL and will be omitted.");
+		if (n.isURI()) {
+			String iri = FmtUtils.stringForURI(n.getURI(), query);
+			out.print(String.format("REGISTER STREAM %s AS ", iri));
+		} else {
+			out.print(String.format("REGISTER STREAM %s AS ", n.toString()));
+		}
+		out.newline();
+		out.newline();
 	}
 
 	@Override
@@ -99,9 +110,9 @@ public class CQELSSerializer implements QueryVisitor {
 
 		if (query.getStreamType() != null) {
 			String type = query.getStreamType().toUpperCase();
-			if (!type.equals("ISTREAM")) {
+			if (!type.equals("RSTREAM")) {
 				System.err.println(String.format(
-						"WARNING: %s is not supported in CQELS-QL. Implicit ISTREAM will be used instead. ", type));
+						"WARNING: %s is not supported in C-SPARQL. Implicit RSTREAM will be used instead. ", type));
 			}
 		}
 
@@ -119,13 +130,13 @@ public class CQELSSerializer implements QueryVisitor {
 
 	@Override
 	public void visitDescribeResultForm(Query query) {
-		System.err.println("Error: DESCRIBE queries are not supported in CQELS-QL");
+		System.err.println("Error: DESCRIBE queries are not supported in C-SPARQL");
 		return;
 	}
 
 	@Override
 	public void visitAskResultForm(Query query) {
-		System.err.println("Error: ASK queries are not supported in CQELS-QL");
+		System.err.println("Error: ASK queries are not supported in C-SPARQL");
 		return;
 	}
 
@@ -145,6 +156,76 @@ public class CQELSSerializer implements QueryVisitor {
 				out.print(FmtUtils.stringForURI(uri, query));
 				out.newline();
 			}
+		}
+
+		// C-SPARQL only allows a stream to be defined only once, consequently
+		// there
+		// can be only a single window over a stream. This limitation is not
+		// present in RSP-QL. If multiple windows are defined over the same
+		// stream the current approach identifies the outer bounds of all
+		// windows defined over a query and takes the smallest step size found
+		// and uses this to define a new stream definition.
+		// If both physical and logical windows have been defined over the
+		// stream the physical window will be prioritized.
+		HashMap<String, CSPARQLStream> streams = new HashMap<>();
+		for (ElementNamedWindow window : query.getNamedWindows()) {
+			Node stream = (Node) window.getStream();
+			String streamIri = stream.toString();
+			if (stream.isURI()) {
+				streamIri = FmtUtils.stringForURI(stream.getURI(), query);
+			}
+			if (window instanceof ElementLogicalPastWindow) {
+				System.err.println("WARNING: Windows in the past are not supported");
+				return;
+			}
+
+			CSPARQLStream s = streams.containsKey(streamIri) ? streams.get(streamIri) : new CSPARQLStream();
+			streams.put(streamIri, s);
+			if (window instanceof ElementPhysicalWindow) {
+				if (s.isLogical()) {
+					System.err.println(String.format(
+							"WARNING: A logical window is already defined for the stream %s (skipping)", streamIri));
+				} else {
+					s.type = "physical";
+					s.setRange(((ElementPhysicalWindow) window).getSize().toString());
+				}
+			} else {
+				if (s.isPhysical()) {
+					System.err.println(String.format(
+							"WARNING: A physical window is already defined for the stream %s (overriding)", streamIri));
+					s = new CSPARQLStream();
+					streams.put(streamIri, s);
+				}
+				s.type = "logical";
+				s.setRange(((ElementLogicalWindow) window).getRange().toString());
+				s.setStep(((ElementLogicalWindow) window).getStep().toString());
+			}
+		}
+
+		// Print all streams
+		for (String streamIri : streams.keySet()) {
+			CSPARQLStream stream = streams.get(streamIri);
+			out.print(String.format("FROM STREAM %s ", streamIri));
+
+			// Logical or physical window
+			if (stream.isLogical()) {
+				String range = stream.range.toString();
+				Object step = stream.step;
+				if (step != null) {
+					out.print(String.format("[RANGE %s STEP %s]", formatDuration(range), formatDuration(step.toString())));
+				} else {
+					System.err.println("STEP is missing, using minimum value  (1ms)");
+					out.print(String.format("[RANGE %s STEP %s]", formatDuration(range), "1ms"));
+				}
+			} else {
+				String range = stream.range.toString();
+				Object step = stream.step;
+				if (step != null) {
+					System.err.println("STEP is not supported for phyical windows (ignoring)");
+				}
+				out.print(String.format("[TRIPLES %s]", range));
+			}
+			out.newline();
 		}
 	}
 
@@ -340,4 +421,102 @@ public class CQELSSerializer implements QueryVisitor {
 			first = false;
 		}
 	}
+
+	/**
+	 * Helper class to manage multiple windows over a stream. Variables are
+	 * always lower than actual values.
+	 */
+	public class CSPARQLStream {
+		String type = "";
+		String step = "";
+		String range = "";
+
+		public void setStep(String newStep) {
+			if (step.equals("") || step.matches("^\\?")) {
+				this.step = newStep;
+				return;
+			}
+
+			if (isLogical()) {
+				// Compare, we want the lowest
+				Duration step1 = Duration.parse(step);
+				Duration step2 = Duration.parse(newStep);
+				if (step2.minus(step1).isNegative()) {
+					step = step2.toString();
+				}
+			} else {
+				// Not applicable
+			}
+		}
+
+		public void setRange(String newRange) {
+			if (range.equals("") || range.matches("^\\?")) {
+				this.range = newRange;
+				return;
+			}
+
+			if (isLogical()) {
+				// Compare, we want the largest
+				Duration range1 = Duration.parse(range);
+				Duration range2 = Duration.parse(newRange);
+				if (range1.minus(range2).isNegative()) {
+					range = range2.toString();
+				}
+			} else {
+				// Compare, we want the largest
+				int range1 = Integer.parseInt(range);
+				int range2 = Integer.parseInt(newRange);
+				if (range1 < range2) {
+					range = Integer.toString(range2);
+				}
+			}
+		}
+
+		public boolean isLogical() {
+			return type.equals("logical");
+		}
+
+		public boolean isPhysical() {
+			return type.equals("physical");
+		}
+	}
+
+	/**
+	 * Returns a duration formatted for CSPARQL. A single integer with the
+	 * largest possible unit is returned for simplicity.
+	 * 
+	 * @param duration
+	 * @return
+	 */
+	public String formatDuration(String duration) {
+		Duration d = Duration.parse(duration);
+		// Use the largest possible unit
+		String unit = "s";
+		double time = d.getSeconds();
+		if (d.getNano() != 0) {
+			unit = "ms";
+			time *= 1000000 + d.getNano();
+			time /= 1000000;
+		} else {
+			if (time % 60 == 0) {
+				unit = "m";
+				time = time / 60;
+			}
+			if (time % 60 == 0) {
+				unit = "h";
+				time = time / 60;
+			}
+			if (time % 24 == 0) {
+				unit = "d";
+				time = time / 24;
+			}
+		}
+		return Integer.toString((int) time) + unit;
+	}
 }
+
+/*
+ * Fix format of register stream/query as
+ * 
+ * 
+ */
