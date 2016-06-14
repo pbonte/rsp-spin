@@ -44,14 +44,42 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 				}
 			} else {
 				el.visit(this);
+				out.println();
 			}
-			out.println();
 		}
 
 		out.decIndent(INDENT);
 		out.print("}");
 	}
 
+	public void visitResultGroup(ElementGroup elGroup) {
+		out.print("{ ");
+		out.incIndent(INDENT);
+
+		for (Element el : elGroup.getElements()) {
+			if (el instanceof ElementNamedGraph) {
+				System.err.println(
+						"WARNING: Named graphs in results are not supported in CQELS-QL. The triples will be added directly to the default graph.");
+
+				ElementGroup group = (ElementGroup) ((ElementNamedGraph) el).getElement();
+				for (Element e : group.getElements()) {
+					e.visit(this);
+					if (e instanceof ElementPathBlock) {
+						out.print(" .");
+						out.println();
+					}
+				}
+			} else {
+				el.visit(this);
+				out.println();
+			}
+		}
+
+		out.decIndent(INDENT);
+		out.print("}");
+		out.println();
+	}
+	
 	public void visit(ElementWindow el) {
 		ElementNamedWindow window = null;
 		for (ElementNamedWindow w : query.getNamedWindows()) {
@@ -104,7 +132,7 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 			String range = physicalWindow.getSize().toString();
 			if (physicalWindow.getStep() != null) {
 				System.err.println(
-						"WARNING: Only triple streams are supported in CQELS-QL. The window will be interpretted in terms of triples.");
+						"WARNING: Only triple streams are supported in CQELS-QL. The window size will be defined in terms of triples.");
 				System.err.println(
 						"WARNING: SLIDE is not supported for physical windows in CQELS-QL and will be omitted.");
 			}

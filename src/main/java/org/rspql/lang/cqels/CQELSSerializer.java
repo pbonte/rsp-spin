@@ -25,9 +25,14 @@ import com.hp.hpl.jena.sparql.serializer.FormatterTemplate;
 import com.hp.hpl.jena.sparql.serializer.PrologueSerializer;
 import com.hp.hpl.jena.sparql.serializer.SerializationContext;
 import com.hp.hpl.jena.sparql.syntax.Element;
+import com.hp.hpl.jena.sparql.syntax.ElementGroup;
+import com.hp.hpl.jena.sparql.syntax.ElementNamedGraph;
 import com.hp.hpl.jena.sparql.util.FmtUtils;
 
-/** Serialize a query into CQELS-QL. Note: This is only a proof of concept */
+/**
+ * Serialize a query into CQELS-QL. Disclaimer: This is meant as a proof of
+ * concept only. If you find any bugs or errors please use the issue tracker.
+ */
 
 public class CQELSSerializer implements QueryVisitor {
 	static final int BLOCK_INDENT = 2;
@@ -105,7 +110,12 @@ public class CQELSSerializer implements QueryVisitor {
 		out.incIndent(BLOCK_INDENT);
 		out.newline();
 		Element el = query.getConstructGraphTemplate();
-		fmtElement.visitAsGroup(el);
+
+		if (el instanceof ElementGroup) {
+			fmtElement.visitResultGroup((ElementGroup) el);
+		} else {
+			fmtElement.visitAsGroup(el);
+		}
 		out.decIndent(BLOCK_INDENT);
 	}
 
