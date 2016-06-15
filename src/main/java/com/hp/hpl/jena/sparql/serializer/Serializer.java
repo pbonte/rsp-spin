@@ -25,7 +25,11 @@ import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.atlas.logging.Log;
 import org.rspql.lang.cqels.CQELSSerializer;
 import org.rspql.lang.cqels.ParserCQELS;
+import org.rspql.lang.csparql.CSPARQLSerializer;
+import org.rspql.lang.csparql.ParserCSPARQL;
 import org.rspql.lang.rspql.ParserRSPQL;
+import org.rspql.lang.sparqlstream.ParserSPARQLStream;
+import org.rspql.lang.sparqlstream.SPARQLStreamSerializer;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.Syntax;
@@ -161,6 +165,20 @@ public class Serializer {
 			writer.flush();
 			return;
 		}
+		
+		// CSPARQL
+		if (outSyntax.equals(ParserCSPARQL.csparqlSyntax)) {
+			serializeCSPARQL(query, writer);
+			writer.flush();
+			return;
+		}
+		
+		// SPARQLStreaming
+		if (outSyntax.equals(ParserSPARQLStream.sparqlStreamSyntax)) {
+			serializeSPARQLStream(query, writer);
+			writer.flush();
+			return;
+		}
 
 		Log.warn(Serializer.class, "Unknown syntax: " + outSyntax);
 	}
@@ -226,5 +244,27 @@ public class Serializer {
 		query.visit(serilizer);
 	}
 	
-
+	/**
+	 * Support for serializing RSP-QL as C-SPARQL.
+	 * @param query
+	 * @param writer
+	 */
+	static public void serializeCSPARQL(Query query, IndentedWriter writer) {
+		SerializationContext cxt1 = new SerializationContext(query, new NodeToLabelMapBNode("b", false));
+		SerializationContext cxt2 = new SerializationContext(query, new NodeToLabelMapBNode("c", false));
+		CSPARQLSerializer serilizer = new CSPARQLSerializer(writer,  new org.rspql.lang.csparql.FormatterElement(writer, cxt1), new FmtExprSPARQL(writer, cxt1), new FmtTemplate(writer, cxt2));
+		query.visit(serilizer);
+	}
+	
+	/**
+	 * Support for serializing RSP-QL as SPARQLStream.
+	 * @param query
+	 * @param writer
+	 */
+	static public void serializeSPARQLStream(Query query, IndentedWriter writer) {
+		SerializationContext cxt1 = new SerializationContext(query, new NodeToLabelMapBNode("b", false));
+		SerializationContext cxt2 = new SerializationContext(query, new NodeToLabelMapBNode("c", false));
+		SPARQLStreamSerializer serilizer = new SPARQLStreamSerializer(writer,  new org.rspql.lang.sparqlstream.FormatterElement(writer, cxt1), new FmtExprSPARQL(writer, cxt1), new FmtTemplate(writer, cxt2));
+		query.visit(serilizer);
+	}
 }
