@@ -34,6 +34,9 @@ import com.hp.hpl.jena.sparql.util.FmtUtils;
 /**
  * Serialize a query into CQELS-QL. Disclaimer: This is meant as a proof of
  * concept only. If you find any bugs or errors please use the issue tracker.
+ * 
+ * Known bugs:
+ * STREAM vs QUERY is not defined
  */
 
 public class CSPARQLSerializer implements QueryVisitor {

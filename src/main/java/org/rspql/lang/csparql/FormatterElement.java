@@ -1,6 +1,7 @@
 package org.rspql.lang.csparql;
 
 import org.apache.jena.atlas.io.IndentedWriter;
+import org.hamcrest.core.IsInstanceOf;
 import org.rspql.syntax.ElementWindow;
 
 import com.hp.hpl.jena.query.Query;
@@ -20,11 +21,8 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 
 	public void visitWindowGroup(ElementGroup elGroup) {
 		for (Element el : elGroup.getElements()) {
-			if (el instanceof ElementNamedGraph) {
-				System.err.println("WARNING: GRAPH blocks in stream will be added directly to the where clause.");
-			}
 			el.visit(this);
-			out.println();
+
 		}
 	}
 
@@ -57,7 +55,10 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 	}
 
 	public void visit(ElementWindow el) {
-		visitWindowGroup((ElementGroup) el.getElement());
+		for(Element e : ((ElementGroup) el.getElement()).getElements()){
+			e.visit(this);
+			out.println();
+		}
 	}
 
 	public void setQuery(Query query) {
@@ -66,7 +67,7 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 
 	public void visitAsGroup(Element el) {
 		boolean needBraces = !((el instanceof ElementGroup) || (el instanceof ElementSubQuery));
-		
+
 		if (needBraces) {
 			out.print("{ ");
 			out.incIndent(INDENT);
