@@ -66,11 +66,6 @@ public class CSPARQLSerializer implements QueryVisitor {
 
 	@Override
 	public void visitPrologue(Prologue prologue) {
-		int row1 = out.getRow();
-		PrologueSerializer.output(out, prologue);
-		int row2 = out.getRow();
-		if (row1 != row2)
-			out.newline();
 	}
 
 	@Override
@@ -79,13 +74,19 @@ public class CSPARQLSerializer implements QueryVisitor {
 		if (n == null)
 			return;
 		if (n.isURI()) {
-			String iri = FmtUtils.stringForURI(n.getURI(), query);
-			out.print(String.format("REGISTER STREAM %s AS ", iri));
+			out.print(String.format("REGISTER STREAM %s AS ", n.getURI()));
 		} else {
 			out.print(String.format("REGISTER STREAM %s AS ", n.toString()));
 		}
 		out.newline();
 		out.newline();
+		
+		// Now print prologue
+		int row1 = out.getRow();
+		PrologueSerializer.output(out, (Prologue) query);
+		int row2 = out.getRow();
+		if (row1 != row2)
+			out.newline();
 	}
 
 	@Override
@@ -139,7 +140,7 @@ public class CSPARQLSerializer implements QueryVisitor {
 
 	@Override
 	public void visitAskResultForm(Query query) {
-		System.err.println("Error: ASK queries are not supported in C-SPARQL");
+		System.err.println("Error: ASK queries are currently not supported");
 		return;
 	}
 
