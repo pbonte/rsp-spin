@@ -24,7 +24,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public class CsrbenchParseTest {
 	private Model model = ModelFactory.createDefaultModel();
-
+	
 	@Test
 	public void csrbenchQuery1() {
 		test("./queries/csrbench/query1.rspql");
@@ -66,6 +66,7 @@ public class CsrbenchParseTest {
 			parse(path, false);
 			valid = true;
 		} catch (IOException e) {
+			System.err.println("ERROR: " + e.getMessage());
 		}
 		assertTrue(valid);
 	}

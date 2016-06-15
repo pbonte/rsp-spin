@@ -95,7 +95,7 @@ public class CSPARQLSerializer implements QueryVisitor {
 		if (query.getStreamType() != null) {
 			String type = query.getStreamType().toUpperCase();
 			if (!type.equals("ISTREAM")) {
-				System.err.println(String.format(
+				FormatterElement.printError(String.format(
 						"WARNING: %s is not supported in C-SPARQL. Implicit RSTREAM will be used instead. ", type));
 			}
 		}
@@ -119,7 +119,7 @@ public class CSPARQLSerializer implements QueryVisitor {
 		if (query.getStreamType() != null) {
 			String type = query.getStreamType().toUpperCase();
 			if (!type.equals("RSTREAM")) {
-				System.err.println(String.format(
+				FormatterElement.printError(String.format(
 						"WARNING: %s is not supported in C-SPARQL. Implicit RSTREAM will be used instead. ", type));
 			}
 		}
@@ -138,13 +138,13 @@ public class CSPARQLSerializer implements QueryVisitor {
 
 	@Override
 	public void visitDescribeResultForm(Query query) {
-		System.err.println("Error: DESCRIBE queries are not supported in C-SPARQL");
+		FormatterElement.printError("Error: DESCRIBE queries are not supported in C-SPARQL");
 		return;
 	}
 
 	@Override
 	public void visitAskResultForm(Query query) {
-		System.err.println("Error: ASK queries are currently not supported");
+		FormatterElement.printError("Error: ASK queries are currently not supported");
 		return;
 	}
 
@@ -183,7 +183,7 @@ public class CSPARQLSerializer implements QueryVisitor {
 				streamIri = FmtUtils.stringForURI(stream.getURI(), query);
 			}
 			if (window instanceof ElementLogicalPastWindow) {
-				System.err.println("WARNING: Windows in the past are not supported");
+				FormatterElement.printError("WARNING: Windows in the past are not supported\n");
 				return;
 			}
 
@@ -191,18 +191,20 @@ public class CSPARQLSerializer implements QueryVisitor {
 			streams.put(streamIri, s);
 			if (window instanceof ElementPhysicalWindow) {
 				if (s.isLogical()) {
-					System.err.println(String.format(
-							"WARNING: A logical window is already defined for the stream %s (skipping)", streamIri));
+					FormatterElement.printError(String.format(
+							"WARNING: A logical window is already defined for the stream %s (skipping)\n", streamIri));
 				} else {
 					s.type = "physical";
 					s.setRange(((ElementPhysicalWindow) window).getSize().toString());
 				}
 			} else {
 				if (s.isPhysical()) {
-					System.err.println(String.format(
-							"WARNING: A physical window is already defined for the stream %s (overriding)", streamIri));
+					FormatterElement.printError(String.format(
+							"WARNING: A physical window is already defined for the stream %s (overriding)\n", streamIri));
 					s = new CSPARQLStream();
 					streams.put(streamIri, s);
+				} else if(s.isLogical()){
+					FormatterElement.printError(String.format("WARNING: Duplicate stream definition for stream %s. Modifying window with new bounds.\n", streamIri));
 				}
 				s.type = "logical";
 				s.setRange(((ElementLogicalWindow) window).getRange().toString());
@@ -222,14 +224,14 @@ public class CSPARQLSerializer implements QueryVisitor {
 				if (step != null) {
 					out.print(String.format("[RANGE %s STEP %s]", formatDuration(range), formatDuration(step.toString())));
 				} else {
-					System.err.println("STEP is missing, using minimum value  (1ms)");
+					FormatterElement.printError("WARNING: STEP is missing, using minimum value  (1ms)\n");
 					out.print(String.format("[RANGE %s STEP %s]", formatDuration(range), "1ms"));
 				}
 			} else {
 				String range = stream.range.toString();
 				Object step = stream.step;
 				if (step != null) {
-					System.err.println("STEP is not supported for phyical windows (ignoring)");
+					FormatterElement.printError("WARNING: STEP is not supported for phyical windows (ignoring)\n");
 				}
 				out.print(String.format("[TRIPLES %s]", range));
 			}

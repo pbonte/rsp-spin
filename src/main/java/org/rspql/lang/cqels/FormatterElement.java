@@ -31,8 +31,8 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 
 		for (Element el : elGroup.getElements()) {
 			if (el instanceof ElementNamedGraph) {
-				System.err.println(
-						"WARNING: GRAPH blocks in streams is not supported in CQELS-QL. The triples will be added directly to the stream block.");
+				FormatterElement.printError(
+						"WARNING: GRAPH blocks in streams is not supported in CQELS-QL. The triples will be added directly to the stream block.\n");
 
 				ElementGroup group = (ElementGroup) ((ElementNamedGraph) el).getElement();
 				for (Element e : group.getElements()) {
@@ -58,8 +58,8 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 
 		for (Element el : elGroup.getElements()) {
 			if (el instanceof ElementNamedGraph) {
-				System.err.println(
-						"WARNING: Named graphs in results are not supported in CQELS-QL. The triples will be added directly to the default graph.");
+				FormatterElement.printError(
+						"WARNING: Named graphs in results are not supported in CQELS-QL. The triples will be added directly to the default graph.\n");
 
 				ElementGroup group = (ElementGroup) ((ElementNamedGraph) el).getElement();
 				for (Element e : group.getElements()) {
@@ -89,7 +89,7 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 			}
 		}
 		if (window == null) {
-			System.err.println("Error: No matching stream declared.");
+			FormatterElement.printError("Error: No matching stream declared.\n");
 			return;
 		}
 
@@ -105,11 +105,6 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 		if (window.getClass().equals(ElementLogicalWindow.class)) {
 			ElementLogicalWindow logicalWindow = (ElementLogicalWindow) window;
 			String range = logicalWindow.getRange().toString();
-			if(range.startsWith("NOW-")){
-				System.err.println(
-						"ERROR: Windows in the past are not supported in CQELS-QL.");
-				return;
-			}
 			if(range.equals("NOW")){
 				out.print(String.format("[NOW]"));
 			} else {
@@ -131,10 +126,10 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 			ElementPhysicalWindow physicalWindow = (ElementPhysicalWindow) window;
 			String range = physicalWindow.getSize().toString();
 			if (physicalWindow.getStep() != null) {
-				System.err.println(
-						"WARNING: Only triple streams are supported in CQELS-QL. The window size will be defined in terms of triples.");
-				System.err.println(
-						"WARNING: SLIDE is not supported for physical windows in CQELS-QL and will be omitted.");
+				FormatterElement.printError(
+						"WARNING: Only triple streams are supported in CQELS-QL. The window size will be defined in terms of triples.\n");
+				FormatterElement.printError(
+						"WARNING: SLIDE is not supported for physical windows in CQELS-QL and will be omitted.\n");
 			}
 			out.print(String.format("[TRIPLES %s]", range));
 		}

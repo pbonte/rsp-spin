@@ -18,6 +18,9 @@
 
 package com.hp.hpl.jena.sparql.serializer;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -56,7 +59,20 @@ import com.hp.hpl.jena.sparql.syntax.ElementVisitor;
 
 public class FormatterElement extends FormatterBase implements ElementVisitor {
 	public static final int INDENT = 2;
+	public static OutputStream errorStream = System.err;
 
+	public static void setErrorStream(OutputStream errorStream){
+		FormatterElement.errorStream = errorStream;
+	}
+	
+	public static void printError(String message){
+		try {
+			errorStream.write(message.getBytes(Charset.forName("UTF-8")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Control whether to show triple pattern boundaries - creates extra nesting
 	 */

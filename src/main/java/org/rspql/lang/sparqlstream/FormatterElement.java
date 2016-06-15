@@ -32,8 +32,8 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 
 		for (Element el : elGroup.getElements()) {
 			if (el instanceof ElementNamedGraph) {
-				System.err.println(
-						"WARNING: Named graphs in results are not supported in SPARQLStream. The triples will be added directly to the default graph.");
+				FormatterElement.printError(
+						"WARNING: Named graphs in results are not supported in SPARQLStream. The triples will be added directly to the default graph.\n");
 
 				ElementGroup group = (ElementGroup) ((ElementNamedGraph) el).getElement();
 				for (Element e : group.getElements()) {

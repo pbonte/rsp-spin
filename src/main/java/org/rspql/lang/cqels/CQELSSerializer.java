@@ -71,7 +71,7 @@ public class CQELSSerializer implements QueryVisitor {
 		Node n = query.getRegisterAs();
 		if (n == null)
 			return;
-		System.err.println("WARNING: REGISTER AS is not supported in CQELS-QL and will be omitted.");
+		FormatterElement.printError("WARNING: REGISTER AS is not supported in CQELS-QL and will be omitted.\n");
 	}
 
 	@Override
@@ -80,8 +80,8 @@ public class CQELSSerializer implements QueryVisitor {
 		if (query.getStreamType() != null) {
 			String type = query.getStreamType().toUpperCase();
 			if (!type.equals("ISTREAM")) {
-				System.err.println(String.format(
-						"WARNING: %s is not supported in CQELS-QL. Implicit ISTREAM will be used instead. ", type));
+				FormatterElement.printError(String.format(
+						"WARNING: %s is not supported in CQELS-QL. Implicit ISTREAM will be used instead.\n", type));
 			}
 		}
 		if (query.isDistinct())
@@ -104,8 +104,8 @@ public class CQELSSerializer implements QueryVisitor {
 		if (query.getStreamType() != null) {
 			String type = query.getStreamType().toUpperCase();
 			if (!type.equals("ISTREAM")) {
-				System.err.println(String.format(
-						"WARNING: %s is not supported in CQELS-QL. Implicit ISTREAM will be used instead. ", type));
+				FormatterElement.printError(String.format(
+						"WARNING: %s is not supported in CQELS-QL. Implicit ISTREAM will be used instead.\n", type));
 			}
 		}
 
@@ -123,13 +123,13 @@ public class CQELSSerializer implements QueryVisitor {
 
 	@Override
 	public void visitDescribeResultForm(Query query) {
-		System.err.println("Error: DESCRIBE queries are not supported in CQELS-QL");
+		FormatterElement.printError("Error: DESCRIBE queries are not supported in CQELS-QL");
 		return;
 	}
 
 	@Override
 	public void visitAskResultForm(Query query) {
-		System.err.println("Error: ASK queries are not supported in CQELS-QL");
+		FormatterElement.printError("Error: ASK queries are not supported in CQELS-QL\n");
 		return;
 	}
 

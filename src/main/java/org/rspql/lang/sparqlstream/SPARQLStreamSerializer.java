@@ -77,7 +77,7 @@ public class SPARQLStreamSerializer implements QueryVisitor {
 		Node n = query.getRegisterAs();
 		if (n == null)
 			return;
-		System.err.println("WARNING: REGISTER AS is not supported in SPARQLStream and will be omitted.");
+		FormatterElement.printError("WARNING: REGISTER AS is not supported in SPARQLStream and will be omitted.\n");
 	}
 
 	@Override
@@ -123,13 +123,13 @@ public class SPARQLStreamSerializer implements QueryVisitor {
 
 	@Override
 	public void visitDescribeResultForm(Query query) {
-		System.err.println("Error: DESCRIBE queries are not supported in C-SPARQL");
+		FormatterElement.printError("Error: DESCRIBE queries are not supported in C-SPARQL\n");
 		return;
 	}
 
 	@Override
 	public void visitAskResultForm(Query query) {
-		System.err.println("Error: ASK queries are currently not supported");
+		FormatterElement.printError("Error: ASK queries are currently not supported\n");
 		return;
 	}
 
@@ -174,8 +174,8 @@ public class SPARQLStreamSerializer implements QueryVisitor {
 			streams.put(streamIri, s);
 			if (window instanceof ElementLogicalPastWindow) {
 				if (s.type != "") {
-					System.err.println(
-							String.format("WARNING: A %s window is already defined for %s (skipping)", s.type, streamIri));
+					FormatterElement.printError(
+							String.format("WARNING: A %s window is already defined for %s (skipping)\n", s.type, streamIri));
 					continue;
 				}
 
@@ -186,12 +186,12 @@ public class SPARQLStreamSerializer implements QueryVisitor {
 				s.setTo(w.getTo().toString());
 				s.setType("past");
 			} else if (window instanceof ElementPhysicalWindow) {
-				System.err.println("WARNING: Physical windows is not supported (skipping).");
+				FormatterElement.printError("WARNING: Physical windows is not supported (skipping).");
 				continue;
 			} else if (window instanceof ElementLogicalWindow) {
 				if (s.isPhysical()) {
-					System.err.println(String.format(
-							"WARNING: A physical window is already defined for the stream %s (overriding)", streamIri));
+					FormatterElement.printError(String.format(
+							"WARNING: A physical window is already defined for the stream %s (overriding)\n", streamIri));
 					s = new Stream();
 					streams.put(streamIri, s);
 				}
@@ -217,8 +217,8 @@ public class SPARQLStreamSerializer implements QueryVisitor {
 					out.print(String.format("[NOW-%s SLIDE]", formatDuration(range)));
 				}
 			} else if (stream.isPhysical()) {
-				System.out.println(
-						"WARNING: It's unclear how SPARQLStream supports tuple streams in the current version (skipping).");
+				FormatterElement.printError(
+						"WARNING: It's unclear how SPARQLStream supports tuple streams in the current version (skipping).\n");
 			} else {
 				out.print(String.format("[NOW-%s TO NOW-%s SLIDE", formatDuration(stream.from),
 						formatDuration(stream.to)));
