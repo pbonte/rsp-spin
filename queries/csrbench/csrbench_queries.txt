@@ -1,0 +1,304 @@
+{
+	"query1" : {
+		"cqels" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#>
+			PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+			SELECT ?sensor ?obs 
+			WHERE { 
+				STREAM <http://ex.org/streams/test> [RANGE 10s SLIDE 10s] {
+					?obs om-owl:observedProperty weather:_AirTemperature ;
+						om-owl:procedure ?sensor ;
+						om-owl:result ?res .
+					?res om-owl:floatValue ?value .
+				}
+				FILTER(?value > 80)
+			}",
+		"csparql" : "
+			REGISTER QUERY test AS
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?obs 
+			FROM STREAM <http://ex.org/streams/test> [RANGE 10s STEP 10s]
+			WHERE {
+				?obs om-owl:observedProperty weather:_AirTemperature ;
+					om-owl:procedure ?sensor ;  
+					om-owl:result ?res .
+				?res om-owl:floatValue ?value . 
+				FILTER(?value > 80)
+			}",
+		"sparqlstream" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?obs  
+			FROM NAMED STREAM <http://cwi.nl/SRBench/observations> [NOW- 10 S SLIDE 10 S]
+			WHERE { 
+				?obs om-owl:observedProperty weather:_AirTemperature ;  
+					om-owl:procedure ?sensor ;  
+					om-owl:result ?res .
+				?res om-owl:floatValue ?value .
+				FILTER(?value > 80)
+			}"
+	},
+	"query2" : {
+		"cqels" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#>
+			SELECT ?sensor ?obs 
+			WHERE { 
+				STREAM <http://ex.org/streams/test> [RANGE 1s SLIDE 1s] {
+					?obs om-owl:observedProperty weather:_AirTemperature ;
+						om-owl:procedure ?sensor ;
+						om-owl:result ?res .
+					?res om-owl:floatValue ?value .
+				}
+				FILTER(?value > 80)
+			}",
+		"csparql" : "
+			REGISTER QUERY test AS
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?obs 
+			FROM STREAM <http://ex.org/streams/test> [RANGE 1s STEP 1s]
+			WHERE {
+				?obs om-owl:observedProperty weather:_AirTemperature ;
+					om-owl:procedure ?sensor ;  
+					om-owl:result ?res .  
+				?res om-owl:floatValue ?value . 
+				FILTER(?value > 80)
+			}",
+		"sparqlstream" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?obs 
+			FROM NAMED STREAM <http://cwi.nl/SRBench/observations> [NOW - 1 S SLIDE 1 S]
+			WHERE { 
+				?obs om-owl:observedProperty weather:_AirTemperature ;  
+					om-owl:procedure ?sensor ;  
+					om-owl:result ?res .
+				?res om-owl:floatValue ?value .
+				FILTER(?value > 80)
+			}"
+	},
+	"query3" : {
+		"cqels" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#>
+			SELECT ?sensor ?obs ?value
+			WHERE {
+				STREAM <http://ex.org/streams/test> [RANGE 4s SLIDE 4s] {
+					?obs om-owl:observedProperty weather:_RelativeHumidity ; 
+						om-owl:procedure ?sensor ;
+						om-owl:result ?res .
+					?res om-owl:floatValue ?value . 
+				}
+				FILTER(?value < 49) 
+				FILTER(?value > 24)
+			}",
+		"csparql" : "
+			REGISTER QUERY test AS
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?obs ?value 
+			FROM STREAM <http://ex.org/streams/test> [RANGE 4s STEP 4s]
+			WHERE {
+				?obs om-owl:observedProperty weather:_RelativeHumidity ; 
+					om-owl:procedure ?sensor ;
+					om-owl:result ?res . 
+				?res om-owl:floatValue ?value . 
+				FILTER(?value < 49)  
+				FILTER(?value > 24)
+			}",
+		"sparqlstream" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?obs ?value 
+			FROM NAMED STREAM <http://cwi.nl/SRBench/observations> [NOW- 4 S SLIDE 4 S] 
+			WHERE { 
+				?obs om-owl:observedProperty weather:_RelativeHumidity ;  
+					om-owl:procedure ?sensor ;  
+					om-owl:result ?res . 
+				?res om-owl:floatValue ?value .
+				FILTER(?value > 24)
+				FILTER(?value < 49)
+			}"
+	},"query4" : {
+		"cqels" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT (AVG(?value) AS ?avg) 
+			WHERE {
+				STREAM <http://ex.org/streams/test> [RANGE 4s SLIDE 4s] {
+					?obs om-owl:observedProperty weather:_AirTemperature ; 
+						om-owl:procedure ?sensor ;
+						om-owl:result ?res . 
+					?res om-owl:floatValue ?value . 
+				}
+				FILTER(?value > 80)
+			}",
+		"csparql" : "
+			REGISTER QUERY test AS
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT (AVG(?value) AS ?avg) 
+			FROM STREAM <http://ex.org/streams/test> [RANGE 4s STEP 4s]
+			WHERE {
+				?obs om-owl:observedProperty weather:_AirTemperature ; 
+					om-owl:procedure ?sensor ;
+					om-owl:result ?res . 
+				?res om-owl:floatValue ?value . 
+				FILTER(?value > 80)  
+			}",
+		"sparqlstream" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT (AVG(?value) AS ?avg)
+			FROM NAMED STREAM <http://cwi.nl/SRBench/observations> [NOW- 4 S SLIDE 4 S]
+			WHERE { 
+				?obs om-owl:observedProperty weather:_AirTemperature ;  
+					om-owl:procedure ?sensor ;  
+					om-owl:result ?res .
+				?res om-owl:floatValue ?value .
+				FILTER(?value > 80)
+			}"
+	},
+	"query5" : {
+		"cqels" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?obs 
+			WHERE {
+				STREAM <http://ex.org/streams/test> [RANGE 5s SLIDE 1s] {
+					?obs om-owl:observedProperty weather:_AirTemperature ; 
+						om-owl:procedure ?sensor ;
+						om-owl:result ?res . 
+					?res om-owl:floatValue ?value . 
+				}
+				FILTER(?value > 80)
+			}",
+		"csparql" : "
+			REGISTER QUERY test AS
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?obs 
+			FROM STREAM <http://ex.org/streams/test> [RANGE 5s STEP 1s]
+			WHERE {
+				?obs om-owl:observedProperty weather:_AirTemperature ; 
+					om-owl:procedure ?sensor ;
+					om-owl:result ?res . 
+				?res om-owl:floatValue ?value . 
+				FILTER(?value > 80)
+			}",
+		"sparqlstream" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?obs  
+			FROM NAMED STREAM <http://cwi.nl/SRBench/observations>[NOW - 5 S SLIDE 1 S]
+			WHERE { 
+				?obs om-owl:observedProperty weather:_AirTemperature ;  
+					om-owl:procedure ?sensor ; 
+					om-owl:result ?res .
+				?res om-owl:floatValue ?value .
+				FILTER(?value > 80)
+			}"
+	},
+	"query6" : {
+		"cqels" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?ob1 ?value1 ?obs 
+			WHERE {
+				STREAM <http://ex.org/streams/test> [RANGE 5s SLIDE 5s] {
+					?ob1 om-owl:procedure ?sensor ; 
+						om-owl:observedProperty weather:_AirTemperature ;           
+						om-owl:result [om-owl:floatValue ?value1] . 
+					?obs om-owl:procedure ?sensor ; 
+						om-owl:observedProperty weather:_AirTemperature ;        
+						om-owl:result [om-owl:floatValue ?value] . 
+				} 
+				FILTER(?value1 > ?value) 
+				FILTER(?value > 75) 
+			}",
+		"csparql" : "
+			REGISTER QUERY test AS
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?ob1 ?value1 ?obs 
+			FROM STREAM <http://ex.org/streams/test> [RANGE 5s STEP 5s]
+			WHERE {
+				?ob1 om-owl:procedure ?sensor ; 
+					om-owl:observedProperty weather:_AirTemperature ;           
+					om-owl:result [om-owl:floatValue ?value1] . 
+				?obs om-owl:procedure ?sensor ; 
+					om-owl:observedProperty weather:_AirTemperature ;        
+					om-owl:result [om-owl:floatValue ?value]. 
+				FILTER(?value1 > ?value) 
+				FILTER(?value > 75) 
+			}
+			}",
+		"sparqlstream" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			SELECT ?sensor ?ob1 ?value1 ?obs   
+			FROM NAMED STREAM <http://cwi.nl/SRBench/observations>[NOW - 5 S SLIDE 5 S]
+			WHERE { 
+				{ ?ob1 om-owl:procedure ?sensor ; 
+						om-owl:observedProperty weather:_AirTemperature ;         
+						om-owl:result [om-owl:floatValue ?value1] } .
+				{ ?obs om-owl:procedure ?sensor ;
+						om-owl:observedProperty weather:_AirTemperature ;        
+						om-owl:result [om-owl:floatValue ?value] }
+				FILTER(?value1 - ?value > 0.5)
+				FILTER(?value > 75)
+			}"
+	},
+	"query7" : {
+		"cqels" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#>
+			PREFIX sens-obs: <http://knoesis.wright.edu/ssw/> 
+			SELECT ?sensor ?ob1 
+			WHERE {
+				STREAM <http://ex.org/streams/test> [RANGE 5s SLIDE 5s] {
+					?ob  om-owl:procedure sens-obs:System_C1190 ; 
+						om-owl:observedProperty weather:_AirTemperature ;           
+						om-owl:result [om-owl:floatValue ?value] . 
+					?ob1 om-owl:procedure ?sensor ; 
+						om-owl:observedProperty weather:_AirTemperature ;        
+						om-owl:result [om-owl:floatValue ?value1] .
+				} 
+				FILTER(?value1 > ?value) 
+			}",
+		"csparql" : "
+			REGISTER QUERY test AS
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#>
+			PREFIX sens-obs: <http://knoesis.wright.edu/ssw/> 
+			SELECT ?sensor ?ob1 
+			FROM STREAM <http://ex.org/streams/test> [RANGE 5s STEP 5s]
+			WHERE {
+				?ob  om-owl:procedure sens-obs:System_C1190 ; 
+					om-owl:observedProperty weather:_AirTemperature ;           
+					om-owl:result [om-owl:floatValue ?value] . 
+				?ob1 om-owl:procedure ?sensor ; 
+					om-owl:observedProperty weather:_AirTemperature ;        
+					om-owl:result [om-owl:floatValue ?value1]. 
+				FILTER(?value1 > ?value) 
+			}",
+		"sparqlstream" : "
+			PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#> 
+			PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#> 
+			PREFIX sens-obs: <http://knoesis.wright.edu/ssw/>
+			SELECT ?sensor ?ob1     
+			FROM NAMED STREAM <http://cwi.nl/SRBench/observations>[NOW - 5 S SLIDE 5 S]
+			WHERE { 
+				{ ?ob om-owl:procedure sens-obs:System_C1190 ; 
+					om-owl:observedProperty weather:_AirTemperature ;       
+					om-owl:result [om-owl:floatValue ?value] }
+				{ ?ob1 om-owl:procedure ?sensor ; 
+					om-owl:observedProperty weather:_AirTemperature ;         
+					om-owl:result [om-owl:floatValue ?value1] }
+				FILTER(?value1 > ?value)
+			}"
+	}
+}
