@@ -1,6 +1,7 @@
-package org.rspql.lang.csparql;
+package org.rspql.lang.sparqlstream;
 
 import org.apache.jena.atlas.io.IndentedWriter;
+import org.hamcrest.core.IsInstanceOf;
 import org.rspql.syntax.ElementWindow;
 
 import com.hp.hpl.jena.query.Query;
@@ -32,7 +33,7 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 		for (Element el : elGroup.getElements()) {
 			if (el instanceof ElementNamedGraph) {
 				System.err.println(
-						"WARNING: Named graphs in results are not supported in C-SPARQL. The triples will be added directly to the default graph.");
+						"WARNING: Named graphs in results are not supported in SPARQLStream. The triples will be added directly to the default graph.");
 
 				ElementGroup group = (ElementGroup) ((ElementNamedGraph) el).getElement();
 				for (Element e : group.getElements()) {

@@ -78,7 +78,11 @@ public class CQELSSerializer implements QueryVisitor {
 	public void visitSelectResultForm(Query query) {
 		out.print("SELECT ");
 		if (query.getStreamType() != null) {
-			out.print(query.getStreamType() + " ");
+			String type = query.getStreamType().toUpperCase();
+			if (!type.equals("ISTREAM")) {
+				System.err.println(String.format(
+						"WARNING: %s is not supported in CQELS-QL. Implicit ISTREAM will be used instead. ", type));
+			}
 		}
 		if (query.isDistinct())
 			out.print("DISTINCT ");

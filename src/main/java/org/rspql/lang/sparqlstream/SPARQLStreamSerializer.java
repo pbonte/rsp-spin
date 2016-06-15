@@ -2,7 +2,7 @@
  * @author Robin Keskisarkka (https://github.com/keski)
  */
 
-package org.rspql.lang.csparql;
+package org.rspql.lang.sparqlstream;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -35,19 +35,18 @@ import com.hp.hpl.jena.sparql.util.FmtUtils;
  * Serialize a query into CQELS-QL. Disclaimer: This is meant as a proof of
  * concept only. If you find any bugs or errors please use the issue tracker.
  * 
- * Known bugs:
- * STREAM vs QUERY is not defined
+ * Known bugs: STREAM vs QUERY is not defined
  */
 
-public class CSPARQLSerializer implements QueryVisitor {
+public class SPARQLStreamSerializer implements QueryVisitor {
 	static final int BLOCK_INDENT = 2;
 	protected FormatterTemplate fmtTemplate;
 	protected FormatterElement fmtElement;
 	protected FmtExprSPARQL fmtExpr;
 	protected IndentedWriter out = null;
 
-	public CSPARQLSerializer(IndentedWriter iwriter, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
-			FormatterTemplate formatterTemplate) {
+	public SPARQLStreamSerializer(IndentedWriter iwriter, FormatterElement formatterElement,
+			FmtExprSPARQL formatterExpr, FormatterTemplate formatterTemplate) {
 		out = iwriter;
 		fmtTemplate = formatterTemplate;
 		fmtElement = formatterElement;
@@ -66,6 +65,11 @@ public class CSPARQLSerializer implements QueryVisitor {
 
 	@Override
 	public void visitPrologue(Prologue prologue) {
+		int row1 = out.getRow();
+		PrologueSerializer.output(out, prologue);
+		int row2 = out.getRow();
+		if (row1 != row2)
+			out.newline();
 	}
 
 	@Override
@@ -73,31 +77,14 @@ public class CSPARQLSerializer implements QueryVisitor {
 		Node n = query.getRegisterAs();
 		if (n == null)
 			return;
-		if (n.isURI()) {
-			out.print(String.format("REGISTER QUERY %s AS ", n.getURI()));
-		} else {
-			out.print(String.format("REGISTER QUERY %s AS ", n.toString()));
-		}
-		out.newline();
-		out.newline();
-		
-		// Now print prologue
-		int row1 = out.getRow();
-		PrologueSerializer.output(out, (Prologue) query);
-		int row2 = out.getRow();
-		if (row1 != row2)
-			out.newline();
+		System.err.println("WARNING: REGISTER AS is not supported in SPARQLStream and will be omitted.");
 	}
 
 	@Override
 	public void visitSelectResultForm(Query query) {
 		out.print("SELECT ");
 		if (query.getStreamType() != null) {
-			String type = query.getStreamType().toUpperCase();
-			if (!type.equals("ISTREAM")) {
-				System.err.println(String.format(
-						"WARNING: %s is not supported in C-SPARQL. Implicit RSTREAM will be used instead. ", type));
-			}
+			out.print(query.getStreamType() + " ");
 		}
 		if (query.isDistinct())
 			out.print("DISTINCT ");
@@ -115,15 +102,13 @@ public class CSPARQLSerializer implements QueryVisitor {
 	@Override
 	public void visitConstructResultForm(Query query) {
 		out.print("CONSTRUCT ");
-
 		if (query.getStreamType() != null) {
-			String type = query.getStreamType().toUpperCase();
-			if (!type.equals("RSTREAM")) {
-				System.err.println(String.format(
-						"WARNING: %s is not supported in C-SPARQL. Implicit RSTREAM will be used instead. ", type));
-			}
+			out.print(query.getStreamType() + " ");
 		}
 
+		if (query.getStreamType() != null) {
+			out.print(query.getStreamType() + " ");
+		}
 		out.incIndent(BLOCK_INDENT);
 		out.newline();
 		Element el = query.getConstructGraphTemplate();
@@ -166,42 +151,48 @@ public class CSPARQLSerializer implements QueryVisitor {
 			}
 		}
 
-		// C-SPARQL only allows a stream to be defined only once, consequently
-		// there
-		// can be only a single window over a stream. This limitation is not
-		// present in RSP-QL. If multiple windows are defined over the same
+		// SPARQLStream only allows a stream to be defined once, consequently
+		// there can be only a single window over a stream. This limitation is
+		// not
+		// present in RSP-QL. If multiple logical windows are defined over the
+		// same
 		// stream the current approach identifies the outer bounds of all
 		// windows defined over a query and takes the smallest step size found
 		// and uses this to define a new stream definition.
-		// If both physical and logical windows have been defined over the
-		// stream the physical window will be prioritized.
-		HashMap<String, CSPARQLStream> streams = new HashMap<>();
+		//
+		// There is some confusion regarding some of the constructs and keywords
+		// in SPARQLStream.
+		HashMap<String, Stream> streams = new HashMap<>();
 		for (ElementNamedWindow window : query.getNamedWindows()) {
 			Node stream = (Node) window.getStream();
 			String streamIri = stream.toString();
 			if (stream.isURI()) {
 				streamIri = FmtUtils.stringForURI(stream.getURI(), query);
 			}
-			if (window instanceof ElementLogicalPastWindow) {
-				System.err.println("WARNING: Windows in the past are not supported");
-				return;
-			}
 
-			CSPARQLStream s = streams.containsKey(streamIri) ? streams.get(streamIri) : new CSPARQLStream();
+			Stream s = streams.containsKey(streamIri) ? streams.get(streamIri) : new Stream();
 			streams.put(streamIri, s);
-			if (window instanceof ElementPhysicalWindow) {
-				if (s.isLogical()) {
-					System.err.println(String.format(
-							"WARNING: A logical window is already defined for the stream %s (skipping)", streamIri));
-				} else {
-					s.type = "physical";
-					s.setRange(((ElementPhysicalWindow) window).getSize().toString());
+			if (window instanceof ElementLogicalPastWindow) {
+				if (s.type != "") {
+					System.err.println(
+							String.format("WARNING: A %s window is already defined for %s (skipping)", s.type, streamIri));
+					continue;
 				}
-			} else {
+
+				ElementLogicalPastWindow w = (ElementLogicalPastWindow) window;
+				if (w.getStep() != null)
+					s.setStep(w.getStep().toString());
+				s.setFrom(w.getFrom().toString());
+				s.setTo(w.getTo().toString());
+				s.setType("past");
+			} else if (window instanceof ElementPhysicalWindow) {
+				System.err.println("WARNING: Physical windows is not supported (skipping).");
+				continue;
+			} else if (window instanceof ElementLogicalWindow) {
 				if (s.isPhysical()) {
 					System.err.println(String.format(
 							"WARNING: A physical window is already defined for the stream %s (overriding)", streamIri));
-					s = new CSPARQLStream();
+					s = new Stream();
 					streams.put(streamIri, s);
 				}
 				s.type = "logical";
@@ -212,7 +203,7 @@ public class CSPARQLSerializer implements QueryVisitor {
 
 		// Print all streams
 		for (String streamIri : streams.keySet()) {
-			CSPARQLStream stream = streams.get(streamIri);
+			Stream stream = streams.get(streamIri);
 			out.print(String.format("FROM STREAM %s ", streamIri));
 
 			// Logical or physical window
@@ -220,18 +211,22 @@ public class CSPARQLSerializer implements QueryVisitor {
 				String range = stream.range.toString();
 				Object step = stream.step;
 				if (step != null) {
-					out.print(String.format("[RANGE %s STEP %s]", formatDuration(range), formatDuration(step.toString())));
+					out.print(
+							String.format("[NOW-%s SLIDE %s]", formatDuration(range), formatDuration(step.toString())));
 				} else {
-					System.err.println("STEP is missing, using minimum value  (1ms)");
-					out.print(String.format("[RANGE %s STEP %s]", formatDuration(range), "1ms"));
+					out.print(String.format("[NOW-%s SLIDE]", formatDuration(range)));
 				}
+			} else if (stream.isPhysical()) {
+				System.out.println(
+						"WARNING: It's unclear how SPARQLStream supports tuple streams in the current version (skipping).");
 			} else {
-				String range = stream.range.toString();
-				Object step = stream.step;
-				if (step != null) {
-					System.err.println("STEP is not supported for phyical windows (ignoring)");
+				out.print(String.format("[NOW-%s TO NOW-%s SLIDE", formatDuration(stream.from),
+						formatDuration(stream.to)));
+				if (stream.step.isEmpty()) {
+					out.print("]");
+				} else {
+					out.print(String.format(" %s]", formatDuration(stream.step)));
 				}
-				out.print(String.format("[TRIPLES %s]", range));
 			}
 			out.newline();
 		}
@@ -431,13 +426,26 @@ public class CSPARQLSerializer implements QueryVisitor {
 	}
 
 	/**
-	 * Helper class to manage multiple windows over a stream. Variables are
-	 * always lower than actual values.
+	 * Helper class to manage multiple windows over a stream.
 	 */
-	public class CSPARQLStream {
+	public class Stream {
 		String type = "";
 		String step = "";
 		String range = "";
+		String from = "";
+		String to = "";
+
+		public void setFrom(String from) {
+			this.from = from;
+		}
+
+		public void setTo(String to) {
+			this.to = to;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
 
 		public void setStep(String newStep) {
 			if (step.equals("") || step.matches("^\\?")) {
@@ -487,39 +495,51 @@ public class CSPARQLSerializer implements QueryVisitor {
 		public boolean isPhysical() {
 			return type.equals("physical");
 		}
+
+		public boolean isPastWindow() {
+			return type.equals("past");
+		}
 	}
 
 	/**
-	 * Returns a duration formatted for CSPARQL. A single integer with the
-	 * largest possible unit is returned for simplicity.
+	 * Returns a duration formatted for SPARQLStream. A single integer with the
+	 * largest possible.
 	 * 
 	 * @param duration
 	 * @return
 	 */
 	public String formatDuration(String duration) {
+		if (duration.isEmpty()) {
+			return "";
+		}
+
 		Duration d = Duration.parse(duration);
 		// Use the largest possible unit
-		String unit = "s";
+		String unit = "S";
 		double time = d.getSeconds();
 		if (d.getNano() != 0) {
-			unit = "ms";
+			unit = "MS";
 			time *= 1000000 + d.getNano();
 			time /= 1000000;
 		} else {
 			if (time % 60 == 0) {
-				unit = "m";
+				unit = "MINUTE";
 				time = time / 60;
 			}
 			if (time % 60 == 0) {
-				unit = "h";
+				unit = "HOUR";
 				time = time / 60;
 			}
 			if (time % 24 == 0) {
-				unit = "d";
+				unit = "DAY";
+				time = time / 24;
+			}
+			if (time % 7 == 0) {
+				unit = "WEEK";
 				time = time / 24;
 			}
 		}
-		return Integer.toString((int) time) + unit;
+		return String.format("%d %s", (int) time, unit);
 	}
 }
 
