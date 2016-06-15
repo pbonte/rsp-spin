@@ -16,6 +16,21 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 public class TestConstructSPIN {
 	// Graph output tests
 	/**
+	 * Filter query (no variable)
+	 */
+	@Test
+	public void constructFilter() {
+		String q = "CONSTRUCT {\n"
+				+ "   ?a ?b ?c. \n"
+				+ "}\n"
+				+ "WHERE {\n"
+				+ "   ?a ?b ?c .\n"
+				+ "   FILTER regex(str(?a), ?c, \"i\")\n"
+				+ "}";
+		validate(q, "constructFilter");
+	}
+	
+	/**
 	 * Graph query (no variable)
 	 */
 	@Test
@@ -207,7 +222,8 @@ public class TestConstructSPIN {
 		ARQFactory.get().setSyntax(ParserRSPQL.rspqlSyntax);
 		Query reparsedQuery = ARQFactory.get().createQuery(spinQuery);
 		reparsedQuery.setPrefixMapping(query.getPrefixMapping());
-
+		if(query.toString().contains("FILTER"))
+		System.out.println(query.toString());
 		assertEquals(message, query.toString(), reparsedQuery.toString());
 	}
 

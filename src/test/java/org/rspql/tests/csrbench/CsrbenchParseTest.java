@@ -24,32 +24,45 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public class CsrbenchParseTest {
 	private Model model = ModelFactory.createDefaultModel();
-	
+	private boolean print = false;
+
+	public static void main(String[] args) {
+		CsrbenchParseTest c = new CsrbenchParseTest();
+		c.print = true;
+		c.csrbenchQuery1();
+		c.csrbenchQuery2();
+		c.csrbenchQuery3();
+		c.csrbenchQuery4();
+		c.csrbenchQuery5();
+		c.csrbenchQuery6();
+		c.csrbenchQuery7();
+	}
+
 	@Test
 	public void csrbenchQuery1() {
 		test("./queries/csrbench/query1.rspql");
 	}
-	
+
 	@Test
 	public void csrbenchQuery2() {
 		test("./queries/csrbench/query2.rspql");
 	}
-	
+
 	@Test
 	public void csrbenchQuery3() {
 		test("./queries/csrbench/query3.rspql");
 	}
-	
+
 	@Test
 	public void csrbenchQuery4() {
 		test("./queries/csrbench/query4.rspql");
 	}
-	
+
 	@Test
 	public void csrbenchQuery5() {
 		test("./queries/csrbench/query5.rspql");
 	}
-	
+
 	@Test
 	public void csrbenchQuery6() {
 		test("./queries/csrbench/query6.rspql");
@@ -59,11 +72,11 @@ public class CsrbenchParseTest {
 	public void csrbenchQuery7() {
 		test("./queries/csrbench/query7.rspql");
 	}
-	
+
 	public void test(String path) {
 		boolean valid = false;
 		try {
-			parse(path, false);
+			parse(path, print);
 			valid = true;
 		} catch (IOException e) {
 			System.err.println("ERROR: " + e.getMessage());
@@ -73,7 +86,9 @@ public class CsrbenchParseTest {
 
 	public void parse(String path, boolean print) throws IOException {
 		String queryString = new String(Files.readAllBytes(Paths.get(path)));
-		System.out.println("\n" + path);
+		if (print) {
+			System.out.println("\n" + path);
+		}
 
 		// Register the parser
 		ParserRSPQL.register();
@@ -99,27 +114,35 @@ public class CsrbenchParseTest {
 		reparsedQuery.setPrefixMapping(query.getPrefixMapping());
 
 		// RSP-QL
-		System.out.println("### RSP-QL ###");
 		reparsedQuery.setSyntax(ParserRSPQL.rspqlSyntax);
-		reparsedQuery.toString();
-		// System.out.println(reparsedQuery);
-
+		queryString = reparsedQuery.toString();
+		if (print) {
+			System.out.println("RSP-QL:");
+			System.out.println(queryString);
+		}
+		
 		// CQELS
-		System.out.println("### CQELS-QL ###");
 		reparsedQuery.setSyntax(ParserCQELS.cqelsSyntax);
-		reparsedQuery.toString();
-		// System.out.println(reparsedQuery);
-
+		queryString = reparsedQuery.toString();
+		if (print) {
+			System.out.println("CQELS-QL:");
+			System.out.println(queryString);
+		}
+		
 		// CSPARQL
-		System.out.println("### C-SPARQL ###");
 		reparsedQuery.setSyntax(ParserCSPARQL.csparqlSyntax);
-		reparsedQuery.toString();
-		// System.out.println(reparsedQuery);
+		queryString = reparsedQuery.toString();
+		if (print) {
+			System.out.println("C-SPARQL:");
+			System.out.println(queryString);
+		}
 
 		// SAPRQLStream
-		System.out.println("### SPARQLStream ###");
 		reparsedQuery.setSyntax(ParserSPARQLStream.sparqlStreamSyntax);
-		reparsedQuery.toString();
-		// System.out.println(reparsedQuery);
+		queryString = reparsedQuery.toString();
+		if (print) {
+			System.out.println("SPARQLStream:");
+			System.out.println(queryString);
+		}
 	}
 }
