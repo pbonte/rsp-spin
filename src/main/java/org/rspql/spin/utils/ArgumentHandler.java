@@ -24,6 +24,7 @@ public class ArgumentHandler {
 	 * 
 	 * @param template
 	 * @param bindings
+	 * @param validationErrors
 	 */
 
 	public static void check(Template template, QuerySolutionMap bindings, List<String> validationErrors) {
@@ -125,6 +126,14 @@ public class ArgumentHandler {
 		return bindings;
 	}
 
+	/**
+	 * Create an RDF node from a string value.
+	 * 
+	 * @param value
+	 * @param valueType
+	 * @param errors
+	 * @return rdfNode
+	 */
 	public static RDFNode createRDFNode(String value, RDFNode valueType, List<String> errors) {
 		if (value == null) {
 			return null;
