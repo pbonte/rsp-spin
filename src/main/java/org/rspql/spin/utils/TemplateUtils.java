@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.riot.system.PrefixMapFactory;
 import org.topbraid.spin.model.Argument;
 import org.topbraid.spin.model.Query;
 import org.topbraid.spin.model.Template;
