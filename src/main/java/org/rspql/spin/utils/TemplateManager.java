@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.UUID;
 
 import org.rspql.lang.rspql.ParserRSPQL;
 import org.topbraid.spin.arq.ARQ2SPIN;
@@ -104,15 +103,15 @@ public class TemplateManager {
 
 	/**
 	 * Create a template argument.
-	 * 
 	 * @param template
 	 * @param varName
 	 * @param valueType
 	 * @param defaultValue
 	 * @param optional
 	 * @param comment
+	 * @return arg
 	 */
-	public void createArgument(Template template, String varName, RDFNode valueType, RDFNode defaultValue,
+	public Resource createArgument(Template template, String varName, RDFNode valueType, RDFNode defaultValue,
 			boolean optional, String comment) {
 		Model model = template.getModel();
 		Resource arg = model.createResource(SPL.Argument);
@@ -125,6 +124,7 @@ public class TemplateManager {
 		}
 		arg.addProperty(SPL.optional, model.createTypedLiteral(optional));
 		arg.addProperty(RDFS.comment, comment);
+		return arg;
 	}
 
 	/**
