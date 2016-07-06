@@ -17,6 +17,8 @@ import org.topbraid.spin.vocabulary.SPL;
 
 import com.hp.hpl.jena.query.ParameterizedSparqlString;
 import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -32,9 +34,10 @@ public class TemplateManager {
 	public Model model = ModelFactory.createDefaultModel();
 	public String NS = "http://w3id.org/rsp/spin/template#";
 	public SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd'T'hh:mm:ss");
-	
+
 	/**
 	 * Setup a new template manager
+	 * 
 	 * @param loadTemplates
 	 */
 	public TemplateManager() {
@@ -48,18 +51,20 @@ public class TemplateManager {
 
 	/**
 	 * Load templates from input stream.
+	 * 
 	 * @param is
 	 * @param format
 	 */
 	public void loadTemplates(InputStream is, String format) {
 		model.read(is, format);
 	}
-	
+
 	/**
 	 * Set the default namespace.
+	 * 
 	 * @param ns
 	 */
-	public void setNS(String ns){
+	public void setNS(String ns) {
 		this.NS = ns;
 	}
 
@@ -90,7 +95,7 @@ public class TemplateManager {
 			System.err.println("Unrecognized");
 			return null;
 		}
-		
+
 		ARQ2SPIN arq2SPIN = new ARQ2SPIN(model);
 		org.topbraid.spin.model.Query spinQuery = arq2SPIN.createQuery(query, null);
 
@@ -103,6 +108,7 @@ public class TemplateManager {
 
 	/**
 	 * Create a template argument.
+	 * 
 	 * @param template
 	 * @param varName
 	 * @param valueType
@@ -152,6 +158,32 @@ public class TemplateManager {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Return a model describing a template or null.
+	 * 
+	 * @param templateId
+	 * @return
+	 */
+	public Model getTemplateModel(String templateId) {
+		templateId = templateId.startsWith("http://") ? templateId : NS + templateId;
+		String getTemplate = String.format(""
+				+ "PREFIX : <http://ex/> "
+				+ "CONSTRUCT {?mid ?p ?end } "
+				+ "FROM <http://external/template/graph> "
+				+ "WHERE {"
+				+ "   <%s> (!:)* ?mid ."
+				+ "   OPTIONAL { ?mid ?p ?end }"
+				+ "}", templateId);
+		try {
+			QueryExecution qe = QueryExecutionFactory.create(getTemplate, model);
+			model.setNsPrefixes(TemplateUtils.getCommonPrefixes());
+			return qe.execConstruct();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return null;
+		}
 	}
 
 	/**
