@@ -39,6 +39,7 @@ public class TemplateUtils {
 		map.put("sp", SP.NS);
 		map.put("spl", SPL.NS);
 		map.put("spin", SPIN.NS);
+		map.put("arg", ARG.NS);
 		map.put("rsp", SP.RSP);
 		map.put("rdf", RDF.getURI());
 		map.put("rdfs", RDFS.getURI());
