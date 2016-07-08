@@ -197,7 +197,13 @@ public class SPARQLStreamSerializer implements QueryVisitor {
 				}
 				s.type = "logical";
 				s.setRange(((ElementLogicalWindow) window).getRange().toString());
-				s.setStep(((ElementLogicalWindow) window).getStep().toString());
+				if(((ElementLogicalWindow) window).getStep() != null){
+					s.setStep(((ElementLogicalWindow) window).getStep().toString());
+				} else {
+					FormatterElement.printError(String.format(
+							"WARNING: No SLIDE paramater defined for the stream %s. Defaulting to 1 second.\n", streamIri));
+					s.setStep("PT1S");
+				}
 			}
 		}
 
@@ -509,8 +515,8 @@ public class SPARQLStreamSerializer implements QueryVisitor {
 	 * @return
 	 */
 	public String formatDuration(String duration) {
-		if (duration.isEmpty()) {
-			return "";
+		if(duration.startsWith("?")) {
+			return duration;
 		}
 
 		Duration d = Duration.parse(duration);
