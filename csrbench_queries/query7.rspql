@@ -1,0 +1,22 @@
+PREFIX  :     <http://w3id.org/rsp/>
+PREFIX  weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#>
+PREFIX  om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>
+PREFIX  sens-obs: <http://knoesis.wright.edu/ssw/>
+
+REGISTER STREAM :q7 AS 
+
+SELECT  ?sensor ?ob1
+FROM NAMED WINDOW :w ON :s [RANGE PT5S STEP PT5S]
+WHERE
+  { WINDOW :w
+      { ?ob om-owl:procedure sens-obs:System_C1190 .
+        ?ob om-owl:observedProperty weather:AirTemperature .
+        ?ob om-owl:result _:b0 .
+        _:b0 om-owl:floatValue ?value .
+        ?ob1 om-owl:procedure ?sensor .
+        ?ob1 om-owl:observedProperty weather:AirTemperature .
+        ?ob1 om-owl:result _:b1 .
+        _:b1 om-owl:floatValue ?value1
+      }
+    FILTER ( ?value1 > ?value )
+  }
