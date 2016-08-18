@@ -1,4 +1,3 @@
-## Coming soon: RSP-SPIN API 
 # RSP-SPIN Modeling Vocabulary
 
 This is the RSP-QL extension of the SPIN modeling vocabulary, which enables RSP-QL queries (see [link](https://github.com/streamreasoning/RSP-QL)) to be represented as RDF. In combination with the provided API queries can be converted to and from RDF, as well as support parameterization of queries into reusable query templates. 
