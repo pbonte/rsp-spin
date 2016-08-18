@@ -1,0 +1,139 @@
+# baseURI: http://w3id.org/rsp/spin
+# imports: http://spinrdf.org/spl
+
+@prefix : <http://w3id.org/rsp/spin#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://w3id.org/rsp/spin>
+  rdf:type owl:Ontology ;
+  owl:imports <http://spinrdf.org/spl> ;
+  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+.
+:Dstream
+  rdf:type rdfs:Class ;
+  rdfs:comment "Specifies that the stream operator used by an RSP-QL query is Dstream."^^xsd:string ;
+  rdfs:subClassOf :StreamOperator ;
+.
+:Istream
+  rdf:type rdfs:Class ;
+  rdfs:comment "Specifies that the stream operator used by an RSP-QL query is Istream."^^xsd:string ;
+  rdfs:subClassOf :StreamOperator ;
+.
+:LogicalPastWindow
+  rdf:type rdfs:Class ;
+  rdfs:comment "A logical window in the past such as FROM NAMED WINDOW <uri> ON <stream> [FROM NOW-PT2H TO NOW-PT1H]."^^xsd:string ;
+  rdfs:subClassOf :NamedWindow ;
+.
+:LogicalWindow
+  rdf:type rdfs:Class ;
+  rdfs:comment "A logical window such as FROM NAMED WINDOW <uri> ON <stream> [RANGE PT1M]."^^xsd:string ;
+  rdfs:subClassOf :NamedWindow ;
+.
+:NamedWindow
+  rdf:type rdfs:Class ;
+  rdfs:comment "A named window in an RSP-QL query."^^xsd:string ;
+  rdfs:subClassOf <http://spinrdf.org/sp#ElementGroup> ;
+.
+:PhysicalWindow
+  rdf:type rdfs:Class ;
+  rdfs:comment "A physical window such as FROM NAMED WINDOW <uri> ON <stream> [ITEM 10]."^^xsd:string ;
+  rdfs:subClassOf :NamedWindow ;
+.
+:Rstream
+  rdf:type rdfs:Class ;
+  rdfs:comment "Specifies that the stream operator used by an RSP-QL query is Rstream."^^xsd:string ;
+  rdfs:subClassOf :StreamOperator ;
+.
+:StreamOperator
+  rdf:type rdfs:Class ;
+  rdfs:subClassOf <http://spinrdf.org/sp#Element> ;
+.
+:from
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies the start of logical window in the past (FROM NAMED WINDOW <uri> ON <stream> [FROM <start> TO <end>]."^^xsd:string ;
+  rdfs:domain :LogicalPastWindow ;
+  rdfs:range xsd:duration ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
+:fromNamedWindow
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies a named window over a stream (FROM NAMED WINDOW)."^^xsd:string ;
+  rdfs:domain <http://spinrdf.org/sp#Query> ;
+  rdfs:range :NamedWindow ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
+:logicalStep
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies logical step parameter of a window."^^xsd:string ;
+  rdfs:domain :LogicalPastWindow ;
+  rdfs:domain :LogicalWindow ;
+  rdfs:range xsd:duration ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
+:physicalStep
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies physical step parameter of a window."^^xsd:string ;
+  rdfs:domain :PhysicalWindow ;
+  rdfs:range xsd:integer ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
+:range
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies the range of a logical window."^^xsd:string ;
+  rdfs:domain :LogicalWindow ;
+  rdfs:range xsd:duration ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
+:registerAs
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies the IRI to which on which streaming results will be made available by an RSP-QL query."^^xsd:string ;
+  rdfs:domain <http://spinrdf.org/sp#Query> ;
+  rdfs:range rdfs:Resource ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
+:size
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies size of a physical window over a stream."^^xsd:string ;
+  rdfs:domain :PhysicalWindow ;
+  rdfs:range xsd:integer ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
+:streamIri
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies IRI of the stream referenced in named window (logical or physical)."^^xsd:string ;
+  rdfs:domain :NamedWindow ;
+  rdfs:range rdfs:Resource ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
+:streamOperator
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies stream operator to be used by an RSP-QL query."^^xsd:string ;
+  rdfs:domain <http://spinrdf.org/sp#Query> ;
+  rdfs:range :StreamOperator ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
+:to
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies the start of logical window in the past (FROM NAMED WINDOW <uri> ON <stream> [FROM <start> TO <end>]."^^xsd:string ;
+  rdfs:domain :LogicalPastWindow ;
+  rdfs:range xsd:duration ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
+:windowIri
+  rdf:type rdf:Property ;
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Specifies the URI of a named window (logical or physical)."^^xsd:string ;
+  rdfs:domain :NamedWindow ;
+  rdfs:range rdfs:Resource ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
+:windowNameNode
+  rdf:type rdf:Property ;
+  rdfs:comment "The name (URI) of a named window."^^xsd:string ;
+  rdfs:domain :NamedWindow ;
+  rdfs:range rdfs:Resource ;
+  rdfs:subPropertyOf <http://spinrdf.org/sp#systemProperty> ;
+.
