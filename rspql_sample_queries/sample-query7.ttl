@@ -1,0 +1,65 @@
+@prefix :      <http://debs2015.org/streams/> .
+@prefix ex:    <http://example.org/> .
+@prefix geof:  <http://www.opengis.net/def/geosparql/function/> .
+@prefix gn:    <http://www.geonames.org/ontology#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix debs:  <http://debs2015.org/onto#> .
+@prefix sp:    <http://spinrdf.org/sp#> .
+@prefix rsp:   <http://w3id.org/rsp/spin#> .
+
+[ a                    sp:Select ;
+  sp:from              gn:geonames ;
+  sp:groupBy           ( [ sp:varName  "neighbourhood"^^xsd:string ] ) ;
+  sp:having            ( [ a        sp:ge ;
+                           sp:arg1  [ sp:varName  "increase"^^xsd:string ] ;
+                           sp:arg2  1.2
+                         ] ) ;
+  sp:resultVariables   ( [ sp:varName  "neighbourhood"^^xsd:string ] [ sp:expression  [ a        sp:divide ;
+                                                                                        sp:arg1  [ a              sp:Count ;
+                                                                                                   sp:expression  [ sp:varName  "newPickups"^^xsd:string ]
+                                                                                                 ] ;
+                                                                                        sp:arg2  [ a              sp:Count ;
+                                                                                                   sp:expression  [ sp:varName  "oldPickups"^^xsd:string ]
+                                                                                                 ]
+                                                                                      ] ;
+                                                                       sp:varName     "increase"^^xsd:string
+                                                                     ] ) ;
+  sp:where             ( [ sp:object     [ sp:varName  "neighbourhood"^^xsd:string ] ;
+                           sp:predicate  gn:neighbourhood ;
+                           sp:subject    [ sp:varName  "oldPickups"^^xsd:string ]
+                         ] [ sp:object     [ sp:varName  "neighbourhood"^^xsd:string ] ;
+                             sp:predicate  gn:neighbourhood ;
+                             sp:subject    [ sp:varName  "newPickups"^^xsd:string ]
+                           ] [ a                   rsp:NamedWindow ;
+                               sp:elements         ( [ sp:object     [ sp:varName  "nlat"^^xsd:string ] ;
+                                                       sp:predicate  debs:pickup_latitude ;
+                                                       sp:subject    [ sp:varName  "newPickups"^^xsd:string ]
+                                                     ] [ sp:object     [ sp:varName  "nlon"^^xsd:string ] ;
+                                                         sp:predicate  debs:pickup_longitude ;
+                                                         sp:subject    [ sp:varName  "newPickups"^^xsd:string ]
+                                                       ] ) ;
+                               rsp:windowNameNode  :newPickups
+                             ] [ a                   rsp:NamedWindow ;
+                                 sp:elements         ( [ sp:object     [ sp:varName  "olat"^^xsd:string ] ;
+                                                         sp:predicate  debs:pickup_latitude ;
+                                                         sp:subject    [ sp:varName  "oldPickups"^^xsd:string ]
+                                                       ] [ sp:object     [ sp:varName  "olon"^^xsd:string ] ;
+                                                           sp:predicate  debs:pickup_longitude ;
+                                                           sp:subject    [ sp:varName  "oldPickups"^^xsd:string ]
+                                                         ] ) ;
+                                 rsp:windowNameNode  :oldPickups
+                               ] ) ;
+  rsp:fromNamedWindow  [ a                rsp:LogicalPastWindow ;
+                         rsp:from         "PT2H"^^xsd:duration ;
+                         rsp:logicalStep  "PT1H"^^xsd:duration ;
+                         rsp:streamIri    :rides ;
+                         rsp:to           "PT1H"^^xsd:duration ;
+                         rsp:windowIri    :oldPickups
+                       ] ;
+  rsp:fromNamedWindow  [ a                rsp:LogicalWindow ;
+                         rsp:logicalStep  "PT1H"^^xsd:duration ;
+                         rsp:range        "PT1H"^^xsd:duration ;
+                         rsp:streamIri    :rides ;
+                         rsp:windowIri    :newPickups
+                       ]
+] .
