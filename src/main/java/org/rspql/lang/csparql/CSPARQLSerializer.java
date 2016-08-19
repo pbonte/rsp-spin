@@ -94,7 +94,7 @@ public class CSPARQLSerializer implements QueryVisitor {
 		out.print("SELECT ");
 		if (query.getStreamType() != null) {
 			String type = query.getStreamType().toUpperCase();
-			if (!type.equals("ISTREAM")) {
+			if (!type.equals("RSTREAM")) {
 				FormatterElement.printError(String.format(
 						"WARNING: %s is not supported in C-SPARQL. Implicit RSTREAM will be used instead. ", type));
 			}
@@ -166,13 +166,12 @@ public class CSPARQLSerializer implements QueryVisitor {
 			}
 		}
 
-		// C-SPARQL only allows a stream to be defined only once, consequently
-		// there
-		// can be only a single window over a stream. This limitation is not
+		// C-SPARQL only allows a stream to be defined once, consequently
+		// there can be only a single window over a stream. This limitation is not
 		// present in RSP-QL. If multiple windows are defined over the same
 		// stream the current approach identifies the outer bounds of all
 		// windows defined over a query and takes the smallest step size found
-		// and uses this to define a new stream definition.
+		// and uses these values to define a new stream definition.
 		// If both physical and logical windows have been defined over the
 		// stream the physical window will be prioritized.
 		HashMap<String, CSPARQLStream> streams = new HashMap<>();
@@ -192,7 +191,7 @@ public class CSPARQLSerializer implements QueryVisitor {
 			if (window instanceof ElementPhysicalWindow) {
 				if (s.isLogical()) {
 					FormatterElement.printError(String.format(
-							"WARNING: A logical window is already defined for the stream %s (skipping)\n", streamIri));
+							"WARNING: A logical window is already defined for the stream %s. Ignoring physical window.\n", streamIri));
 				} else {
 					s.type = "physical";
 					s.setRange(((ElementPhysicalWindow) window).getSize().toString());
@@ -200,11 +199,11 @@ public class CSPARQLSerializer implements QueryVisitor {
 			} else {
 				if (s.isPhysical()) {
 					FormatterElement.printError(String.format(
-							"WARNING: A physical window is already defined for the stream %s (overriding)\n", streamIri));
+							"WARNING: Replacing a physical window that is already defined for the stream %s.\n", streamIri));
 					s = new CSPARQLStream();
 					streams.put(streamIri, s);
 				} else if(s.isLogical()){
-					FormatterElement.printError(String.format("WARNING: Duplicate stream definition for stream %s. Modifying window with new bounds.\n", streamIri));
+					FormatterElement.printError(String.format("WARNING: Duplicate stream definition for stream %s. Window bounds updated.\n", streamIri));
 				}
 				s.type = "logical";
 				s.setRange(((ElementLogicalWindow) window).getRange().toString());
@@ -212,7 +211,7 @@ public class CSPARQLSerializer implements QueryVisitor {
 					s.setStep(((ElementLogicalWindow) window).getStep().toString());
 				} else {
 					FormatterElement.printError(String.format(
-							"WARNING: No STEP paramater defined for the stream %s. Defaulting to 1 second.\n", streamIri));
+							"WARNING: No STEP paramater defined for the stream %s. Using default value of 1 s.\n", streamIri));
 					s.setStep("PT1S");
 				}
 			}
@@ -220,8 +219,18 @@ public class CSPARQLSerializer implements QueryVisitor {
 
 		// Print all streams
 		for (String streamIri : streams.keySet()) {
+			// C-SPARQL doesn't play well with prefixed stream IRIs, expand
+			String modifiedStreamIri = streamIri;
+			if(!streamIri.startsWith("http")){
+				String prefix = streamIri.split(":")[0];
+				String namespace = query.getPrefix(prefix);
+				modifiedStreamIri = "<" + streamIri.replace(prefix + ":", namespace) + ">";
+			}
+			
+			
 			CSPARQLStream stream = streams.get(streamIri);
-			out.print(String.format("FROM STREAM %s ", streamIri));
+			System.err.println(streamIri);
+			out.print(String.format("FROM STREAM %s ", modifiedStreamIri));
 
 			// Logical or physical window
 			if (stream.isLogical()) {
@@ -230,14 +239,14 @@ public class CSPARQLSerializer implements QueryVisitor {
 				if (step != null) {
 					out.print(String.format("[RANGE %s STEP %s]", formatDuration(range), formatDuration(step.toString())));
 				} else {
-					FormatterElement.printError("WARNING: STEP is missing, using minimum value  (1ms)\n");
+					FormatterElement.printError("WARNING: STEP is missing, minimum value of 1 ms will be used.\n");
 					out.print(String.format("[RANGE %s STEP %s]", formatDuration(range), "1ms"));
 				}
 			} else {
 				String range = stream.range.toString();
 				Object step = stream.step;
 				if (step != null) {
-					FormatterElement.printError("WARNING: STEP is not supported for phyical windows (ignoring)\n");
+					FormatterElement.printError("WARNING: STEP is not supported for physical windows and will be ignored.\n");
 				}
 				out.print(String.format("[TRIPLES %s]", range));
 			}
