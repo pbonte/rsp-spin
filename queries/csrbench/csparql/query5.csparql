@@ -1,0 +1,12 @@
+REGISTER QUERY http://ex.org/streams/query5 AS
+PREFIX om-owl: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>
+PREFIX weather: <http://knoesis.wright.edu/ssw/ont/weather.owl#>
+SELECT ?sensor ?obs
+FROM STREAM <http://ex.org/streams/test> [RANGE 5s STEP 1s]
+WHERE {
+	?obs om-owl:observedProperty weather:_AirTemperature ;
+		om-owl:procedure ?sensor ;
+		om-owl:result ?res .
+	?res om-owl:floatValue ?value .
+	FILTER(?value > 80)
+}
