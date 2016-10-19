@@ -221,7 +221,7 @@ public class CSPARQLSerializer implements QueryVisitor {
 		for (String streamIri : streams.keySet()) {
 			// C-SPARQL doesn't play well with prefixed stream IRIs, expand
 			String modifiedStreamIri = streamIri;
-			if(!streamIri.startsWith("http")){
+			if(!streamIri.startsWith("<http")){
 				String prefix = streamIri.split(":")[0];
 				String namespace = query.getPrefix(prefix);
 				modifiedStreamIri = "<" + streamIri.replace(prefix + ":", namespace) + ">";
