@@ -117,7 +117,7 @@ public class FormatterElement extends com.hp.hpl.jena.sparql.serializer.Formatte
 					if (!step.startsWith("?")) {
 						step = getCQELSFormattedDuration(step);
 					}
-					out.print(String.format("[RANGE %s STEP %s]", range, step));
+					out.print(String.format("[RANGE %s SLIDE %s]", range, step));
 				} else {
 					out.print(String.format("[RANGE %s]", range));
 				}
