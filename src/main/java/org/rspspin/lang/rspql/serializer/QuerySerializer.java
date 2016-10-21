@@ -51,9 +51,9 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 		// Logical windows
 		for (ElementLogicalWindow window : query.getLogicalWindows()) {
 			out.print("FROM NAMED WINDOW ");
-			out.print(FmtUtils.stringForNode(window.getWindowNameNode()));
+			out.print(FmtUtils.stringForNode(window.getWindowNameNode(), query.getPrefixMapping()));
 			out.print(" ON ");
-			out.print(FmtUtils.stringForNode(window.getStreamNameNode()));
+			out.print(FmtUtils.stringForNode(window.getStreamNameNode(), query.getPrefixMapping()));
 			out.print(" [ ");
 			out.print("RANGE ");
 			out.print(stringForLiteral(window.getRangeNode()));
@@ -65,9 +65,9 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 		// Logical past windows
 		for (ElementLogicalPastWindow window : query.getLogicalPastWindows()) {
 			out.print("FROM NAMED WINDOW ");
-			out.print(FmtUtils.stringForNode(window.getWindowNameNode()));
+			out.print(FmtUtils.stringForNode(window.getWindowNameNode(), query.getPrefixMapping()));
 			out.print(" ON ");
-			out.print(FmtUtils.stringForNode(window.getStreamNameNode()));
+			out.print(FmtUtils.stringForNode(window.getStreamNameNode(), query.getPrefixMapping()));
 			out.print(" [ ");
 			out.print("FROM ");
 			out.print(stringForPastDuration(window.getFromNode()));
@@ -79,9 +79,9 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 		// Physical windows
 		for (ElementPhysicalWindow window : query.getPhysicalWindows()) {
 			out.print("FROM NAMED WINDOW ");
-			out.print(FmtUtils.stringForNode(window.getWindowNameNode()));
+			out.print(FmtUtils.stringForNode(window.getWindowNameNode(), query.getPrefixMapping()));
 			out.print(" ON ");
-			out.print(FmtUtils.stringForNode(window.getStreamNameNode()));
+			out.print(FmtUtils.stringForNode(window.getStreamNameNode(), query.getPrefixMapping()));
 			out.print(" [ ");
 			out.print("ITEM ");
 			out.print(stringForLiteral(window.getRangeNode()));
@@ -91,16 +91,16 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 			out.newline();
 		}
 	}
-	
-	public String stringForLiteral(Node n){
-		if(n.isVariable()){
+
+	public String stringForLiteral(Node n) {
+		if (n.isVariable()) {
 			return n.toString();
 		}
 		return n.getLiteral().getValue().toString();
 	}
-	
-	public String stringForPastDuration(Node n){
-		if(n.isVariable()){
+
+	public String stringForPastDuration(Node n) {
+		if (n.isVariable()) {
 			return n.toString();
 		}
 		return "NOW-" + n.getLiteral().getValue().toString();

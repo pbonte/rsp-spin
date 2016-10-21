@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.apache.jena.query;
 
 import java.io.OutputStream;
@@ -51,24 +33,10 @@ import org.rspspin.syntax.ElementLogicalPastWindow;
 import org.rspspin.syntax.ElementLogicalWindow;
 import org.rspspin.syntax.ElementPhysicalWindow;
 
-/**
- * The data structure for a query as presented externally. There are two ways of
- * creating a query - use the parser to turn a string description of the query
- * into the executable form, and the programmatic way (the parser is calling the
- * programmatic operations driven by the quyery string). The declarative
- * approach of passing in a string is preferred.
- *
- * Once a query is built, it can be passed to the QueryFactory to produce a
- * query execution engine.
- * 
- * @see QueryExecutionFactory
- * @see ResultSet
- */
-
 public class Query extends Prologue implements Cloneable, Printable {
 	static {
 		JenaSystem.init();
-		/* Ensure everything has started properly */ }
+	}
 
 	public static final int QueryTypeUnknown = -123;
 	public static final int QueryTypeSelect = 111;
@@ -77,11 +45,9 @@ public class Query extends Prologue implements Cloneable, Printable {
 	public static final int QueryTypeAsk = 444;
 	int queryType = QueryTypeUnknown;
 
-	// If no model is provided explicitly, the query engine will load
-	// a model from the URL. Never a list of zero items.
-
 	private List<String> graphURIs = new ArrayList<>();
 	private List<String> namedGraphURIs = new ArrayList<>();
+	private List<Node> namedWindowNodes = new ArrayList<>();
 	private List<ElementLogicalWindow> logicalWindows = new ArrayList<>();
 	private List<ElementLogicalPastWindow> logicalPastWindows = new ArrayList<>();
 	private List<ElementPhysicalWindow> physicalWindows = new ArrayList<>();
@@ -144,10 +110,6 @@ public class Query extends Prologue implements Cloneable, Printable {
 	private Var allocInternVar() {
 		return varAlloc.allocVar();
 	}
-
-	// private VarAlloc varAnonAlloc = new
-	// VarAlloc(ARQConstants.allocVarAnonMarker) ;
-	// public Var allocVarAnon() { return varAnonAlloc.allocVar() ; }
 
 	public void setQuerySelectType() {
 		queryType = QueryTypeSelect;
@@ -213,13 +175,9 @@ public class Query extends Prologue implements Cloneable, Printable {
 	}
 
 	private void initStrict() {
-		// if ( prefixMap.getGlobalPrefixMapping() == globalPrefixMap )
-		// prefixMap.setGlobalPrefixMapping(null) ;
 	}
 
 	private void initLax() {
-		// if ( prefixMap.getGlobalPrefixMapping() == null )
-		// prefixMap.setGlobalPrefixMapping(globalPrefixMap) ;
 	}
 
 	public void setDistinct(boolean b) {
@@ -238,15 +196,10 @@ public class Query extends Prologue implements Cloneable, Printable {
 		return reduced;
 	}
 
-	/** @return Returns the syntax. */
 	public Syntax getSyntax() {
 		return syntax;
 	}
 
-	/**
-	 * @param syntax
-	 *            The syntax to set.
-	 */
 	public void setSyntax(Syntax syntax) {
 		this.syntax = syntax;
 		if (syntax != Syntax.syntaxSPARQL)
@@ -545,15 +498,12 @@ public class Query extends Prologue implements Cloneable, Printable {
 
 	private static void _addVarExpr(VarExprList varExprList, Var v, Expr expr) {
 		if (varExprList.contains(v))
-			// SELECT ?x (?a+?b AS ?x)
-			// SELECT (2*?a AS ?x) (?a+?b AS ?x)
 			throw new QueryBuildException("Duplicate variable in result projection '" + v + "'");
 		varExprList.add(v, expr);
 	}
 
 	protected VarExprList groupVars = new VarExprList();
-	protected List<Expr> havingExprs = new ArrayList<>(); // Expressions : Make
-															// an ExprList?
+	protected List<Expr> havingExprs = new ArrayList<>();
 
 	public boolean hasGroupBy() {
 		return !groupVars.isEmpty() || getAggregators().size() > 0;
@@ -589,11 +539,9 @@ public class Query extends Prologue implements Cloneable, Printable {
 			v = allocInternVar();
 
 		if (expr.isVariable() && v.isAllocVar()) {
-			// It was (?x) with no AS - keep the name by adding by variable.
 			addGroupBy(expr.asVar());
 			return;
 		}
-
 		groupVars.add(v, expr);
 	}
 
@@ -602,17 +550,6 @@ public class Query extends Prologue implements Cloneable, Printable {
 	}
 
 	// ---- Aggregates
-
-	// Record allocated aggregations.
-	// Later: The same aggregation expression used in a query
-	// will always lead to the same aggregator.
-	// For now, allocate a fresh one each time (cause the calculation
-	// to be done multiple times but (1) it's unusual to have repeated
-	// aggregators normally and (2) the actual calculation is cheap.
-
-	// Unlike SELECT expressions, here the expression itself (E_Aggregator)
-	// knows its variable
-	// Commonality?
 
 	private List<ExprAggregator> aggregators = new ArrayList<>();
 	private Map<Var, ExprAggregator> aggregatorsMap = new HashMap<>();
@@ -629,9 +566,6 @@ public class Query extends Prologue implements Cloneable, Printable {
 	}
 
 	public Expr allocAggregate(Aggregator agg) {
-		// We need to track the aggregators in case one aggregator is used
-		// twice, e.g. in HAVING and in SELECT expression
-		// (is that much harm to do twice? Yes, if distinct.)
 		String key = agg.key();
 
 		Var v = aggregatorsAllocated.get(key);
@@ -672,8 +606,6 @@ public class Query extends Prologue implements Cloneable, Printable {
 	}
 
 	private static void checkDataBlock(List<Var> variables, List<Binding> values) {
-		// Check.
-		int N = variables.size();
 		for (Binding valueRow : values) {
 			Iterator<Var> iter = valueRow.vars();
 			for (; iter.hasNext();) {
@@ -755,9 +687,6 @@ public class Query extends Prologue implements Cloneable, Printable {
 				findAndAddNamedVars();
 			return;
 		}
-
-		// if ( isAskType() )
-		// {}
 	}
 
 	private void findAndAddNamedVars() {
@@ -800,7 +729,6 @@ public class Query extends Prologue implements Cloneable, Printable {
 		if (this.isAskType())
 			visitor.visitAskResultForm(this);
 		visitor.visitDatasetDecl(this);
-		// Visit window declarations
 		visitor.visitWindowDecl(this);
 		visitor.visitQueryPattern(this);
 		visitor.visitGroupBy(this);
@@ -824,18 +752,12 @@ public class Query extends Prologue implements Cloneable, Printable {
 	 * @return Copy of this query
 	 */
 	public Query cloneQuery() {
-		// A little crude.
-		// Must use toString() rather than serialize() because we may not know
-		// how to serialize extended syntaxes
 		String qs = this.toString();
 		return QueryFactory.create(qs, getSyntax());
 	}
 
 	// ---- Query canonical syntax
 
-	// Reverse of parsing : should produce a string that parses to an equivalent
-	// query
-	// "Equivalent" => gives the same results on any model
 	@Override
 	public String toString() {
 		return serialize();
@@ -877,9 +799,6 @@ public class Query extends Prologue implements Cloneable, Printable {
 			return true;
 		return QueryCompare.equals(this, (Query) other);
 	}
-
-	// public static boolean sameAs(Query query1, Query query2)
-	// { return query1.sameAs(query2) ; }
 
 	@Override
 	public void output(IndentedWriter out) {
@@ -982,36 +901,56 @@ public class Query extends Prologue implements Cloneable, Printable {
 	public void serialize(IndentedWriter writer, Syntax outSyntax) {
 		// Try to use a serializer factory if available
 		QuerySerializerFactory factory = SerializerRegistry.get().getQuerySerializerFactory(outSyntax);
-		System.err.println(factory);
 		QueryVisitor serializer = factory.create(outSyntax, this, writer);
 		this.visit(serializer);
 	}
 
 	// RSP
-
 	public void addLogicalWindow(Node windowNameNode, Node streamNameNode, Node rangeNode, Node stepNode) {
+		checkDuplicateWindowUri(windowNameNode);
+		namedWindowNodes.add(windowNameNode);
 		ElementLogicalWindow window = new ElementLogicalWindow(windowNameNode, streamNameNode, rangeNode, stepNode);
 		logicalWindows.add(window);
 	}
-	
+
 	public void addLogicalPastWindow(Node windowNameNode, Node streamNameNode, Node rangeNode, Node stepNode) {
-		ElementLogicalPastWindow window = new ElementLogicalPastWindow(windowNameNode, streamNameNode, rangeNode, stepNode);
+		checkDuplicateWindowUri(windowNameNode);
+		namedWindowNodes.add(windowNameNode);
+		ElementLogicalPastWindow window = new ElementLogicalPastWindow(windowNameNode, streamNameNode, rangeNode,
+				stepNode);
 		logicalPastWindows.add(window);
 	}
-	
+
 	public void addPhysicalWindow(Node windowNameNode, Node streamNameNode, Node rangeNode, Node stepNode) {
+		checkDuplicateWindowUri(windowNameNode);
+		namedWindowNodes.add(windowNameNode);
 		ElementPhysicalWindow window = new ElementPhysicalWindow(windowNameNode, streamNameNode, rangeNode, stepNode);
 		physicalWindows.add(window);
+	}
+
+	private void checkDuplicateWindowUri(Node windowNameNode) {
+		if(hasWindowUri(windowNameNode)){
+			throw new QueryException("Window node already in named window set: " + windowNameNode);
+		}
+	}
+	
+	public boolean hasWindowUri(Node windowNameNode){
+		for (Node n : namedWindowNodes) {
+			if (n.toString().equals(windowNameNode.toString())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public List<ElementLogicalWindow> getLogicalWindows() {
 		return logicalWindows;
 	}
-	
+
 	public List<ElementLogicalPastWindow> getLogicalPastWindows() {
 		return logicalPastWindows;
 	}
-	
+
 	public List<ElementPhysicalWindow> getPhysicalWindows() {
 		return physicalWindows;
 	}

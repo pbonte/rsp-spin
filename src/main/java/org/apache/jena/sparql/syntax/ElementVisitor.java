@@ -18,7 +18,7 @@
 
 package org.apache.jena.sparql.syntax;
 
-import org.rspspin.syntax.ElementLogicalWindow;
+import org.rspspin.syntax.ElementWindowGraph;
 
 public interface ElementVisitor
 {
@@ -38,5 +38,5 @@ public interface ElementVisitor
     public void visit(ElementMinus el) ;
     public void visit(ElementService el) ;
     public void visit(ElementSubQuery el) ;
-    public void visit(ElementLogicalWindow el) ;
+    public void visit(ElementWindowGraph el);
 }
