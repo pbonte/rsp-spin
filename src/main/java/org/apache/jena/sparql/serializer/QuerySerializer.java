@@ -355,7 +355,12 @@ public class QuerySerializer implements QueryVisitor {
 
 	@Override
 	public void visitWindowDecl(Query query) {
-		System.err.println("QuerySerializer: Window clause is not supported");
+		System.err.println("QuerySerializer: Visiting window declaration does nothing");
+	}
+
+	@Override
+	public void visitOutputStreamDecl(Query query) {
+		System.err.println("QuerySerializer: Visiting output stream declaration does nothing");
 	}
 
 }

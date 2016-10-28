@@ -47,6 +47,8 @@ public class Query extends Prologue implements Cloneable, Printable {
 
 	private List<String> graphURIs = new ArrayList<>();
 	private List<String> namedGraphURIs = new ArrayList<>();
+	
+	private Node outputStream = null;
 	private List<Node> namedWindowNodes = new ArrayList<>();
 	private List<ElementLogicalWindow> logicalWindows = new ArrayList<>();
 	private List<ElementLogicalPastWindow> logicalPastWindows = new ArrayList<>();
@@ -720,6 +722,7 @@ public class Query extends Prologue implements Cloneable, Printable {
 		visitor.startVisit(this);
 		visitor.visitResultForm(this);
 		visitor.visitPrologue(this);
+		visitor.visitOutputStreamDecl(this);
 		if (this.isSelectType())
 			visitor.visitSelectResultForm(this);
 		if (this.isConstructType())
@@ -953,5 +956,14 @@ public class Query extends Prologue implements Cloneable, Printable {
 
 	public List<ElementPhysicalWindow> getPhysicalWindows() {
 		return physicalWindows;
+	}
+
+	
+	public void setOutputstream(Node iri) {
+		outputStream = iri;
+	}
+	
+	public Node getOutputStream() {
+		return outputStream;
 	}
 }

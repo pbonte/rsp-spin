@@ -106,4 +106,13 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 		return "NOW-" + n.getLiteral().getValue().toString();
 	}
 
+	public void visitOutputStreamDecl(Query query) {
+		if(query.getOutputStream() != null){
+			out.print("REGISTER STREAM ");
+			out.print(FmtUtils.stringForNode(query.getOutputStream()));
+			out.print(" AS ");
+			out.newline();
+			out.newline();
+		}
+	}
 }
