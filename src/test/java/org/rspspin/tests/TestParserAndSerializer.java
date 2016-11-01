@@ -174,8 +174,6 @@ public class TestParserAndSerializer {
 				+ "FROM NAMED WINDOW <http://window> ON ?stream [FROM NOW-PT2H TO NOW-PT1H STEP PT1H] "
 				+ "WHERE { WINDOW <http://window> { ?a ?b ?c } }";
 		Query q = QueryFactory.create(query, ParserRSPQL.syntax);
-		System.err.println(q);
-		System.out.println(query);
 		assertEquals(compress(q.toString()), compress(query));
 	}
 	
