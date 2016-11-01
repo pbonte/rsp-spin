@@ -48,6 +48,12 @@ public class Query extends Prologue implements Cloneable, Printable {
 	private List<String> graphURIs = new ArrayList<>();
 	private List<String> namedGraphURIs = new ArrayList<>();
 	
+	public static final int OutputStreamTypeUnknown = -1;
+	public static final int OutputStreamTypeIstream = 1;
+	public static final int OutputStreamTypeDstream = 2;
+	public static final int OutputStreamTypeRstream = 3;
+	private int outputStreamType = OutputStreamTypeUnknown;
+	
 	private Node outputStream = null;
 	private List<Node> namedWindowNodes = new ArrayList<>();
 	private List<ElementLogicalWindow> logicalWindows = new ArrayList<>();
@@ -908,7 +914,6 @@ public class Query extends Prologue implements Cloneable, Printable {
 		this.visit(serializer);
 	}
 
-	// RSP
 	public void addLogicalWindow(Node windowNameNode, Node streamNameNode, Node rangeNode, Node stepNode) {
 		checkDuplicateWindowUri(windowNameNode);
 		namedWindowNodes.add(windowNameNode);
@@ -958,12 +963,31 @@ public class Query extends Prologue implements Cloneable, Printable {
 		return physicalWindows;
 	}
 
-	
 	public void setOutputstream(Node iri) {
 		outputStream = iri;
 	}
 	
 	public Node getOutputStream() {
 		return outputStream;
+	}
+	
+	public void setOutputStreamOp(int outputStreamOp){
+		this.outputStreamType = outputStreamOp;
+	}
+	
+	public int getOutputStreamType(){
+		return outputStreamType;
+	}
+
+	public void setQueryDstreamType() {
+		outputStreamType = OutputStreamTypeDstream;
+	}
+	
+	public void setQueryIstreamType() {
+		outputStreamType = OutputStreamTypeIstream;
+	}
+	
+	public void setQueryRstreamType() {
+		outputStreamType = OutputStreamTypeRstream;
 	}
 }

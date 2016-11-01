@@ -82,7 +82,7 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 			out.print(FmtUtils.stringForNode(window.getWindowNameNode(), query.getPrefixMapping()));
 			out.print(" ON ");
 			out.print(FmtUtils.stringForNode(window.getStreamNameNode(), query.getPrefixMapping()));
-			out.print(" [ ");
+			out.print(" [");
 			out.print("ITEM ");
 			out.print(stringForLiteral(window.getRangeNode()));
 			out.print(" STEP ");
@@ -110,7 +110,7 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 		if(query.getOutputStream() != null){
 			out.print("REGISTER STREAM ");
 			out.print(FmtUtils.stringForNode(query.getOutputStream()));
-			out.print(" AS ");
+			out.print(" AS");
 			out.newline();
 			out.newline();
 		}

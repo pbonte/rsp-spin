@@ -39,10 +39,8 @@ public interface QueryVisitor {
 
 	public void visitDatasetDecl(Query query);
 
-	// Visit window declarations
 	public void visitWindowDecl(Query query);
 
-	// Visit
 	public void visitOutputStreamDecl(Query query);
 
 	public void visitQueryPattern(Query query);

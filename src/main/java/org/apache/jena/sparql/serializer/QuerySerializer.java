@@ -82,6 +82,19 @@ public class QuerySerializer implements QueryVisitor {
 			out.print("DISTINCT ");
 		if (query.isReduced())
 			out.print("REDUCED ");
+		if (query.getOutputStreamType() != Query.OutputStreamTypeUnknown) {
+			switch (query.getOutputStreamType()) {
+			case Query.OutputStreamTypeIstream:
+				out.print("ISTREAM ");
+				break;
+			case Query.OutputStreamTypeRstream:
+				out.print("RSTREAM ");
+				break;
+			case Query.OutputStreamTypeDstream:
+				out.print("DSTREAM ");
+				break;
+			}
+		}
 		out.print(" "); // Padding
 
 		if (query.isQueryResultStar())
@@ -94,19 +107,25 @@ public class QuerySerializer implements QueryVisitor {
 	@Override
 	public void visitConstructResultForm(Query query) {
 		out.print("CONSTRUCT ");
-		// if ( query.isQueryResultStar() )
-		// {
-		// out.print("*") ;
-		// out.newline() ;
-		// }
-		// else
-		{
-			out.incIndent(BLOCK_INDENT);
-			out.newline();
-			Template t = query.getConstructTemplate();
-			fmtTemplate.format(t);
-			out.decIndent(BLOCK_INDENT);
+		if (query.getOutputStreamType() != Query.OutputStreamTypeUnknown) {
+			switch (query.getOutputStreamType()) {
+			case Query.OutputStreamTypeIstream:
+				out.print("ISTREAM ");
+				break;
+			case Query.OutputStreamTypeRstream:
+				out.print("RSTREAM ");
+				break;
+			case Query.OutputStreamTypeDstream:
+				out.print("DSTREAM ");
+				break;
+			}
 		}
+		out.incIndent(BLOCK_INDENT);
+		out.newline();
+		Template t = query.getConstructTemplate();
+		fmtTemplate.format(t);
+		out.decIndent(BLOCK_INDENT);
+
 	}
 
 	@Override
@@ -355,12 +374,12 @@ public class QuerySerializer implements QueryVisitor {
 
 	@Override
 	public void visitWindowDecl(Query query) {
-		System.err.println("QuerySerializer: Visiting window declaration does nothing");
+		System.err.println("QuerySerializer: visitWindowDecl does nothing");
 	}
 
 	@Override
 	public void visitOutputStreamDecl(Query query) {
-		System.err.println("QuerySerializer: Visiting output stream declaration does nothing");
+		System.err.println("QuerySerializer: visitOutputStreamDecl does nothing");
 	}
 
 }
