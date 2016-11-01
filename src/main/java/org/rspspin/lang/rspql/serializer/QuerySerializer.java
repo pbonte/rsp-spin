@@ -77,6 +77,10 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 			out.print(stringForPastDuration(window.getFromNode()));
 			out.print(" TO ");
 			out.print(stringForPastDuration(window.getToNode()));
+			if(window.getStepNode() != null){
+				out.print(" STEP ");
+				out.print(stringForLiteral(window.getStepNode()));
+			}
 			out.print("]");
 			out.newline();
 		}
@@ -107,7 +111,7 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 
 	public String stringForPastDuration(Node n) {
 		if (n.isVariable()) {
-			return n.toString();
+			return "NOW-" + n.toString();
 		}
 		return "NOW-" + n.getLiteral().getValue().toString();
 	}

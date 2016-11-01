@@ -11,11 +11,13 @@ import org.apache.jena.sparql.util.NodeIsomorphismMap;
 public class ElementLogicalPastWindow extends ElementWindow {
 	private Node fromNode;
 	private Node toNode;
+	private Node stepNode;
 
-	public ElementLogicalPastWindow(Node windowNameNode, Node streamNameNode, Node fromNode, Node toNode) {
+	public ElementLogicalPastWindow(Node windowNameNode, Node streamNameNode, Node fromNode, Node toNode, Node stepNode) {
 		super(windowNameNode, streamNameNode);
 		this.fromNode = fromNode;
 		this.toNode = toNode;
+		this.stepNode = stepNode;
 	}
 
 	@Override
@@ -41,5 +43,9 @@ public class ElementLogicalPastWindow extends ElementWindow {
 
 	public Node getToNode() {
 		return toNode;
+	}
+	
+	public Node getStepNode() {
+		return stepNode;
 	}
 }

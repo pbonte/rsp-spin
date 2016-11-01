@@ -921,11 +921,11 @@ public class Query extends Prologue implements Cloneable, Printable {
 		logicalWindows.add(window);
 	}
 
-	public void addLogicalPastWindow(Node windowNameNode, Node streamNameNode, Node rangeNode, Node stepNode) {
+	public void addLogicalPastWindow(Node windowNameNode, Node streamNameNode, Node rangeNode, Node toNode, Node stepNode) {
 		checkDuplicateWindowUri(windowNameNode);
 		namedWindowNodes.add(windowNameNode);
 		ElementLogicalPastWindow window = new ElementLogicalPastWindow(windowNameNode, streamNameNode, rangeNode,
-				stepNode);
+				toNode, stepNode);
 		logicalPastWindows.add(window);
 	}
 
