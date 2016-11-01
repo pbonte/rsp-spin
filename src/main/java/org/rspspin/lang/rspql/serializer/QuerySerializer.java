@@ -54,21 +54,25 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 			out.print(FmtUtils.stringForNode(window.getWindowNameNode(), query.getPrefixMapping()));
 			out.print(" ON ");
 			out.print(FmtUtils.stringForNode(window.getStreamNameNode(), query.getPrefixMapping()));
-			out.print(" [ ");
+			out.print(" [");
 			out.print("RANGE ");
 			out.print(stringForLiteral(window.getRangeNode()));
-			out.print(" STEP ");
-			out.print(stringForLiteral(window.getStepNode()));
+			if (window.getStepNode() != null) {
+				out.print(" STEP ");
+				out.print(stringForLiteral(window.getStepNode()));
+			}
 			out.print("]");
 			out.newline();
 		}
 		// Logical past windows
-		for (ElementLogicalPastWindow window : query.getLogicalPastWindows()) {
+		for (
+
+		ElementLogicalPastWindow window : query.getLogicalPastWindows()) {
 			out.print("FROM NAMED WINDOW ");
 			out.print(FmtUtils.stringForNode(window.getWindowNameNode(), query.getPrefixMapping()));
 			out.print(" ON ");
 			out.print(FmtUtils.stringForNode(window.getStreamNameNode(), query.getPrefixMapping()));
-			out.print(" [ ");
+			out.print(" [");
 			out.print("FROM ");
 			out.print(stringForPastDuration(window.getFromNode()));
 			out.print(" TO ");
@@ -85,8 +89,10 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 			out.print(" [");
 			out.print("ITEM ");
 			out.print(stringForLiteral(window.getRangeNode()));
-			out.print(" STEP ");
-			out.print(stringForLiteral(window.getStepNode()));
+			if (window.getStepNode() != null) {
+				out.print(" STEP ");
+				out.print(stringForLiteral(window.getStepNode()));
+			}
 			out.print("]");
 			out.newline();
 		}
@@ -107,7 +113,7 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 	}
 
 	public void visitOutputStreamDecl(Query query) {
-		if(query.getOutputStream() != null){
+		if (query.getOutputStream() != null) {
 			out.print("REGISTER STREAM ");
 			out.print(FmtUtils.stringForNode(query.getOutputStream()));
 			out.print(" AS");
