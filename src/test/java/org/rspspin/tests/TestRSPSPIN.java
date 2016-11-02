@@ -178,7 +178,6 @@ public class TestRSPSPIN {
 		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
 		Model model = JenaUtil.createDefaultModel();
 		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
-		System.err.println(spinQuery);
 		assertEquals(compress(q), compress(spinQuery.toString()));
 	}
 	
@@ -231,7 +230,6 @@ public class TestRSPSPIN {
 		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
 		Model model = JenaUtil.createDefaultModel();
 		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
-		System.err.println(spinQuery);
 		assertEquals(compress(q), compress(spinQuery.toString()));
 	}
 	
