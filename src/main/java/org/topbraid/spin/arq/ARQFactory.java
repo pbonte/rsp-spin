@@ -14,7 +14,6 @@ import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.util.SPINExpressions;
 
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;

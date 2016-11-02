@@ -1,6 +1,5 @@
 package org.rspspin.model;
 
-import org.topbraid.spin.model.NamedGraph;
 import org.topbraid.spin.model.SPINFactory;
 import org.topbraid.spin.model.Variable;
 import org.topbraid.spin.model.print.PrintContext;

@@ -1,6 +1,5 @@
 package org.rspspin.tests;
 
-import org.apache.jena.base.Sys;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.rdf.model.Model;
