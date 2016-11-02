@@ -75,6 +75,7 @@ public class SelectImpl extends QueryImpl implements Select {
 		p.printIndentation(p.getIndentation());
 		p.printKeyword("SELECT");
 		p.print(" ");
+		printOutputStreamOperator(p);
 		if (isDistinct()) {
 			p.printKeyword("DISTINCT");
 			p.print(" ");

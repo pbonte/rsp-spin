@@ -138,12 +138,7 @@ public class TestRSPSPIN {
 				+ "}";
 		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
 		Model model = JenaUtil.createDefaultModel();
-		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
-		
-		spinQuery.getModel().setNsPrefix("", "http://w3id.org/rsp/spin#");
-		spinQuery.getModel().setNsPrefix("sp", "http://spinrdf.org/sp#");
-		spinQuery.getModel().write(System.err, "TTL");
-		
+		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");		
 		assertEquals(compress(q), compress(spinQuery.toString()));
 	}
 	
@@ -163,6 +158,110 @@ public class TestRSPSPIN {
 				+ "}\n"
 				+ "WHERE {\n"
 				+ "}";
+		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
+		Model model = JenaUtil.createDefaultModel();
+		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
+		assertEquals(compress(q), compress(spinQuery.toString()));
+	}
+	
+	/* Istream construct */
+	@Test
+	public void istreamConstruct(){
+		SPINModuleRegistry.get().init();
+		ParserRSPQL.register();
+		ARQFactory.setSyntax(ParserRSPQL.syntax);
+		String q = ""
+				+ "REGISTER STREAM <http://output> AS\n"
+				+ "CONSTRUCT ISTREAM {\n"
+				+ "   ?s ?p ?o .\n"
+				+ "}\n"
+				+ "WHERE { }";
+		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
+		Model model = JenaUtil.createDefaultModel();
+		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
+		System.err.println(spinQuery);
+		assertEquals(compress(q), compress(spinQuery.toString()));
+	}
+	
+	/* Dstream construct */
+	@Test
+	public void dstreamConstruct(){
+		SPINModuleRegistry.get().init();
+		ParserRSPQL.register();
+		ARQFactory.setSyntax(ParserRSPQL.syntax);
+		String q = ""
+				+ "REGISTER STREAM <http://output> AS\n"
+				+ "CONSTRUCT DSTREAM {\n"
+				+ "   ?s ?p ?o .\n"
+				+ "}\n"
+				+ "WHERE { }";
+		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
+		Model model = JenaUtil.createDefaultModel();
+		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
+		assertEquals(compress(q), compress(spinQuery.toString()));
+	}
+	
+	/* Rstream construct */
+	@Test
+	public void rstreamConstruct(){
+		SPINModuleRegistry.get().init();
+		ParserRSPQL.register();
+		ARQFactory.setSyntax(ParserRSPQL.syntax);
+		String q = ""
+				+ "REGISTER STREAM <http://output> AS\n"
+				+ "CONSTRUCT RSTREAM {\n"
+				+ "   ?s ?p ?o .\n"
+				+ "}\n"
+				+ "WHERE { }";
+		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
+		Model model = JenaUtil.createDefaultModel();
+		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
+		assertEquals(compress(q), compress(spinQuery.toString()));
+	}
+	
+	/* Istream select */
+	@Test
+	public void istreamSelect(){
+		SPINModuleRegistry.get().init();
+		ParserRSPQL.register();
+		ARQFactory.setSyntax(ParserRSPQL.syntax);
+		String q = ""
+				+ "REGISTER STREAM <http://output> AS\n"
+				+ "SELECT ISTREAM ?s ?p ?o\n"
+				+ "WHERE { }";
+		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
+		Model model = JenaUtil.createDefaultModel();
+		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
+		System.err.println(spinQuery);
+		assertEquals(compress(q), compress(spinQuery.toString()));
+	}
+	
+	/* Dstream select */
+	@Test
+	public void dstreamSelect(){
+		SPINModuleRegistry.get().init();
+		ParserRSPQL.register();
+		ARQFactory.setSyntax(ParserRSPQL.syntax);
+		String q = ""
+				+ "REGISTER STREAM <http://output> AS\n"
+				+ "SELECT DSTREAM ?s ?p ?o\n"
+				+ "WHERE { }";
+		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
+		Model model = JenaUtil.createDefaultModel();
+		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
+		assertEquals(compress(q), compress(spinQuery.toString()));
+	}
+	
+	/* Rstream select */
+	@Test
+	public void rstreamSelect(){
+		SPINModuleRegistry.get().init();
+		ParserRSPQL.register();
+		ARQFactory.setSyntax(ParserRSPQL.syntax);
+		String q = ""
+				+ "REGISTER STREAM <http://output> AS\n"
+				+ "SELECT RSTREAM ?s ?p ?o\n"
+				+ "WHERE { }";
 		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
 		Model model = JenaUtil.createDefaultModel();
 		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");

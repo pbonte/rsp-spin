@@ -338,4 +338,16 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 		p.print(String.format("REGISTER STREAM %s AS", Formatter.varOrUriAsString(node)));
 		p.println();
 	}
+	
+	protected void printOutputStreamOperator(PrintContext p) {
+		Statement stmt = getProperty(RSP.hasOutputStreamOperator);
+		if(stmt == null) return;
+		RDFNode node = stmt.getObject();
+		if(node.equals(RSP.Istream))
+			p.print("ISTREAM ");
+		if(node.equals(RSP.Dstream))
+			p.print("DSTREAM ");
+		if(node.equals(RSP.Rstream))
+			p.print("RSTREAM ");
+	}
 }

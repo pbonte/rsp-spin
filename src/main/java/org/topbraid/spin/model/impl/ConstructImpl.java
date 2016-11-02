@@ -33,9 +33,9 @@ public class ConstructImpl extends QueryImpl implements Construct {
 		printPrefixes(context);
 		context.printIndentation(context.getIndentation());
 		printOutputStream(context);
-		context.printKeyword("CONSTRUCT");
+		context.printKeyword("CONSTRUCT ");
+		printOutputStreamOperator(context);
 		printNestedElementList(context, SP.templates);
-		context.println();
 		printStringFrom(context);
 		context.println();
 		printWhere(context);
