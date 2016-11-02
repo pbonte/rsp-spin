@@ -233,7 +233,6 @@ public class TestParserAndSerializer {
 		assertEquals(q, null);
 	}
 
-
 	public String compress(String s) {
 		return s.replaceAll("\\s+", " ").trim();
 	}
