@@ -338,7 +338,7 @@ public class FormatterElement extends FormatterBase implements ElementVisitor {
 	
 	@Override
 	public void visit(ElementWindowGraph el) {
-		visitNodePattern("WINDOW", el.getGraphNameNode(), el.getElement());
+		visitNodePattern("WINDOW", el.getWindowNameNode(), el.getElement());
 	}
 
 	@Override
