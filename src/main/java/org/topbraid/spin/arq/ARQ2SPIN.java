@@ -398,13 +398,16 @@ public class ARQ2SPIN {
 
 			// To
 			RDFNode to = model.asRDFNode(toNode);
-			if (fromNode.isVariable())
+			if (toNode.isVariable())
 				to = getVariable(toNode.getName());
 			root.addProperty(RSP.to, to);
 
 			// Logical step
 			if (stepNode != null) {
-				root.addProperty(RSP.logicalStep, model.asRDFNode(stepNode));
+				RDFNode step = model.asRDFNode(stepNode);
+				if (stepNode.isVariable())
+					step = getVariable(stepNode.getName());
+				root.addProperty(RSP.logicalStep, step);
 			}
 			spinQuery.addProperty(RSP.fromNamedWindow, root);
 		}
