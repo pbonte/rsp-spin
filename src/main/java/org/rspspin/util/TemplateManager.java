@@ -169,10 +169,11 @@ public class TemplateManager {
 		} else {
 			arq = ARQFactory.get().createQuery(template.getProperty(SP.text).getObject().toString());
 		}
+		
+		System.out.println(arq);
 		// Parameterized
 		ParameterizedSparqlString pss = new ParameterizedSparqlString(arq.toString(), bindings);
 		
-		System.out.println(arq);
 		System.err.println(pss.toString());
 		return null;//pss.asQuery(ParserRSPQL.syntax).toString();
 	}
@@ -195,7 +196,7 @@ public class TemplateManager {
 				+ "REGISTER STREAM ?out AS "
 				+ "SELECT * "
 				+ "FROM NAMED WINDOW :w1 ON :s [RANGE ?range STEP ?step] "
-				+ "FROM NAMED WINDOW :w2 ON :s [FROM  NOW-?range TO NOW-?step STEP ?step2] "
+				+ "FROM NAMED WINDOW :w2 ON :s [FROM  NOW-?from TO NOW-?to STEP ?step] "
 				+ "FROM NAMED WINDOW :w3 ON :s [ITEM ?physical STEP ?physical] "
 				+ "WHERE { "
 				+ "   WINDOW :w1 { ?s ?p ?o FILTER(\"range\" < ?range)} "
@@ -211,14 +212,14 @@ public class TemplateManager {
 		arg1.addProperty(RDFS.comment, "Set the logical step of the window");
 		Resource arg4 = tm.createArgumentConstraint("s", RDFS.Resource, null, true);
 		arg1.addProperty(RDFS.comment, "Set the subject of this query");
-		//Resource arg5 = tm.createArgumentConstraint("physical", XSD.integer, null, true);
-		//arg1.addProperty(RDFS.comment, "An integer");
+		Resource arg5 = tm.createArgumentConstraint("physical", XSD.integer, null, true);
+		arg1.addProperty(RDFS.comment, "An integer");
 		
 		template.addProperty(SPIN.constraint, arg1);
 		template.addProperty(SPIN.constraint, arg2);
 		template.addProperty(SPIN.constraint, arg3);
 		template.addProperty(SPIN.constraint, arg4);
-		//template.addProperty(SPIN.constraint, arg5);
+		template.addProperty(SPIN.constraint, arg5);
 
 		// Print model
 		//tm.model.write(System.out, "TTL");
@@ -226,9 +227,12 @@ public class TemplateManager {
 		// Create bindings
 		QuerySolutionMap bindings = new QuerySolutionMap();
 		bindings.add("out", ResourceFactory.createResource("http://ouputstream"));
-		bindings.add("range", ResourceFactory.createTypedLiteral("PT1H", XSDDatatype.XSDduration));
+		bindings.add("range", ResourceFactory.createTypedLiteral("PT2H", XSDDatatype.XSDduration));
 		bindings.add("step", ResourceFactory.createTypedLiteral("PT1H", XSDDatatype.XSDduration));
-		bindings.add("s", ResourceFactory.createResource("http://robin"));
+		bindings.add("from", ResourceFactory.createTypedLiteral("PT5H", XSDDatatype.XSDduration));
+		bindings.add("to", ResourceFactory.createTypedLiteral("PT3H", XSDDatatype.XSDduration));
+		bindings.add("physical", ResourceFactory.createTypedLiteral("10", XSDDatatype.XSDinteger));
+		bindings.add("p", ResourceFactory.createTypedLiteral("PT3H", XSDDatatype.XSDduration));
 		SPINArgumentChecker.get().check(template, bindings);
 
 		// Print query

@@ -1331,12 +1331,12 @@ public class ParameterizedSparqlString implements PrefixMapping {
 			if (n.isLiteral() && n.getLiteralDatatype().equals(XSDDatatype.XSDduration)) {
 				p = Pattern.compile("(RANGE\\s+|STEP\\s+)([?$]" + var + ")([^\\w]|$)");
 				command = p.matcher(command).replaceAll("$1" + n.getLiteralLexicalForm() + "$3");
-				//p = Pattern.compile("(FROM\\s+NOW\\-|TO\\s+NOW\\-)([?$]" + var + ")([^\\w]|$)");
-				//command = p.matcher(command).replaceAll("$1" + n.getLiteralLexicalForm() + "$3");
+				p = Pattern.compile("(FROM\\s+NOW\\-|TO\\s+NOW\\-)([?$]" + var + ")([^\\w]|$)");
+				command = p.matcher(command).replaceAll("$1" + n.getLiteralLexicalForm() + "$3");
 			}
 			// Or replace variable as normal
-			//p = Pattern.compile("([?$]" + var + ")([^\\w]|$)");
-			//command = p.matcher(command).replaceAll(Matcher.quoteReplacement(this.stringForNode(n, context)) + "$2");
+			p = Pattern.compile("([?$]" + var + ")([^\\w]|$)");
+			command = p.matcher(command).replaceAll(Matcher.quoteReplacement(this.stringForNode(n, context)) + "$2");
 
 		}
 
