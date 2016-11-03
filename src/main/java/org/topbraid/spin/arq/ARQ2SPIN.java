@@ -288,6 +288,7 @@ public class ARQ2SPIN {
 	 */
 	private void addOutputStream(Query arq, Resource spinQuery) {
 		Node outputStreamNode = arq.getOutputStream();
+		if(outputStreamNode == null) return;
 		// Output stream
 		RDFNode outputStreamName = model.asRDFNode(outputStreamNode);
 		if (outputStreamNode.isVariable())

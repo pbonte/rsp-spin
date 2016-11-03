@@ -49,7 +49,6 @@ import org.apache.jena.sparql.util.FmtUtils;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
-import org.apache.jena.vocabulary.XSD;
 
 /**
  * <p>
@@ -1397,6 +1396,7 @@ public class ParameterizedSparqlString implements PrefixMapping {
 	 *                Thrown if the command text does not parse
 	 */
 	public Query asQuery(Syntax syntax) throws QueryException {
+		System.err.println(this.toString());
 		return QueryFactory.create(this.toString(), syntax);
 	}
 

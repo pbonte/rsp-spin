@@ -20,203 +20,180 @@ package org.apache.jena.sparql.syntax;
 
 import org.rspspin.syntax.ElementWindowGraph;
 
-/** An element visitor that walks the graph pattern tree, 
- *  applying a visitor at each Element traversed.
- *  Does not (NOT)EXISTS in filters.
- *    These will need to call down themselves if it is meaningful for the visitor.  
- *  Bottom-up walk - apply to subelements before applying to current element.
+/**
+ * An element visitor that walks the graph pattern tree, applying a visitor at
+ * each Element traversed. Does not (NOT)EXISTS in filters. These will need to
+ * call down themselves if it is meaningful for the visitor. Bottom-up walk -
+ * apply to subelements before applying to current element.
  */
 
-public class ElementWalker 
-{
-    public static void walk(Element el, ElementVisitor visitor)
-    {
-        walk(el, visitor, null, null) ;
-    }
-    
-    public static void walk(Element el, ElementVisitor visitor, ElementVisitor beforeVisitor, ElementVisitor afterVisitor)
-    {
-        Walker w = new Walker(visitor, beforeVisitor, afterVisitor) ;
-        el.visit(w) ;
-    }
+public class ElementWalker {
+	public static void walk(Element el, ElementVisitor visitor) {
+		walk(el, visitor, null, null);
+	}
 
-    protected static void walk$(Element el, Walker walker)
-    {
-        el.visit(walker) ;
-    }
+	public static void walk(Element el, ElementVisitor visitor, ElementVisitor beforeVisitor,
+			ElementVisitor afterVisitor) {
+		Walker w = new Walker(visitor, beforeVisitor, afterVisitor);
+		el.visit(w);
+	}
 
-    static public class Walker implements ElementVisitor
-    {
-        protected final ElementVisitor proc ;
-        protected final ElementVisitor beforeVisitor ;
-        protected final ElementVisitor afterVisitor ;
-        
-        protected Walker(ElementVisitor visitor, ElementVisitor beforeVisitor, ElementVisitor afterVisitor)
-        { 
-            proc = visitor ;
-            this.beforeVisitor= beforeVisitor ; 
-            this.afterVisitor = afterVisitor ;
-        }
-        
-        private void before(Element elt)
-        {
-            if ( beforeVisitor != null )
-                elt.visit(beforeVisitor) ;
-        }
-        
-        private void after(Element elt)
-        {
-            if ( afterVisitor != null )
-                elt.visit(afterVisitor) ;
-        }
-        
-        @Override
-        public void visit(ElementTriplesBlock el)
-        {
-            before(el) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
-        
-        @Override
-        public void visit(ElementFilter el)
-        {
-            before(el) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
+	protected static void walk$(Element el, Walker walker) {
+		el.visit(walker);
+	}
 
-        @Override
-        public void visit(ElementAssign el)
-        {
-            before(el) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
-        
-        @Override
-        public void visit(ElementBind el)
-        {
-            before(el) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
-        
-        @Override
-        public void visit(ElementData el)
-        {
-            before(el) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
-        
-        @Override
-        public void visit(ElementUnion el)
-        {
-            before(el) ;
-            for ( Element e : el.getElements() )
-                e.visit(this) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
-        
-        @Override
-        public void visit(ElementGroup el)
-        {
-            before(el) ;
-            for (Element e : el.getElements())
-                e.visit(this) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
-    
-        @Override
-        public void visit(ElementOptional el)
-        {
-            before(el) ;
-            if ( el.getOptionalElement() != null )
-                el.getOptionalElement().visit(this) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
-        
-        @Override
-        public void visit(ElementDataset el)
-        {
-            before(el) ;
-            if ( el.getElement() != null )
-                el.getElement().visit(this) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
+	static public class Walker implements ElementVisitor {
+		protected final ElementVisitor proc;
+		protected final ElementVisitor beforeVisitor;
+		protected final ElementVisitor afterVisitor;
 
-        @Override
-        public void visit(ElementNamedGraph el)
-        {
-            before(el) ;
-            if ( el.getElement() != null )
-                el.getElement().visit(this) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
-    
-        @Override
-        public void visit(ElementService el)
-        {
-            before(el) ;
-            if ( el.getElement() != null )
-                el.getElement().visit(this) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
+		protected Walker(ElementVisitor visitor, ElementVisitor beforeVisitor, ElementVisitor afterVisitor) {
+			proc = visitor;
+			this.beforeVisitor = beforeVisitor;
+			this.afterVisitor = afterVisitor;
+		}
 
-        // EXISTs, NOT EXISTs also occur in FILTERs via expressions.
-        
-        @Override
-        public void visit(ElementExists el)
-        {
-            before(el) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
+		private void before(Element elt) {
+			if (beforeVisitor != null)
+				elt.visit(beforeVisitor);
+		}
 
-        @Override
-        public void visit(ElementNotExists el)
-        {
-            before(el) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
+		private void after(Element elt) {
+			if (afterVisitor != null)
+				elt.visit(afterVisitor);
+		}
 
-        @Override
-        public void visit(ElementMinus el)
-        {
-            before(el) ;
-            if ( el.getMinusElement() != null )
-                el.getMinusElement().visit(this) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
-        
-        @Override
-        public void visit(ElementSubQuery el)
-        {
-            before(el) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
+		@Override
+		public void visit(ElementTriplesBlock el) {
+			before(el);
+			proc.visit(el);
+			after(el);
+		}
 
-        @Override
-        public void visit(ElementPathBlock el)
-        {
-            before(el) ;
-            proc.visit(el) ;
-            after(el) ;
-        }
+		@Override
+		public void visit(ElementFilter el) {
+			before(el);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementAssign el) {
+			before(el);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementBind el) {
+			before(el);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementData el) {
+			before(el);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementUnion el) {
+			before(el);
+			for (Element e : el.getElements())
+				e.visit(this);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementGroup el) {
+			before(el);
+			for (Element e : el.getElements())
+				e.visit(this);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementOptional el) {
+			before(el);
+			if (el.getOptionalElement() != null)
+				el.getOptionalElement().visit(this);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementDataset el) {
+			before(el);
+			if (el.getElement() != null)
+				el.getElement().visit(this);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementNamedGraph el) {
+			before(el);
+			if (el.getElement() != null)
+				el.getElement().visit(this);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementService el) {
+			before(el);
+			if (el.getElement() != null)
+				el.getElement().visit(this);
+			proc.visit(el);
+			after(el);
+		}
+
+		// EXISTs, NOT EXISTs also occur in FILTERs via expressions.
+
+		@Override
+		public void visit(ElementExists el) {
+			before(el);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementNotExists el) {
+			before(el);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementMinus el) {
+			before(el);
+			if (el.getMinusElement() != null)
+				el.getMinusElement().visit(this);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementSubQuery el) {
+			before(el);
+			proc.visit(el);
+			after(el);
+		}
+
+		@Override
+		public void visit(ElementPathBlock el) {
+			before(el);
+			proc.visit(el);
+			after(el);
+		}
 
 		@Override
 		public void visit(ElementWindowGraph el) {
 			// Do nothing for now
 		}
-    }
+	}
 }

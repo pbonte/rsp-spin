@@ -178,6 +178,23 @@ public class TemplateManager {
 	}
 
 	/**
+	 * Get a query from a template.
+	 * @param template
+	 * @return query
+	 */
+	public Query getQuery(Template template) {
+		Query arq;
+		if (template.getBody() != null) {
+			Command spinQuery = template.getBody();
+			arq = ARQFactory.get().createQuery((org.topbraid.spin.model.Query) spinQuery);
+		} else {
+			arq = ARQFactory.get().createQuery(template.getProperty(SP.text).getObject().toString());
+		}
+		
+		return arq;
+	}
+	
+	/**
 	 * Get a query from a template and a set of bindings.
 	 * @param template
 	 * @param bindings
@@ -216,14 +233,13 @@ public class TemplateManager {
 				+ "SELECT * "
 				+ "FROM NAMED WINDOW :w1 ON :s [RANGE ?range STEP ?step] "
 				+ "FROM NAMED WINDOW :w2 ON :s [FROM  NOW-?from TO NOW-?to STEP ?step] "
-				+ "FROM NAMED WINDOW :w3 ON :s [ITEM ?physicalStep STEP ?physicalRange] "
+				+ "FROM NAMED WINDOW :w3 ON :s [ITEM ?physicalRange STEP ?physicalStep] "
 				+ "WHERE { "
 				+ "   WINDOW :w1 { ?s ?p ?o FILTER(\"range\" < ?range)} "
 				+ "}";
 		Template template = tm.createTemplate("http://example.org/templates/1", queryString);
 
-		// Create argument and add as constraint to template
-		
+		// Create argument constraints
 		tm.addArgumentConstraint("out", RDFS.Resource, null, false, template);
 		tm.addArgumentConstraint("range", XSD.duration, null, false, template);
 		tm.addArgumentConstraint("step", XSD.duration, null, false, template);
@@ -232,9 +248,6 @@ public class TemplateManager {
 		tm.addArgumentConstraint("physicalRange", XSD.integer, null, false, template);
 		tm.addArgumentConstraint("physicalStep", XSD.integer, null, false, template);
 		tm.addArgumentConstraint("s", RDFS.Resource, null, true, template);
-
-		// Print model
-		//tm.model.write(System.out, "TTL");
 
 		// Create bindings
 		QuerySolutionMap bindings = new QuerySolutionMap();
@@ -248,7 +261,15 @@ public class TemplateManager {
 		SPINArgumentChecker.get().check(template, bindings);
 
 		// Print query
-		System.err.println(tm.getQuery(template, bindings));
+		//System.out.println(tm.getQuery(template, bindings));
+		
+		// Try with standard SPARQL
+		Query query = tm.getQuery(template);
+		System.err.println(query);
+		
+		tm.setSyntax(Syntax.syntaxARQ);
+		Template t = tm.createTemplate("http://example.org/templates/2", "SELECT * WHERE { ?a ?b ?c }");
+		System.out.println(tm.getQuery(t));
 	}
 
 	/**

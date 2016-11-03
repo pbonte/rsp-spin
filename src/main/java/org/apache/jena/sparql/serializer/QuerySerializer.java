@@ -39,7 +39,7 @@ import org.apache.jena.sparql.util.FmtUtils;
  * Serialize a query into SPARQL or ARQ formats
  */
 public class QuerySerializer implements QueryVisitor {
-	static final int BLOCK_INDENT = 2;
+	protected static final int BLOCK_INDENT = 2;
 	protected FormatterTemplate fmtTemplate;
 	protected FormatterElement fmtElement;
 	protected FmtExprSPARQL fmtExpr;
@@ -82,19 +82,6 @@ public class QuerySerializer implements QueryVisitor {
 			out.print("DISTINCT ");
 		if (query.isReduced())
 			out.print("REDUCED ");
-		if (query.getOutputStreamType() != Query.OutputStreamTypeUnknown) {
-			switch (query.getOutputStreamType()) {
-			case Query.OutputStreamTypeIstream:
-				out.print("ISTREAM ");
-				break;
-			case Query.OutputStreamTypeRstream:
-				out.print("RSTREAM ");
-				break;
-			case Query.OutputStreamTypeDstream:
-				out.print("DSTREAM ");
-				break;
-			}
-		}
 		out.print(" "); // Padding
 
 		if (query.isQueryResultStar())
@@ -107,25 +94,11 @@ public class QuerySerializer implements QueryVisitor {
 	@Override
 	public void visitConstructResultForm(Query query) {
 		out.print("CONSTRUCT ");
-		if (query.getOutputStreamType() != Query.OutputStreamTypeUnknown) {
-			switch (query.getOutputStreamType()) {
-			case Query.OutputStreamTypeIstream:
-				out.print("ISTREAM ");
-				break;
-			case Query.OutputStreamTypeRstream:
-				out.print("RSTREAM ");
-				break;
-			case Query.OutputStreamTypeDstream:
-				out.print("DSTREAM ");
-				break;
-			}
-		}
 		out.incIndent(BLOCK_INDENT);
 		out.newline();
 		Template t = query.getConstructTemplate();
 		fmtTemplate.format(t);
 		out.decIndent(BLOCK_INDENT);
-
 	}
 
 	@Override
@@ -319,7 +292,7 @@ public class QuerySerializer implements QueryVisitor {
 
 	}
 
-	void appendNamedExprList(Query query, IndentedWriter sb, VarExprList namedExprs) {
+	protected void appendNamedExprList(Query query, IndentedWriter sb, VarExprList namedExprs) {
 		boolean first = true;
 		for (Var var : namedExprs.getVars()) {
 			Expr expr = namedExprs.getExpr(var);
@@ -374,12 +347,12 @@ public class QuerySerializer implements QueryVisitor {
 
 	@Override
 	public void visitWindowDecl(Query query) {
-		System.err.println("QuerySerializer: visitWindowDecl does nothing");
+		// visitWindowDecl not supported
 	}
 
 	@Override
 	public void visitOutputStreamDecl(Query query) {
-		System.err.println("QuerySerializer: visitOutputStreamDecl does nothing");
+		// visitOutputStreamDecl not supported
 	}
 
 }

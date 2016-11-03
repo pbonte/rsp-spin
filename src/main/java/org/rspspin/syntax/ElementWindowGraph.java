@@ -13,7 +13,6 @@ public class ElementWindowGraph extends Element {
 	private Node sourceNode;
 	private Element element;
 
-	// GRAPH * (not in SPARQL)
 	public ElementWindowGraph(Element el) {
 		this(null, el);
 	}

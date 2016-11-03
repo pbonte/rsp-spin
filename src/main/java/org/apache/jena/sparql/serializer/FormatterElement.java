@@ -338,7 +338,7 @@ public class FormatterElement extends FormatterBase implements ElementVisitor {
 	
 	@Override
 	public void visit(ElementWindowGraph el) {
-		visitNodePattern("WINDOW", el.getWindowNameNode(), el.getElement());
+		// Not supported
 	}
 
 	@Override
@@ -349,7 +349,7 @@ public class FormatterElement extends FormatterBase implements ElementVisitor {
 		visitNodePattern(x, el.getServiceNode(), el.getElement());
 	}
 
-	private void visitNodePattern(String label, Node node, Element subElement) {
+	protected void visitNodePattern(String label, Node node, Element subElement) {
 		int len = label.length();
 		out.print(label);
 		out.print(" ");
