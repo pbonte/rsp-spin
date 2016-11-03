@@ -99,9 +99,7 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 			out.newline();
 		}
 		// Logical past windows
-		for (
-
-		ElementLogicalPastWindow window : query.getLogicalPastWindows()) {
+		for (ElementLogicalPastWindow window : query.getLogicalPastWindows()) {
 			out.print("FROM NAMED WINDOW ");
 			out.print(FmtUtils.stringForNode(window.getWindowNameNode(), query.getPrefixMapping()));
 			out.print(" ON ");
@@ -153,7 +151,7 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 	public void visitOutputStreamDecl(Query query) {
 		if (query.getOutputStream() != null) {
 			out.print("REGISTER STREAM ");
-			out.print(FmtUtils.stringForNode(query.getOutputStream()));
+			out.print(FmtUtils.stringForNode(query.getOutputStream(), query.getPrefixMapping()));
 			out.print(" AS");
 			out.newline();
 			out.newline();
