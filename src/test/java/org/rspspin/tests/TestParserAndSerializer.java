@@ -197,9 +197,10 @@ public class TestParserAndSerializer {
 		String query = "" 
 				+ "REGISTER STREAM ?out AS "
 				+ "SELECT * "
-				+ "FROM NAMED WINDOW <http://window> ON <http://stream> [FROM NOW-?from TO NOW-?to STEP ?step] "
+				+ "FROM NAMED WINDOW <http://window> ON <http://stream> [FROM NOW-?from TO NOW-?to STEP ?steppppp] "
 				+ "WHERE { WINDOW <http://window> { ?a ?b ?c } }";
 		Query q = QueryFactory.create(query, ParserRSPQL.syntax);
+		System.err.println(q);
 		assertEquals(compress(q.toString()), compress(query));
 	}
 	

@@ -450,7 +450,7 @@ public class ARQ2SPIN {
 			if (stepNode != null) {
 				RDFNode step = model.asRDFNode(stepNode);
 				if (stepNode.isVariable())
-					step = getVariable(rangeNode.getName());
+					step = getVariable(stepNode.getName());
 				root.addProperty(RSP.physicalStep, step);
 			}
 			spinQuery.addProperty(RSP.fromNamedWindow, root);

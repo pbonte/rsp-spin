@@ -1,11 +1,15 @@
 package org.rspspin.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
@@ -29,6 +33,7 @@ import org.topbraid.spin.vocabulary.SPL;
 
 public class TemplateManager {
 	private Model model = Utils.createDefaultModel();
+	private Syntax syntax = ParserRSPQL.syntax;
 
 	/**
 	 * Initialize
@@ -36,7 +41,7 @@ public class TemplateManager {
 	public TemplateManager() {
 		ParserRSPQL.register();
 		SPINModuleRegistry.get().init();
-
+		ARQFactory.setSyntax(syntax);
 		// Install the argument checker
 		SPINArgumentChecker.set(new SPINArgumentChecker() {
 			@Override
@@ -142,9 +147,23 @@ public class TemplateManager {
 	 * @param optional
 	 *            States whether the argument is required
 	 * @return argument
+	 * @throws ArgumentConstraintException 
 	 */
-	public Resource createArgumentConstraint(String varName, RDFNode valueType, RDFNode defaultValue,
-			boolean optional) {
+	public Resource addArgumentConstraint(String varName, RDFNode valueType, RDFNode defaultValue,
+			boolean optional, Template template) throws ArgumentConstraintException {
+		// Check if argument is variable in template
+		QueryExecution qe = QueryExecutionFactory.create(String.format(""
+				+ "PREFIX sp: <http://spinrdf.org/sp#> "
+				+ "ASK WHERE { <%s> (!<:>)*/sp:varName \"%s\" }",
+				template.getURI(), varName), template.getModel());
+		if(!qe.execAsk()){
+			template.getModel().write(System.out, "TTL");
+			List<String> errors = new ArrayList<String>();
+			errors.add("Argument " + varName + " is not a variable in the query");
+			throw new ArgumentConstraintException(errors);
+		}
+		
+		// Create argument
 		Resource arg = createResource(SPL.Argument);
 		arg.addProperty(SPL.predicate, createProperty(ARG.NS + varName));
 		if (valueType != null)
@@ -152,6 +171,9 @@ public class TemplateManager {
 		if (defaultValue != null)
 			arg.addProperty(SPL.defaultValue, defaultValue);
 		arg.addProperty(SPL.optional, model.createTypedLiteral(optional));
+		
+		// Add constraint to template
+		template.addProperty(SPIN.constraint, arg);
 		return arg;
 	}
 
@@ -159,9 +181,9 @@ public class TemplateManager {
 	 * Get a query from a template and a set of bindings.
 	 * @param template
 	 * @param bindings
-	 * @return queryString
+	 * @return query
 	 */
-	public String getQuery(Template template, QuerySolutionMap bindings) {
+	public Query getQuery(Template template, QuerySolutionMap bindings) {
 		Query arq;
 		if (template.getBody() != null) {
 			Command spinQuery = template.getBody();
@@ -170,12 +192,9 @@ public class TemplateManager {
 			arq = ARQFactory.get().createQuery(template.getProperty(SP.text).getObject().toString());
 		}
 		
-		System.out.println(arq);
 		// Parameterized
 		ParameterizedSparqlString pss = new ParameterizedSparqlString(arq.toString(), bindings);
-		
-		System.err.println(pss.toString());
-		return null;//pss.asQuery(ParserRSPQL.syntax).toString();
+		return pss.asQuery(syntax);
 	}
 
 	/**
@@ -197,29 +216,22 @@ public class TemplateManager {
 				+ "SELECT * "
 				+ "FROM NAMED WINDOW :w1 ON :s [RANGE ?range STEP ?step] "
 				+ "FROM NAMED WINDOW :w2 ON :s [FROM  NOW-?from TO NOW-?to STEP ?step] "
-				+ "FROM NAMED WINDOW :w3 ON :s [ITEM ?physical STEP ?physical] "
+				+ "FROM NAMED WINDOW :w3 ON :s [ITEM ?physicalStep STEP ?physicalRange] "
 				+ "WHERE { "
 				+ "   WINDOW :w1 { ?s ?p ?o FILTER(\"range\" < ?range)} "
 				+ "}";
 		Template template = tm.createTemplate("http://example.org/templates/1", queryString);
 
 		// Create argument and add as constraint to template
-		Resource arg1 = tm.createArgumentConstraint("out", RDFS.Resource, null, false);
-		arg1.addProperty(RDFS.comment, "Set the output stream of this query");
-		Resource arg2 = tm.createArgumentConstraint("range", XSD.duration, null, false);
-		arg1.addProperty(RDFS.comment, "Set the logical range of the window");
-		Resource arg3 = tm.createArgumentConstraint("step", XSD.duration, null, false);
-		arg1.addProperty(RDFS.comment, "Set the logical step of the window");
-		Resource arg4 = tm.createArgumentConstraint("s", RDFS.Resource, null, true);
-		arg1.addProperty(RDFS.comment, "Set the subject of this query");
-		Resource arg5 = tm.createArgumentConstraint("physical", XSD.integer, null, true);
-		arg1.addProperty(RDFS.comment, "An integer");
 		
-		template.addProperty(SPIN.constraint, arg1);
-		template.addProperty(SPIN.constraint, arg2);
-		template.addProperty(SPIN.constraint, arg3);
-		template.addProperty(SPIN.constraint, arg4);
-		template.addProperty(SPIN.constraint, arg5);
+		tm.addArgumentConstraint("out", RDFS.Resource, null, false, template);
+		tm.addArgumentConstraint("range", XSD.duration, null, false, template);
+		tm.addArgumentConstraint("step", XSD.duration, null, false, template);
+		tm.addArgumentConstraint("from", XSD.duration, null, false, template);
+		tm.addArgumentConstraint("to", XSD.duration, null, false, template);
+		tm.addArgumentConstraint("physicalRange", XSD.integer, null, false, template);
+		tm.addArgumentConstraint("physicalStep", XSD.integer, null, false, template);
+		tm.addArgumentConstraint("s", RDFS.Resource, null, true, template);
 
 		// Print model
 		//tm.model.write(System.out, "TTL");
@@ -231,11 +243,31 @@ public class TemplateManager {
 		bindings.add("step", ResourceFactory.createTypedLiteral("PT1H", XSDDatatype.XSDduration));
 		bindings.add("from", ResourceFactory.createTypedLiteral("PT5H", XSDDatatype.XSDduration));
 		bindings.add("to", ResourceFactory.createTypedLiteral("PT3H", XSDDatatype.XSDduration));
-		bindings.add("physical", ResourceFactory.createTypedLiteral("10", XSDDatatype.XSDinteger));
-		bindings.add("p", ResourceFactory.createTypedLiteral("PT3H", XSDDatatype.XSDduration));
+		bindings.add("physicalRange", ResourceFactory.createTypedLiteral("10", XSDDatatype.XSDinteger));
+		bindings.add("physicalStep", ResourceFactory.createTypedLiteral("5", XSDDatatype.XSDinteger));
 		SPINArgumentChecker.get().check(template, bindings);
 
 		// Print query
 		System.err.println(tm.getQuery(template, bindings));
+	}
+
+	/**
+	 * Set the syntax used by the template manager.
+
+	 * @param syntax
+	 */
+	public void setSyntax(Syntax syntax){
+		this.syntax = syntax;
+		ARQFactory.setSyntax(syntax);
+	}
+	
+	/**
+	 * Get the syntax used by the template manager.
+	 
+	 * @param syntax
+	 * @return
+	 */
+	public Syntax getSyntax(){
+		return syntax;
 	}
 }

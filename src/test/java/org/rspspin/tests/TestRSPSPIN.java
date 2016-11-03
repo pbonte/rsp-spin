@@ -94,9 +94,13 @@ public class TestRSPSPIN {
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
 		ARQFactory.setSyntax(ParserRSPQL.syntax);
-		String q = "REGISTER STREAM ?output AS\n" + "CONSTRUCT { ?s ?p ?o . }\n"
-				+ "FROM NAMED WINDOW ?w ON ?s [RANGE ?range STEP ?step]\n" + "WHERE {\n"
-				+ "   WINDOW ?w { ?s ?p ?o . } .\n" + "}";
+		String q = ""
+				+ "REGISTER STREAM ?output AS\n" 
+				+ "CONSTRUCT { ?s ?p ?o . }\n"
+				+ "FROM NAMED WINDOW ?w ON ?s [RANGE ?range STEP ?step]\n" 
+				+ "WHERE {\n"
+				+ "   WINDOW ?w { ?s ?p ?o . } .\n" 
+				+ "}";
 		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
 		Model model = JenaUtil.createDefaultModel();
 		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
@@ -122,6 +126,62 @@ public class TestRSPSPIN {
 		assertEquals(compress(q), compress(spinQuery.toString()));
 	}
 
+	/* Literals and URIs */
+	@Test
+	public void logicalPastWindow1() {
+		SPINModuleRegistry.get().init();
+		ParserRSPQL.register();
+		ARQFactory.setSyntax(ParserRSPQL.syntax);
+		String q = "REGISTER STREAM <http://output> AS\n" 
+				+ "SELECT *\n"
+				+ "FROM NAMED WINDOW <http://window> ON <http://stream> [FROM NOW-PT1H TO NOW-PT30M STEP PT10M]\n" 
+				+ "WHERE {\n"
+				+ "   WINDOW <http://window> { ?s ?p ?o . } .\n" 
+				+ "}";
+		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
+		Model model = JenaUtil.createDefaultModel();
+		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
+		assertEquals(compress(q), compress(spinQuery.toString()));
+	}
+
+	/* Variables */
+	@Test
+	public void logicalPastWindow2() {
+		SPINModuleRegistry.get().init();
+		ParserRSPQL.register();
+		ARQFactory.setSyntax(ParserRSPQL.syntax);
+		String q = ""
+				+ "REGISTER STREAM ?output AS\n" 
+				+ "SELECT *\n"
+				+ "FROM NAMED WINDOW ?w ON ?s [FROM NOW-?from TO NOW-?to STEP ?step]\n" 
+				+ "WHERE {\n"
+				+ "   WINDOW ?w { ?s ?p ?o . } .\n" 
+				+ "}";
+		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
+		Model model = JenaUtil.createDefaultModel();
+		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
+		assertEquals(compress(q), compress(spinQuery.toString()));
+	}
+
+	/* No step */
+	@Test
+	public void logicalPastWindow3() {
+		SPINModuleRegistry.get().init();
+		ParserRSPQL.register();
+		ARQFactory.setSyntax(ParserRSPQL.syntax);
+		String q = ""
+				+ "REGISTER STREAM ?output AS\n" 
+				+ "SELECT *\n" 
+				+ "FROM NAMED WINDOW ?w ON ?s [FROM NOW-?from TO NOW-?to]\n"
+				+ "WHERE {\n" 
+				+ "   WINDOW ?w { ?s ?p ?o . } .\n" 
+				+ "}";
+		Query arqQuery = QueryFactory.create(q, ParserRSPQL.syntax);
+		Model model = JenaUtil.createDefaultModel();
+		org.topbraid.spin.model.Query spinQuery = new ARQ2SPIN(model).createQuery(arqQuery, "");
+		assertEquals(compress(q), compress(spinQuery.toString()));
+	}
+	
 	/* Named graph in window clause */
 	@Test
 	public void graphInWindowClause(){

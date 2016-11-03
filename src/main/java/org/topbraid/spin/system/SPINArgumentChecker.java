@@ -1,7 +1,9 @@
 package org.topbraid.spin.system;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.topbraid.spin.model.Argument;
 import org.topbraid.spin.model.Module;
@@ -37,6 +39,18 @@ public abstract class SPINArgumentChecker {
 
 	public void check(Module module, QuerySolutionMap bindings) throws ArgumentConstraintException {
 		List<String> errors = new LinkedList<String>();
+		
+		// Check for illegal bindings
+		Iterator<String> varNameIter = bindings.varNames();
+		Map<String, Argument> argMap = module.getArgumentsMap();
+		while(varNameIter.hasNext()) {
+			String varName = varNameIter.next();
+			if(!argMap.containsKey(varName)){
+				errors.add("Argument " + varName + " is not an accepted argument");
+			}
+		}
+		
+		
 		for(Argument arg : module.getArguments(false)) {
 			String varName = arg.getVarName();
 			RDFNode value = bindings.get(varName);
