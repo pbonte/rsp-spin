@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.junit.Test;
-import org.rspspin.lang.ParserRSPQL;
+import org.rspspin.lang.rspql.ParserRSPQL;
 
 public class TestParserAndSerializer {
 
