@@ -1,6 +1,5 @@
 package org.topbraid.spin.arq;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,12 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.atlas.lib.StrUtils;
-import org.rspql.syntax.ElementLogicalPastWindow;
-import org.rspql.syntax.ElementLogicalWindow;
-import org.rspql.syntax.ElementNamedWindow;
-import org.rspql.syntax.ElementPhysicalWindow;
-import org.rspql.syntax.ElementWindow;
 import org.topbraid.spin.model.Argument;
 import org.topbraid.spin.model.Ask;
 import org.topbraid.spin.model.Construct;
@@ -24,7 +17,6 @@ import org.topbraid.spin.model.Function;
 import org.topbraid.spin.model.FunctionCall;
 import org.topbraid.spin.model.Minus;
 import org.topbraid.spin.model.NamedGraph;
-import org.topbraid.spin.model.NamedWindow;
 import org.topbraid.spin.model.NotExists;
 import org.topbraid.spin.model.Optional;
 import org.topbraid.spin.model.SPINFactory;
@@ -51,85 +43,88 @@ import org.topbraid.spin.vocabulary.SP;
 import org.topbraid.spin.vocabulary.SPIN;
 import org.topbraid.spin.vocabulary.SPL;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.SortCondition;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFList;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.algebra.table.TableData;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.core.TriplePath;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.core.VarExprList;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
-import com.hp.hpl.jena.sparql.expr.Expr;
-import com.hp.hpl.jena.sparql.expr.ExprAggregator;
-import com.hp.hpl.jena.sparql.expr.ExprFunction;
-import com.hp.hpl.jena.sparql.expr.ExprFunctionOp;
-import com.hp.hpl.jena.sparql.expr.ExprVar;
-import com.hp.hpl.jena.sparql.expr.NodeValue;
-import com.hp.hpl.jena.sparql.expr.aggregate.AggGroupConcat;
-import com.hp.hpl.jena.sparql.expr.aggregate.AggGroupConcatDistinct;
-import com.hp.hpl.jena.sparql.expr.aggregate.Aggregator;
-import com.hp.hpl.jena.sparql.modify.request.Target;
-import com.hp.hpl.jena.sparql.modify.request.UpdateClear;
-import com.hp.hpl.jena.sparql.modify.request.UpdateCreate;
-import com.hp.hpl.jena.sparql.modify.request.UpdateDataDelete;
-import com.hp.hpl.jena.sparql.modify.request.UpdateDataInsert;
-import com.hp.hpl.jena.sparql.modify.request.UpdateDeleteWhere;
-import com.hp.hpl.jena.sparql.modify.request.UpdateDrop;
-import com.hp.hpl.jena.sparql.modify.request.UpdateDropClear;
-import com.hp.hpl.jena.sparql.modify.request.UpdateLoad;
-import com.hp.hpl.jena.sparql.modify.request.UpdateModify;
-import com.hp.hpl.jena.sparql.path.P_Alt;
-import com.hp.hpl.jena.sparql.path.P_FixedLength;
-import com.hp.hpl.jena.sparql.path.P_Inverse;
-import com.hp.hpl.jena.sparql.path.P_Link;
-import com.hp.hpl.jena.sparql.path.P_Mod;
-import com.hp.hpl.jena.sparql.path.P_OneOrMore1;
-import com.hp.hpl.jena.sparql.path.P_OneOrMoreN;
-import com.hp.hpl.jena.sparql.path.P_Path1;
-import com.hp.hpl.jena.sparql.path.P_ReverseLink;
-import com.hp.hpl.jena.sparql.path.P_Seq;
-import com.hp.hpl.jena.sparql.path.P_ZeroOrMore1;
-import com.hp.hpl.jena.sparql.path.P_ZeroOrMoreN;
-import com.hp.hpl.jena.sparql.path.P_ZeroOrOne;
-import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.syntax.Element;
-import com.hp.hpl.jena.sparql.syntax.ElementAssign;
-import com.hp.hpl.jena.sparql.syntax.ElementBind;
-import com.hp.hpl.jena.sparql.syntax.ElementData;
-import com.hp.hpl.jena.sparql.syntax.ElementExists;
-import com.hp.hpl.jena.sparql.syntax.ElementFilter;
-import com.hp.hpl.jena.sparql.syntax.ElementGroup;
-import com.hp.hpl.jena.sparql.syntax.ElementMinus;
-import com.hp.hpl.jena.sparql.syntax.ElementNamedGraph;
-import com.hp.hpl.jena.sparql.syntax.ElementNotExists;
-import com.hp.hpl.jena.sparql.syntax.ElementOptional;
-import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementService;
-import com.hp.hpl.jena.sparql.syntax.ElementSubQuery;
-import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementUnion;
-import com.hp.hpl.jena.update.UpdateFactory;
-import com.hp.hpl.jena.update.UpdateRequest;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.XSD;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.SortCondition;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFList;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.algebra.table.TableData;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.TriplePath;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprAggregator;
+import org.apache.jena.sparql.expr.ExprFunction;
+import org.apache.jena.sparql.expr.ExprFunctionOp;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.expr.aggregate.AggGroupConcat;
+import org.apache.jena.sparql.expr.aggregate.AggGroupConcatDistinct;
+import org.apache.jena.sparql.expr.aggregate.Aggregator;
+import org.apache.jena.sparql.modify.request.Target;
+import org.apache.jena.sparql.modify.request.UpdateClear;
+import org.apache.jena.sparql.modify.request.UpdateCreate;
+import org.apache.jena.sparql.modify.request.UpdateDataDelete;
+import org.apache.jena.sparql.modify.request.UpdateDataInsert;
+import org.apache.jena.sparql.modify.request.UpdateDeleteWhere;
+import org.apache.jena.sparql.modify.request.UpdateDrop;
+import org.apache.jena.sparql.modify.request.UpdateDropClear;
+import org.apache.jena.sparql.modify.request.UpdateLoad;
+import org.apache.jena.sparql.modify.request.UpdateModify;
+import org.apache.jena.sparql.path.P_Alt;
+import org.apache.jena.sparql.path.P_FixedLength;
+import org.apache.jena.sparql.path.P_Inverse;
+import org.apache.jena.sparql.path.P_Link;
+import org.apache.jena.sparql.path.P_Mod;
+import org.apache.jena.sparql.path.P_OneOrMore1;
+import org.apache.jena.sparql.path.P_OneOrMoreN;
+import org.apache.jena.sparql.path.P_Path1;
+import org.apache.jena.sparql.path.P_ReverseLink;
+import org.apache.jena.sparql.path.P_Seq;
+import org.apache.jena.sparql.path.P_ZeroOrMore1;
+import org.apache.jena.sparql.path.P_ZeroOrMoreN;
+import org.apache.jena.sparql.path.P_ZeroOrOne;
+import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.serializer.SerializationContext;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementAssign;
+import org.apache.jena.sparql.syntax.ElementBind;
+import org.apache.jena.sparql.syntax.ElementData;
+import org.apache.jena.sparql.syntax.ElementExists;
+import org.apache.jena.sparql.syntax.ElementFilter;
+import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementMinus;
+import org.apache.jena.sparql.syntax.ElementNamedGraph;
+import org.apache.jena.sparql.syntax.ElementNotExists;
+import org.apache.jena.sparql.syntax.ElementOptional;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementService;
+import org.apache.jena.sparql.syntax.ElementSubQuery;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.sparql.syntax.ElementUnion;
+import org.apache.jena.sparql.syntax.Template;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateRequest;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.XSD;
+import org.rspspin.model.NamedWindow;
+import org.rspspin.syntax.ElementLogicalPastWindow;
+import org.rspspin.syntax.ElementLogicalWindow;
+import org.rspspin.syntax.ElementPhysicalWindow;
+import org.rspspin.syntax.ElementWindowGraph;
+import org.rspspin.vocabulary.RSP;
 
 /**
  * Takes a ARQ SPARQL Query as input and creates a corresponding SPIN RDF data
  * structure from it.
- * Modified to support RSP-QL in accordance with the Apache License Version 2.0 
- * distribution of SPIN API (http://topbraid.org/spin/api/)
- * 
- * @author Robin Keskisarkka (https://github.com/keski)
  */
 public class ARQ2SPIN {
 
@@ -271,20 +266,6 @@ public class ARQ2SPIN {
 		}
 	}
 
-	private void addRegisterAs(Query arq, Resource spinQuery) {
-		// Register as
-		Node node = arq.getRegisterAs();
-		if (node == null)
-			return;
-		if (node.isVariable()) {
-			String varName = node.getName();
-			Resource variable = getVariable(varName);
-			spinQuery.addProperty(SP.registerAs, variable);
-		} else {
-			spinQuery.addProperty(SP.registerAs, model.getResource(node.getURI()));
-		}
-	}
-
 	private void addNamedGraphClauses(Query arq, Resource spinQuery) {
 		Iterator<String> graphURIs = arq.getGraphURIs().iterator();
 		while (graphURIs.hasNext()) {
@@ -299,115 +280,181 @@ public class ARQ2SPIN {
 		}
 	}
 
-	private void addNamedWindowClauses(Query arq, Resource spinQuery) {
-		Iterator<ElementNamedWindow> windows = arq.getNamedWindows().iterator();
-		while (windows.hasNext()) {
-			ElementNamedWindow window = windows.next();
+	/**
+	 * Add output stream to model.
+	 * 
+	 * @param arq
+	 * @param spinQuery
+	 */
+	private void addOutputStream(Query arq, Resource spinQuery) {
+		Node outputStreamNode = arq.getOutputStream();
+		if(outputStreamNode == null) return;
+		// Output stream
+		RDFNode outputStreamName = model.asRDFNode(outputStreamNode);
+		if (outputStreamNode.isVariable())
+			outputStreamName = getVariable(outputStreamNode.getName());
+		spinQuery.addProperty(RSP.hasOutputStream, outputStreamName);
+	}
 
-			// window
-			Resource windowNode = model.createResource();
-			// window node
-			spinQuery.addProperty(SP.fromNamedWindow, windowNode);
+	/**
+	 * Add output stream operator to model.
+	 * 
+	 * @param arq
+	 * @param spinQuery
+	 */
+	private void addOutputStreamOperator(Query arq, Resource spinQuery) {
+		// Output stream operator
+		switch (arq.getOutputStreamType()) {
+		case Query.OutputStreamTypeDstream:
+			spinQuery.addProperty(RSP.hasOutputStreamOperator, RSP.Dstream);
+			break;
+		case Query.OutputStreamTypeRstream:
+			spinQuery.addProperty(RSP.hasOutputStreamOperator, RSP.Rstream);
+			break;
+		case Query.OutputStreamTypeIstream:
+			spinQuery.addProperty(RSP.hasOutputStreamOperator, RSP.Istream);
+			break;
+		}
+	}
 
-			// window iri
-			windowNode.addProperty(SP.windowIri, model.getResource(window.getWindowIri()));
-			// stream iri
-			Node stream = (Node) window.getStream();
-			if (stream.isVariable()) {
-				String varName = stream.getName();
-				Resource variable = getVariable(varName);
-				windowNode.addProperty(SP.streamIri, variable);
-			} else {
-				Resource r = model.createResource(stream.toString());
-				windowNode.addProperty(SP.streamIri, r);
+	/**
+	 * Add logical windows to model
+	 * 
+	 * @param arq
+	 * @param spinQuery
+	 */
+	private void addLogicalWindows(Query arq, Resource spinQuery) {
+		List<ElementLogicalWindow> logicalWindows = arq.getLogicalWindows();
+		for (ElementLogicalWindow window : logicalWindows) {
+			Node windowNameNode = window.getWindowNameNode();
+			Node streamNameNode = window.getStreamNameNode();
+			Node rangeNode = window.getRangeNode();
+			Node stepNode = window.getStepNode();
+			Resource root = model.createResource();
+			root.addProperty(RDF.type, RSP.LogicalWindow);
+
+			// Window name
+			RDFNode windowName = model.asRDFNode(windowNameNode);
+			if (windowNameNode.isVariable())
+				windowName = getVariable(windowNameNode.getName());
+			root.addProperty(RSP.windowUri, windowName);
+
+			// Stream name
+			RDFNode streamName = model.asRDFNode(streamNameNode);
+			if (streamNameNode.isVariable())
+				streamName = getVariable(streamNameNode.getName());
+			root.addProperty(RSP.streamUri, streamName);
+
+			// Logical range
+			RDFNode range = model.asRDFNode(rangeNode);
+			if (rangeNode.isVariable())
+				range = getVariable(rangeNode.getName());
+			root.addProperty(RSP.logicalRange, range);
+
+			// Logical step
+			if (stepNode != null) {
+				RDFNode step = model.asRDFNode(stepNode);
+				if (stepNode.isVariable())
+					step = getVariable(stepNode.getName());
+				root.addProperty(RSP.logicalStep, step);
 			}
+			spinQuery.addProperty(RSP.fromNamedWindow, root);
+		}
+	}
 
-			if (window.getClass().equals(ElementLogicalWindow.class)) {
-				// Standard logical window
-				ElementLogicalWindow logicalWindow = (ElementLogicalWindow) window;
-				windowNode.addProperty(RDF.type, SP.LogicalWindow);
-				// Add range
-				Object range = logicalWindow.getRange();
-				if (range instanceof Node) {
-					String varName = ((Node) range).getName();
-					Resource variable = getVariable(varName);
-					windowNode.addProperty(SP.windowRange, variable);
-				} else {
-					Duration d = Duration.parse(range.toString());
-					windowNode.addProperty(SP.windowRange, d.toString(), XSDDatatype.XSDduration);
-				}
-				// Add step (optional)
-				Object step = logicalWindow.getStep();
-				if (step != null) {
-					if (step instanceof Node) {
-						String varName = ((Node) step).getName();
-						Resource variable = getVariable(varName);
-						windowNode.addProperty(SP.windowLogicalStep, variable);
-					} else {
-						windowNode.addProperty(SP.windowLogicalStep, step.toString(), XSDDatatype.XSDduration);
-					}
-				}
-			} else if (window.getClass().equals(ElementLogicalPastWindow.class)) {
-				// Standard logical window
-				ElementLogicalPastWindow logicalPastWindow = (ElementLogicalPastWindow) window;
-				windowNode.addProperty(RDF.type, SP.LogicalPastWindow);
-				// Add from
-				Object from = logicalPastWindow.getFrom();
-				if (from instanceof Node) {
-					String varName = ((Node) from).getName();
-					Resource variable = getVariable(varName);
-					windowNode.addProperty(SP.windowFrom, variable);
-				} else {
-					Duration d = Duration.parse(from.toString().replace("NOW-", ""));
-					windowNode.addProperty(SP.windowFrom, d.toString(), XSDDatatype.XSDduration);
-				}
-				// Add to
-				Object to = logicalPastWindow.getTo();
-				if (to instanceof Node) {
-					String varName = ((Node) to).getName();
-					Resource variable = getVariable(varName);
-					windowNode.addProperty(SP.windowTo, variable);
-				} else {
-					Duration d = Duration.parse(to.toString().replace("NOW-", ""));
-					windowNode.addProperty(SP.windowTo, d.toString(), XSDDatatype.XSDduration);
-				}
-				// Add step (optional)
-				Object step = logicalPastWindow.getStep();
-				if (step != null) {
-					if (step instanceof Node) {
-						String varName = ((Node) step).getName();
-						Resource variable = getVariable(varName);
-						windowNode.addProperty(SP.windowLogicalStep, variable);
-					} else {
-						windowNode.addProperty(SP.windowLogicalStep, step.toString(), XSDDatatype.XSDduration);
-					}
-				}
-			} else if (window.getClass().equals(ElementPhysicalWindow.class)) {
-				// Physical window
-				ElementPhysicalWindow physicalWindow = (ElementPhysicalWindow) window;
-				windowNode.addProperty(RDF.type, SP.PhysicalWindow);
-				// Add range
-				Object size = physicalWindow.getSize();
-				if (size instanceof Node) {
-					String varName = ((Node) size).getName();
-					Resource variable = getVariable(varName);
-					windowNode.addProperty(SP.windowSize, variable);
-				} else {
-					windowNode.addProperty(SP.windowSize, size.toString(), XSDDatatype.XSDinteger);
-				}
-				// Add step (optional)
-				Object step = physicalWindow.getStep();
-				if (step != null) {
-					if (step instanceof Node) {
-						String varName = ((Node) step).getName();
-						Resource variable = getVariable(varName);
-						windowNode.addProperty(SP.windowPhysicalStep, variable);
-					} else {
-						windowNode.addProperty(SP.windowPhysicalStep, step.toString(), XSDDatatype.XSDinteger);
-					}
-				}
+	/**
+	 * Add logical past windows to model
+	 * 
+	 * @param arq
+	 * @param spinQuery
+	 */
+	private void addLogicalPastWindows(Query arq, Resource spinQuery) {
+		List<ElementLogicalPastWindow> logicalWindows = arq.getLogicalPastWindows();
+		for (ElementLogicalPastWindow window : logicalWindows) {
+			Node windowNameNode = window.getWindowNameNode();
+			Node streamNameNode = window.getStreamNameNode();
+			Node fromNode = window.getFromNode();
+			Node toNode = window.getToNode();
+			Node stepNode = window.getStepNode();
+			Resource root = model.createResource();
+			root.addProperty(RDF.type, RSP.LogicalPastWindow);
+
+			// Window name
+			RDFNode windowName = model.asRDFNode(windowNameNode);
+			if (windowNameNode.isVariable())
+				windowName = getVariable(windowNameNode.getName());
+			root.addProperty(RSP.windowUri, windowName);
+
+			// Stream name
+			RDFNode streamName = model.asRDFNode(streamNameNode);
+			if (streamNameNode.isVariable())
+				streamName = getVariable(streamNameNode.getName());
+			root.addProperty(RSP.streamUri, streamName);
+
+			// From
+			RDFNode from = model.asRDFNode(fromNode);
+			if (fromNode.isVariable())
+				from = getVariable(fromNode.getName());
+			root.addProperty(RSP.from, from);
+
+			// To
+			RDFNode to = model.asRDFNode(toNode);
+			if (toNode.isVariable())
+				to = getVariable(toNode.getName());
+			root.addProperty(RSP.to, to);
+
+			// Logical step
+			if (stepNode != null) {
+				RDFNode step = model.asRDFNode(stepNode);
+				if (stepNode.isVariable())
+					step = getVariable(stepNode.getName());
+				root.addProperty(RSP.logicalStep, step);
 			}
+			spinQuery.addProperty(RSP.fromNamedWindow, root);
+		}
+	}
 
+	/**
+	 * Add physical windows to model
+	 * 
+	 * @param arq
+	 * @param spinQuery
+	 */
+	private void addPhysicalWindows(Query arq, Resource spinQuery) {
+		List<ElementPhysicalWindow> logicalWindows = arq.getPhysicalWindows();
+		for (ElementPhysicalWindow window : logicalWindows) {
+			Node windowNameNode = window.getWindowNameNode();
+			Node streamNameNode = window.getStreamNameNode();
+			Node rangeNode = window.getRangeNode();
+			Node stepNode = window.getStepNode();
+			Resource root = model.createResource();
+			root.addProperty(RDF.type, RSP.PhysicalWindow);
+
+			// Window name
+			RDFNode windowName = model.asRDFNode(windowNameNode);
+			if (windowNameNode.isVariable())
+				windowName = getVariable(windowNameNode.getName());
+			root.addProperty(RSP.windowUri, windowName);
+
+			// Stream name
+			RDFNode streamName = model.asRDFNode(streamNameNode);
+			if (streamNameNode.isVariable())
+				streamName = getVariable(streamNameNode.getName());
+			root.addProperty(RSP.streamUri, streamName);
+
+			// Physical range
+			RDFNode range = model.asRDFNode(rangeNode);
+			if (rangeNode.isVariable())
+				range = getVariable(rangeNode.getName());
+			root.addProperty(RSP.physicalRange, range);
+
+			if (stepNode != null) {
+				RDFNode step = model.asRDFNode(stepNode);
+				if (stepNode.isVariable())
+					step = getVariable(stepNode.getName());
+				root.addProperty(RSP.physicalStep, step);
+			}
+			spinQuery.addProperty(RSP.fromNamedWindow, root);
 		}
 	}
 
@@ -719,15 +766,15 @@ public class ARQ2SPIN {
 				}
 
 				@Override
-				public void visit(ElementWindow elementWindow) {
+				public void visit(ElementWindowGraph namedWindow) {
 					Resource windowNameNode;
-					Node nameNode = elementWindow.getWindowNameNode();
+					Node nameNode = namedWindow.getWindowNameNode();
 					if (nameNode.isVariable()) {
 						windowNameNode = getVariable(nameNode.getName());
 					} else {
 						windowNameNode = model.getResource(nameNode.getURI());
 					}
-					Element element = elementWindow.getElement();
+					Element element = namedWindow.getElement();
 					RDFList elements = createElementList(element);
 					NamedWindow ng = SPINFactory.createNamedWindow(model, windowNameNode, elements);
 					members.add(ng);
@@ -757,10 +804,10 @@ public class ARQ2SPIN {
 	}
 
 	private RDFNode createAggregation(ExprAggregator agg) {
-		String str = agg.asSparqlExpr();
+		String str = agg.asSparqlExpr(new SerializationContext());
 		int opening = str.indexOf('(');
 		if (opening > 0) {
-			String name = str.substring(0, opening).toUpperCase();
+			String name = str.substring(0, opening).toUpperCase().trim();
 			Resource aggType = Aggregations.getType(name);
 			if (aggType != null) {
 				if (agg.getAggregator() instanceof AggGroupConcat
@@ -906,6 +953,20 @@ public class ARQ2SPIN {
 		return params;
 	}
 
+	private Resource createHead(Template template) {
+		/*
+		final List<Resource> members = new LinkedList<Resource>();
+		for (Triple triple : template.getTriples()) {
+			Resource tripleTemplate = model.createResource();
+			tripleTemplate.addProperty(SP.subject, getNode(triple.getSubject()));
+			tripleTemplate.addProperty(SP.predicate, getNode(triple.getPredicate()));
+			tripleTemplate.addProperty(SP.object, getNode(triple.getObject()));
+			members.add(tripleTemplate);
+		}*/
+		List<Quad> quads = template.getQuads();
+		return createQuadsList(quads).asResource();
+	}
+
 	/**
 	 * Takes a list of Quads and turns it into an rdf:List consisting of plain
 	 * sp:Triples or GRAPH { ... } blocks for those adjacent Quads with the same
@@ -970,10 +1031,13 @@ public class ARQ2SPIN {
 	public org.topbraid.spin.model.Query createQuery(Query arq, String uri) {
 
 		Resource spinQuery = model.createResource(uri);
-		addRegisterAs(arq, spinQuery);
-		addStreamType(arq, spinQuery);
+		addOutputStream(arq, spinQuery);
+		addOutputStreamOperator(arq, spinQuery);
+
 		addNamedGraphClauses(arq, spinQuery);
-		addNamedWindowClauses(arq, spinQuery);
+		addLogicalWindows(arq, spinQuery);
+		addLogicalPastWindows(arq, spinQuery);
+		addPhysicalWindows(arq, spinQuery);
 
 		Resource where = createElementList(arq.getQueryPattern());
 		spinQuery.addProperty(SP.where, where);
@@ -983,9 +1047,9 @@ public class ARQ2SPIN {
 			addValues(arq, spinQuery);
 			return spinQuery.as(Ask.class);
 		} else if (arq.isConstructType()) {
+			Resource head = createHead(arq.getConstructTemplate());
 			spinQuery.addProperty(RDF.type, SP.Construct);
-			Resource template = createElementList(arq.getConstructGraphTemplate());
-			spinQuery.addProperty(SP.templates, template);
+			spinQuery.addProperty(SP.templates, head);
 			addSolutionModifiers(arq, spinQuery);
 			addValues(arq, spinQuery);
 			return spinQuery.as(Construct.class);
@@ -1005,22 +1069,6 @@ public class ARQ2SPIN {
 			return describe;
 		}
 		throw new IllegalArgumentException("Unsupported SPARQL query type");
-	}
-
-	private void addStreamType(Query arq, Resource spinQuery) {
-		if (arq.getStreamType() != null) {
-			switch (arq.getStreamType()) {
-			case "ISTREAM":
-				spinQuery.addProperty(SP.streamOperator, SP.Istream);
-				break;
-			case "RSTREAM":
-				spinQuery.addProperty(SP.streamOperator, SP.Rstream);
-				break;
-			case "DSTREAM":
-				spinQuery.addProperty(SP.streamOperator, SP.Dstream);
-				break;
-			}
-		}
 	}
 
 	private Modify createModify(UpdateModify arq, String uri) {
@@ -1056,7 +1104,7 @@ public class ARQ2SPIN {
 		return result;
 	}
 
-	public Update createUpdate(com.hp.hpl.jena.update.Update arq, String uri) {
+	public Update createUpdate(org.apache.jena.update.Update arq, String uri) {
 		if (arq instanceof UpdateModify) {
 			return createModify((UpdateModify) arq, uri);
 		} else if (arq instanceof UpdateClear) {
@@ -1121,16 +1169,10 @@ public class ARQ2SPIN {
 	}
 
 	private String getGroupConcatSeparator(Aggregator agg) {
-		// TODO: this is not very clean. Once Jena has the relevant method
-		// public this should be changed
-		String str = agg.toString();
-		int s = str.indexOf("; SEPARATOR='");
-		if (s > 0) {
-			int e = str.indexOf("'", s + 13);
-			String separatorRaw = str.substring(s + 13, e);
-			return StrUtils.unescapeString(separatorRaw);
+		if (agg instanceof AggGroupConcat) {
+			return ((AggGroupConcat) agg).getSeparator();
 		} else {
-			return null;
+			return ((AggGroupConcatDistinct) agg).getSeparator();
 		}
 	}
 

@@ -1,7 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2009 TopQuadrant, Inc.
- * All rights reserved. 
- *******************************************************************************/
 package org.topbraid.spin.model;
 
 import java.util.ArrayList;
@@ -28,31 +24,26 @@ import org.topbraid.spin.vocabulary.SP;
 import org.topbraid.spin.vocabulary.SPIN;
 import org.topbraid.spin.vocabulary.SPL;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFList;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.algebra.Table;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFList;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.algebra.Table;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.vocabulary.RDF;
+import org.rspspin.model.NamedWindow;
+import org.rspspin.vocabulary.RSP;
 
 /**
  * The singleton that is used to convert plain Jena objects into SPIN API
  * resources, and to do corresponding tests.
- * 
- * @author Holger Knublauch
- * 
- * @author Robin Keskisarkka (https://github.com/keski) Modified to support
- *         RSP-QL in accordance with the Apache License Version 2.0 distribution
- *         of SPIN API (http://topbraid.org/spin/api/)
  */
-
 @SuppressWarnings("deprecation")
 public class SPINFactory {
 
@@ -556,9 +547,8 @@ public class SPINFactory {
 	 * @return a new NamedWindow
 	 */
 	public static NamedWindow createNamedWindow(Model model, Resource windowNameNode, RDFList elements) {
-		NamedWindow result = model.createResource(SP.NamedWindow).as(NamedWindow.class);
-
-		result.addProperty(SP.windowNameNode, windowNameNode);
+		NamedWindow result = model.createResource(RSP.NamedWindow).as(NamedWindow.class);
+		result.addProperty(RSP.windowNameNode, windowNameNode);
 		result.addProperty(SP.elements, elements);
 		return result;
 	}
