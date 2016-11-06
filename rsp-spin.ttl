@@ -8,11 +8,10 @@
 <http://w3id.org/rsp/spin>
   rdf:type owl:Ontology ;
   owl:imports <http://spinrdf.org/sp> ;
-  owl:imports <http://spinrdf.org/spl> ;
 .
 
 # Register as
-:registerAs
+:hasOutputStream
   rdf:type rdf:Property ;
   rdfs:comment "Set the name of the result stream of a query."^^xsd:string ;
   rdfs:domain sp:Query ;
@@ -65,18 +64,17 @@
 :windowNameNode
   rdf:type rdf:Property ;
   rdfs:comment "Property to set the name of a window."^^xsd:string ;
-  rdfs:domain :NamedWindow ;
   rdfs:range rdfs:Resource ;
   rdfs:subPropertyOf sp:systemProperty ;
 .
-:streamIri
+:streamUri
   rdf:type rdf:Property ;
   rdfs:comment "Property to set the stream of a window."^^xsd:string ;
   rdfs:domain :NamedWindow ;
   rdfs:range rdfs:Resource, sp:Variable ;
   rdfs:subPropertyOf sp:systemProperty ;
 .
-:windowIri
+:windowUri
   rdf:type rdf:Property ;
   rdfs:comment "Property to set the name of a window."^^xsd:string ;
   rdfs:domain :NamedWindow ;
@@ -90,16 +88,16 @@
   rdfs:comment "A logical window defined using range and step expressed as durations."^^xsd:string ;
   rdfs:subClassOf :NamedWindow ;
 .
-:range
+:logicalRange
   rdf:type rdf:Property ;
-  rdfs:comment "Property to set the duration of a range."^^xsd:string ;
+  rdfs:comment "Property to set the duration of a logical range."^^xsd:string ;
   rdfs:domain :LogicalWindow ;
   rdfs:range xsd:duration, sp:Variable ;
   rdfs:subPropertyOf sp:systemProperty ;
 .
 :logicalStep
   rdf:type rdf:Property ;
-  rdfs:comment "Property to set the duration of a step."^^xsd:string ;
+  rdfs:comment "Property to set the duration of a logical step."^^xsd:string ;
   rdfs:domain :LogicalPastWindow, :LogicalWindow ;
   rdfs:range xsd:duration ;
   rdfs:range sp:Variable ;
@@ -133,7 +131,7 @@
   rdfs:comment "A physical window defined using size and step expressed as number elements."^^xsd:string ;
   rdfs:subClassOf :NamedWindow ;
 .
-:size
+:physicalRange
   rdf:type rdf:Property ;
   rdfs:comment "Property to set the size of a window expressed as number of elements."^^xsd:string ;
   rdfs:domain :PhysicalWindow ;
