@@ -332,7 +332,7 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 	}
 
 	protected void printOutputStream(PrintContext p) {
-		Statement stmt = getProperty(RSP.outputStream);
+		Statement stmt = getProperty(RSP.hasOutputStream);
 		if(stmt == null) return;
 		RDFNode node = stmt.getObject();
 		p.print(String.format("REGISTER STREAM %s AS", Formatter.varOrUriAsString(node)));

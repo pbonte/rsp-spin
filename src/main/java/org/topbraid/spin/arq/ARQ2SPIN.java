@@ -293,7 +293,7 @@ public class ARQ2SPIN {
 		RDFNode outputStreamName = model.asRDFNode(outputStreamNode);
 		if (outputStreamNode.isVariable())
 			outputStreamName = getVariable(outputStreamNode.getName());
-		spinQuery.addProperty(RSP.outputStream, outputStreamName);
+		spinQuery.addProperty(RSP.hasOutputStream, outputStreamName);
 	}
 
 	/**

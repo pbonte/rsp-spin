@@ -937,6 +937,7 @@ public class Query extends Prologue implements Cloneable, Printable {
 	}
 
 	private void checkDuplicateWindowUri(Node windowNameNode) {
+		// This only does the check from a local query, not the super query.
 		if(hasWindowUri(windowNameNode)){
 			throw new QueryException("Window node already in named window set: " + windowNameNode);
 		}

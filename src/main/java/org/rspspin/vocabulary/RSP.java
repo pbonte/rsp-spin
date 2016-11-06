@@ -24,7 +24,7 @@ public class RSP {
 	public final static Resource PhysicalWindow = ResourceFactory.createResource(NS + "PhysicalWindow");
 	
 	// Properties
-	public final static Property outputStream = ResourceFactory.createProperty(NS + "outputStream");
+	public final static Property hasOutputStream = ResourceFactory.createProperty(NS + "hasOutputStream");
 	public final static Property hasOutputStreamOperator = ResourceFactory.createProperty(NS + "hasOutputStreamOperator");
 	public final static Property fromNamedWindow = ResourceFactory.createProperty(NS + "fromNamedWindow");
 	public final static Property windowNameNode = ResourceFactory.createProperty(NS + "windowNameNode");
