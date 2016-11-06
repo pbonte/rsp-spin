@@ -1,4 +1,4 @@
-package org.rspspin.lang.rspql.serializer;
+package org.rspspin.lang.rspql;
 
 import java.io.OutputStream;
 

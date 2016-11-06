@@ -1,4 +1,4 @@
-package org.rspspin.lang.rspql.serializer;
+package org.rspspin.lang.rspql;
 
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.sparql.serializer.SerializationContext;

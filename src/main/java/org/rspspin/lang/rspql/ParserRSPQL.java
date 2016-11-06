@@ -1,4 +1,4 @@
-package org.rspspin.lang;
+package org.rspspin.lang.rspql;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -22,9 +22,6 @@ import org.apache.jena.sparql.serializer.SerializerRegistry;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.Template;
 import org.apache.jena.sparql.util.NodeToLabelMapBNode;
-import org.rspspin.lang.rspql.RSPQLParser;
-import org.rspspin.lang.rspql.serializer.FormatterElement;
-import org.rspspin.lang.rspql.serializer.QuerySerializer;
 
 public class ParserRSPQL extends SPARQLParser {
 
