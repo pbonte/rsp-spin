@@ -63,11 +63,10 @@ public class TemplateManager {
 
 	/**
 	 * Get template manager model.
-	 * 
-	 * @param model
+	 * @return
 	 */
-	public void getModel(Model model) {
-		this.model = model;
+	public Model getModel() {
+		return model;
 	}
 
 	/**
@@ -78,6 +77,11 @@ public class TemplateManager {
 	 * @return
 	 */
 	public Template createTemplate(String templateUri, String queryString) {
+		if(templateUri == null){
+			System.err.println("Template identifier must be a valid URI");
+			return null;
+		}
+		
 		org.topbraid.spin.model.Query spinQuery = ARQ2SPIN.parseQuery(queryString, model);
 		// Get template type
 		Resource templateType;
@@ -165,7 +169,7 @@ public class TemplateManager {
 		
 		// Create argument
 		Resource arg = createResource(SPL.Argument);
-		arg.addProperty(SPL.predicate, createProperty(ARG.NS + varName));
+		arg.addProperty(SPL.predicate, createResource(ARG.NS + varName));
 		if (valueType != null)
 			arg.addProperty(SPL.valueType, valueType);
 		if (defaultValue != null)
@@ -258,7 +262,7 @@ public class TemplateManager {
 		bindings.add("to", ResourceFactory.createTypedLiteral("PT3H", XSDDatatype.XSDduration));
 		bindings.add("physicalRange", ResourceFactory.createTypedLiteral("10", XSDDatatype.XSDinteger));
 		bindings.add("physicalStep", ResourceFactory.createTypedLiteral("5", XSDDatatype.XSDinteger));
-		SPINArgumentChecker.get().check(template, bindings);
+		tm.check(template, bindings);
 
 		// Print query
 		//System.out.println(tm.getQuery(template, bindings));
@@ -270,6 +274,10 @@ public class TemplateManager {
 		tm.setSyntax(Syntax.syntaxARQ);
 		Template t = tm.createTemplate("http://example.org/templates/2", "SELECT * WHERE { ?a ?b ?c }");
 		System.out.println(tm.getQuery(t));
+	}
+
+	public void check(Template template, QuerySolutionMap bindings) throws ArgumentConstraintException {
+		SPINArgumentChecker.get().check(template, bindings);
 	}
 
 	/**

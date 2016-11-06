@@ -43,19 +43,6 @@ public class TestParserAndSerializer {
 		assertEquals(compress(q.toString()), compress(query));
 	}
 
-	/* 'REGISTER ... AS' is required */
-	@Test
-	public void registerAs3() {
-		ParserRSPQL.register();
-		String query = "" + "SELECT * WHERE { ?a ?b ?c }";
-		Query q = null;
-		try {
-			q = QueryFactory.create(query, ParserRSPQL.syntax);
-		} catch (Exception e) {
-		}
-		assertEquals(q, null);
-	}
-
 	/* Window stream name as a variable */
 	@Test
 	public void physicalWindow1() {
