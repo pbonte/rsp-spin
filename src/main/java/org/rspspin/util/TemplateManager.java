@@ -19,6 +19,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.rspspin.lang.rspql.ParserRSPQL;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.arq.ARQFactory;
+import org.topbraid.spin.model.Argument;
 import org.topbraid.spin.model.Command;
 import org.topbraid.spin.model.Module;
 import org.topbraid.spin.model.Template;
@@ -196,9 +197,10 @@ public class TemplateManager {
 		template.addProperty(SPIN.constraint, arg);
 		return arg;
 	}
-	
+
 	/**
 	 * Get template from the current model based on a URI identifier.
+	 * 
 	 * @return
 	 */
 	public Template getTemplate(String uri) {
@@ -233,6 +235,13 @@ public class TemplateManager {
 			arq = ARQFactory.get().createQuery((org.topbraid.spin.model.Query) spinQuery);
 		} else {
 			arq = ARQFactory.get().createQuery(template.getProperty(SP.text).getObject().toString());
+		}
+
+		// Add default values
+		for (Argument arg : template.getArguments(false)) {
+			if (bindings.contains(arg.getVarName()) && arg.getDefaultValue() != null) {
+				bindings.add(arg.getVarName(), arg.getDefaultValue());
+			}
 		}
 
 		// Parameterized
