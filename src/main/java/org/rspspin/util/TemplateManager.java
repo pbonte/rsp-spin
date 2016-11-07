@@ -196,24 +196,6 @@ public class TemplateManager {
 		template.addProperty(SPIN.constraint, arg);
 		return arg;
 	}
-
-	/**
-	 * Get a query from a template.
-	 * 
-	 * @param template
-	 * @return query
-	 */
-	public Query getQuery(Template template) {
-		Query arq;
-		if (template.getBody() != null) {
-			Command spinQuery = template.getBody();
-			arq = ARQFactory.get().createQuery((org.topbraid.spin.model.Query) spinQuery);
-		} else {
-			arq = ARQFactory.get().createQuery(template.getProperty(SP.text).getObject().toString());
-		}
-
-		return arq;
-	}
 	
 	/**
 	 * Get template from the current model based on a URI identifier.
