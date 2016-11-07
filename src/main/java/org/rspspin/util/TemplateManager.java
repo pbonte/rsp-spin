@@ -178,7 +178,6 @@ public class TemplateManager {
 				"" + "PREFIX sp: <http://spinrdf.org/sp#> " + "ASK WHERE { <%s> (!<:>)*/sp:varName \"%s\" }",
 				template.getURI(), varName), template.getModel());
 		if (!qe.execAsk()) {
-			template.getModel().write(System.out, "TTL");
 			List<String> errors = new ArrayList<String>();
 			errors.add("Argument " + varName + " is not a variable in the query");
 			throw new ArgumentConstraintException(errors);
