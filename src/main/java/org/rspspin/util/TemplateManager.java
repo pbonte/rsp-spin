@@ -3,21 +3,17 @@ package org.rspspin.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
-import org.apache.jena.vocabulary.XSD;
 import org.rspspin.lang.rspql.ParserRSPQL;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.arq.ARQFactory;
@@ -32,16 +28,20 @@ import org.topbraid.spin.vocabulary.SPIN;
 import org.topbraid.spin.vocabulary.SPL;
 
 public class TemplateManager {
-	private Model model = Utils.createDefaultModel();
+	private static TemplateManager instance = null;
+	private Model model;
 	private Syntax syntax = ParserRSPQL.syntax;
+	private ARQ2SPIN arq2spin;
 
 	/**
 	 * Initialize
 	 */
-	public TemplateManager() {
+	private TemplateManager() {
 		ParserRSPQL.register();
 		SPINModuleRegistry.get().init();
 		ARQFactory.setSyntax(syntax);
+		model = Utils.createDefaultModel();
+		arq2spin = new ARQ2SPIN(model, true);
 		// Install the argument checker
 		SPINArgumentChecker.set(new SPINArgumentChecker() {
 			@Override
@@ -50,6 +50,16 @@ public class TemplateManager {
 				throw new ArgumentConstraintException(errors);
 			}
 		});
+	}
+
+	/**
+	 * Get singleton.
+	 */
+	public static TemplateManager get() {
+		if (instance == null) {
+			instance = new TemplateManager();
+		}
+		return instance;
 	}
 
 	/**
@@ -63,6 +73,7 @@ public class TemplateManager {
 
 	/**
 	 * Get template manager model.
+	 * 
 	 * @return
 	 */
 	public Model getModel() {
@@ -77,23 +88,27 @@ public class TemplateManager {
 	 * @return
 	 */
 	public Template createTemplate(String templateUri, String queryString) {
-		if(templateUri == null){
+		if (templateUri == null) {
 			System.err.println("Template identifier must be a valid URI");
 			return null;
 		}
-		
-		org.topbraid.spin.model.Query spinQuery = ARQ2SPIN.parseQuery(queryString, model);
+		Query arqQuery = QueryFactory.create(queryString, ParserRSPQL.syntax);
+
 		// Get template type
 		Resource templateType;
-		if (spinQuery.hasProperty(RDF.type, SP.Select)) {
+		if (arqQuery.isSelectType()) {
 			templateType = SPIN.SelectTemplate;
-		} else if (spinQuery.hasProperty(RDF.type, SP.Ask)) {
+		} else if (arqQuery.isAskType()) {
 			templateType = SPIN.AskTemplate;
-		} else if (spinQuery.hasProperty(RDF.type, SP.Construct)) {
+		} else if (arqQuery.isConstructType()) {
 			templateType = SPIN.ConstructTemplate;
 		} else {
+			System.err.println("Invalid query type for template: " + arqQuery.getQueryType());
 			return null;
 		}
+
+		// Use a blank node identifier for the query
+		org.topbraid.spin.model.Query spinQuery = arq2spin.createQuery(arqQuery, null);
 		Template template = createResource(templateUri, templateType).as(Template.class);
 		template.addProperty(SPIN.body, spinQuery);
 		return template;
@@ -151,22 +166,21 @@ public class TemplateManager {
 	 * @param optional
 	 *            States whether the argument is required
 	 * @return argument
-	 * @throws ArgumentConstraintException 
+	 * @throws ArgumentConstraintException
 	 */
-	public Resource addArgumentConstraint(String varName, RDFNode valueType, RDFNode defaultValue,
-			boolean optional, Template template) throws ArgumentConstraintException {
+	public Resource addArgumentConstraint(String varName, RDFNode valueType, RDFNode defaultValue, boolean optional,
+			Template template) throws ArgumentConstraintException {
 		// Check if argument is variable in template
-		QueryExecution qe = QueryExecutionFactory.create(String.format(""
-				+ "PREFIX sp: <http://spinrdf.org/sp#> "
-				+ "ASK WHERE { <%s> (!<:>)*/sp:varName \"%s\" }",
+		QueryExecution qe = QueryExecutionFactory.create(String.format(
+				"" + "PREFIX sp: <http://spinrdf.org/sp#> " + "ASK WHERE { <%s> (!<:>)*/sp:varName \"%s\" }",
 				template.getURI(), varName), template.getModel());
-		if(!qe.execAsk()){
+		if (!qe.execAsk()) {
 			template.getModel().write(System.out, "TTL");
 			List<String> errors = new ArrayList<String>();
 			errors.add("Argument " + varName + " is not a variable in the query");
 			throw new ArgumentConstraintException(errors);
 		}
-		
+
 		// Create argument
 		Resource arg = createResource(SPL.Argument);
 		arg.addProperty(SPL.predicate, createResource(ARG.NS + varName));
@@ -175,7 +189,7 @@ public class TemplateManager {
 		if (defaultValue != null)
 			arg.addProperty(SPL.defaultValue, defaultValue);
 		arg.addProperty(SPL.optional, model.createTypedLiteral(optional));
-		
+
 		// Add constraint to template
 		template.addProperty(SPIN.constraint, arg);
 		return arg;
@@ -183,6 +197,7 @@ public class TemplateManager {
 
 	/**
 	 * Get a query from a template.
+	 * 
 	 * @param template
 	 * @return query
 	 */
@@ -194,12 +209,13 @@ public class TemplateManager {
 		} else {
 			arq = ARQFactory.get().createQuery(template.getProperty(SP.text).getObject().toString());
 		}
-		
+
 		return arq;
 	}
-	
+
 	/**
 	 * Get a query from a template and a set of bindings.
+	 * 
 	 * @param template
 	 * @param bindings
 	 * @return query
@@ -212,68 +228,10 @@ public class TemplateManager {
 		} else {
 			arq = ARQFactory.get().createQuery(template.getProperty(SP.text).getObject().toString());
 		}
-		
+
 		// Parameterized
 		ParameterizedSparqlString pss = new ParameterizedSparqlString(arq.toString(), bindings);
 		return pss.asQuery(syntax);
-	}
-
-	/**
-	 * Example
-	 * 
-	 * @param args
-	 * @throws ArgumentConstraintException
-	 */
-	public static void main(String[] args) throws ArgumentConstraintException {
-		// Initialize a new template manager
-		TemplateManager tm = new TemplateManager();
-		// Use RSP-QL syntax
-		ARQFactory.setSyntax(ParserRSPQL.syntax);
-
-		// Create a template
-		String queryString = ""
-				+ "PREFIX : <http://example.org#> "
-				+ "REGISTER STREAM ?out AS "
-				+ "SELECT * "
-				+ "FROM NAMED WINDOW :w1 ON :s [RANGE ?range STEP ?step] "
-				+ "FROM NAMED WINDOW :w2 ON :s [FROM  NOW-?from TO NOW-?to STEP ?step] "
-				+ "FROM NAMED WINDOW :w3 ON :s [ITEM ?physicalRange STEP ?physicalStep] "
-				+ "WHERE { "
-				+ "   WINDOW :w1 { ?s ?p ?o FILTER(\"range\" < ?range)} "
-				+ "}";
-		Template template = tm.createTemplate("http://example.org/templates/1", queryString);
-
-		// Create argument constraints
-		tm.addArgumentConstraint("out", RDFS.Resource, null, false, template);
-		tm.addArgumentConstraint("range", XSD.duration, null, false, template);
-		tm.addArgumentConstraint("step", XSD.duration, null, false, template);
-		tm.addArgumentConstraint("from", XSD.duration, null, false, template);
-		tm.addArgumentConstraint("to", XSD.duration, null, false, template);
-		tm.addArgumentConstraint("physicalRange", XSD.integer, null, false, template);
-		tm.addArgumentConstraint("physicalStep", XSD.integer, null, false, template);
-		tm.addArgumentConstraint("s", RDFS.Resource, null, true, template);
-
-		// Create bindings
-		QuerySolutionMap bindings = new QuerySolutionMap();
-		bindings.add("out", ResourceFactory.createResource("http://ouputstream"));
-		bindings.add("range", ResourceFactory.createTypedLiteral("PT2H", XSDDatatype.XSDduration));
-		bindings.add("step", ResourceFactory.createTypedLiteral("PT1H", XSDDatatype.XSDduration));
-		bindings.add("from", ResourceFactory.createTypedLiteral("PT5H", XSDDatatype.XSDduration));
-		bindings.add("to", ResourceFactory.createTypedLiteral("PT3H", XSDDatatype.XSDduration));
-		bindings.add("physicalRange", ResourceFactory.createTypedLiteral("10", XSDDatatype.XSDinteger));
-		bindings.add("physicalStep", ResourceFactory.createTypedLiteral("5", XSDDatatype.XSDinteger));
-		tm.check(template, bindings);
-
-		// Print query
-		//System.out.println(tm.getQuery(template, bindings));
-		
-		// Try with standard SPARQL
-		Query query = tm.getQuery(template);
-		System.err.println(query);
-		
-		tm.setSyntax(Syntax.syntaxARQ);
-		Template t = tm.createTemplate("http://example.org/templates/2", "SELECT * WHERE { ?a ?b ?c }");
-		System.out.println(tm.getQuery(t));
 	}
 
 	public void check(Template template, QuerySolutionMap bindings) throws ArgumentConstraintException {
@@ -282,21 +240,21 @@ public class TemplateManager {
 
 	/**
 	 * Set the syntax used by the template manager.
-
+	 * 
 	 * @param syntax
 	 */
-	public void setSyntax(Syntax syntax){
+	public void setSyntax(Syntax syntax) {
 		this.syntax = syntax;
 		ARQFactory.setSyntax(syntax);
 	}
-	
+
 	/**
 	 * Get the syntax used by the template manager.
-	 
+	 * 
 	 * @param syntax
 	 * @return
 	 */
-	public Syntax getSyntax(){
+	public Syntax getSyntax() {
 		return syntax;
 	}
 }
