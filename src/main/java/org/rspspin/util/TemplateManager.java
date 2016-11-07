@@ -11,9 +11,11 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
 import org.rspspin.lang.rspql.ParserRSPQL;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.arq.ARQFactory;
@@ -211,6 +213,28 @@ public class TemplateManager {
 		}
 
 		return arq;
+	}
+	
+	/**
+	 * Get template from the current model based on a URI identifier.
+	 * @return
+	 */
+	public Template getTemplate(String uri) {
+		// Find template type
+		NodeIterator iter = model.listObjectsOfProperty(model.createResource(uri), RDF.type);
+		if (iter.hasNext()) {
+			Resource r = iter.next().asResource();
+			if (r.equals(SPIN.SelectTemplate)) {
+				return model.createResource(uri, SPIN.SelectTemplate).as(Template.class);
+			} else if (r.equals(SPIN.ConstructTemplate)) {
+				return model.createResource(uri, SPIN.ConstructTemplate).as(Template.class);
+			} else if (r.equals(SPIN.AskTemplate)) {
+				return model.createResource(uri, SPIN.AskTemplate).as(Template.class);
+			} else {
+				return model.createResource(uri, SPIN.Template).as(Template.class);
+			}
+		}
+		return null;
 	}
 
 	/**
