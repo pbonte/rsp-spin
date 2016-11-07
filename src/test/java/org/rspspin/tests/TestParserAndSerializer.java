@@ -9,24 +9,8 @@ import org.rspspin.lang.rspql.ParserRSPQL;
 
 public class TestParserAndSerializer {
 
-	public static void main(String[] args) {
-		String query = "PREFIX : <http://test#> " + "REGISTER STREAM <http://out1> AS "
-				+ "CONSTRUCT DSTREAM { ?a ?b ?c } "
-				+ "FROM NAMED WINDOW <http://test#window> ON <http://stream> [RANGE ?a STEP ?b]\n"
-				+ "FROM NAMED WINDOW :window1 ON <http://stream> [RANGE ?a STEP ?b]\n"
-				+ "FROM NAMED WINDOW ?w1 ON ?w [RANGE ?a STEP ?b]\n"
-				+ "FROM NAMED WINDOW ?w2 ON ?w [RANGE PT1H STEP PT30M]\n"
-				+ "FROM NAMED WINDOW ?w3 ON ?w [FROM NOW-PT1H TO NOW - PT30M]\n"
-				+ "FROM NAMED WINDOW ?w4 ON ?w [FROM NOW-PT1H TO ?a]\n"
-				+ "FROM NAMED WINDOW ?w5 ON ?w [ITEM 10 STEP ?a]\n" + "FROM NAMED WINDOW ?w6 ON ?w [ITEM ?b STEP ?a]\n"
-				+ "WHERE { " + "  WINDOW ?w2 { ?a ?b ?c } " + "  WINDOW ?w1 { ?a ?b ?c } " + "}";
-		ParserRSPQL.register();
-		Query q = QueryFactory.create(query, null, ParserRSPQL.syntax);
-		System.out.println(q.toString());
-	}
-
 	/* Output stream name as a variable */
-	@Test
+	//@Test
 	public void registerAs1() {
 		ParserRSPQL.register();
 		String query = "" + "REGISTER STREAM ?out AS SELECT * WHERE { ?a ?b ?c }";
@@ -35,7 +19,7 @@ public class TestParserAndSerializer {
 	}
 
 	/* Output stream name as a URI */
-	@Test
+	//@Test
 	public void registerAs2() {
 		ParserRSPQL.register();
 		String query = "" + "REGISTER STREAM <http://example/stream> AS SELECT * WHERE { ?a  ?b  ?c }";
@@ -44,7 +28,7 @@ public class TestParserAndSerializer {
 	}
 
 	/* Window stream name as a variable */
-	@Test
+	//@Test
 	public void physicalWindow1() {
 		ParserRSPQL.register();
 		String query = ""
@@ -58,7 +42,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Input stream as a URL */
-	@Test
+	//@Test
 	public void physicalWindow2() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -72,7 +56,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Window range and step as variables */
-	@Test
+	//@Test
 	public void physicalWindow3() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -85,7 +69,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Only window range */
-	@Test
+	//@Test
 	public void physicalWindow4() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -98,7 +82,7 @@ public class TestParserAndSerializer {
 	}
 
 	/* Window stream name as a variable */
-	@Test
+	//@Test
 	public void logicalWindow1() {
 		ParserRSPQL.register();
 		String query = ""
@@ -111,7 +95,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Input stream as a URL */
-	@Test
+	//@Test
 	public void logicalWindow2() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -124,7 +108,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Window range and step as variables */
-	@Test
+	//@Test
 	public void logicalWindow3() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -138,7 +122,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Only window range */
-	@Test
+	//@Test
 	public void logicalWindow4() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -151,7 +135,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Window stream name as a variable */
-	@Test
+	//@Test
 	public void logicalPastWindow1() {
 		ParserRSPQL.register();
 		String query = ""
@@ -164,7 +148,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Input stream as a URL */
-	@Test
+	//@Test
 	public void logicalPastWindow2() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -177,7 +161,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Window from, to and step as variables */
-	@Test
+	//@Test
 	public void logicalPastWindow3() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -190,7 +174,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Window no step */
-	@Test
+	//@Test
 	public void logicalPastWindow4() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -204,7 +188,7 @@ public class TestParserAndSerializer {
 	
 	
 	/* Test illegal duration format */
-	@Test
+	//@Test
 	public void illegalDuration() {
 		ParserRSPQL.register();
 		Query q = null;
