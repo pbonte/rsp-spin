@@ -31,7 +31,7 @@ import org.topbraid.spin.vocabulary.SPL;
 public class Example {
 	public static void main(String[] args) throws ArgumentConstraintException {
 		new Example().test1();
-		new Example().test2();
+		//new Example().test2();
 	}
 	
 	/**
@@ -43,9 +43,9 @@ public class Example {
 		String queryString = ""
 				+ "PREFIX  :     <http://debs2015.org/streams/> "
 				+ "PREFIX  debs: <http://debs2015.org/onto#> "
-				+ "REGISTER STREAM :rideCount AS "
+				+ "REGISTER STREAM ?rideCount AS "
 				+ "SELECT ISTREAM (count(?ride) AS ?rideCount) "
-				+ "FROM NAMED WINDOW :wind ON :trips [RANGE PT1H STEP PT1H] "
+				+ "FROM NAMED WINDOW :wind ON ?inputStream [RANGE PT1H STEP PT1H] "
 				+ "WHERE { "
 				+ "   WINDOW :win { "
 				+ "      ?ride debs:distance ?distance "
@@ -54,8 +54,8 @@ public class Example {
 				+ "}";
 		
 		// Create template manager
-		TemplateManager tm = new TemplateManager();
-		Template template = tm.createTemplate("http://template", queryString);
+		TemplateManager tm = TemplateManager.get();
+		Template template = tm.createTemplate("http://example.org/template/1", queryString);
 				
 		// Add template argument. Also tests that the argument is a variable.
 		tm.addArgumentConstraint("limit", XSD.integer, ResourceFactory.createTypedLiteral("2", XSDDatatype.XSDinteger),
@@ -69,6 +69,8 @@ public class Example {
 		
 		// Get query from template and bindings
 		Query query = tm.getQuery(template, bindings);
+		query.setPrefix("", "http://debs2015.org/streams/");
+		query.setPrefix("onto", "http://debs2015.org/onto#");
 		System.out.println(query);
 		
 		// Print model
