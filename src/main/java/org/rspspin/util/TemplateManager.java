@@ -239,7 +239,7 @@ public class TemplateManager {
 
 		// Add default values
 		for (Argument arg : template.getArguments(false)) {
-			if (bindings.contains(arg.getVarName()) && arg.getDefaultValue() != null) {
+			if (!bindings.contains(arg.getVarName()) && arg.getDefaultValue() != null) {
 				bindings.add(arg.getVarName(), arg.getDefaultValue());
 			}
 		}
