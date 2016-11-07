@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 public class TestRSPSPIN {
 
 	/* Literals and URIs */
-	@Test
+	//@Test
 	public void selectLogicalWindow1() {
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -32,7 +32,7 @@ public class TestRSPSPIN {
 	}
 
 	/* Variables */
-	@Test
+	//@Test
 	public void selectLogicalWindow2() {
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -51,7 +51,7 @@ public class TestRSPSPIN {
 	}
 
 	/* No step */
-	@Test
+	//@Test
 	public void selectLogicalWindow3() {
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -70,7 +70,7 @@ public class TestRSPSPIN {
 	}
 
 	/* Literals and URIs */
-	@Test
+	//@Test
 	public void constructLogicalWindow1() {
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -89,7 +89,7 @@ public class TestRSPSPIN {
 	}
 
 	/* Variables */
-	@Test
+	//@Test
 	public void constructLogicalWindow2() {
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -108,7 +108,7 @@ public class TestRSPSPIN {
 	}
 
 	/* No step */
-	@Test
+	//@Test
 	public void constructLogicalWindow3() {
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -127,7 +127,7 @@ public class TestRSPSPIN {
 	}
 
 	/* Literals and URIs */
-	@Test
+	//@Test
 	public void logicalPastWindow1() {
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -145,7 +145,7 @@ public class TestRSPSPIN {
 	}
 
 	/* Variables */
-	@Test
+	//@Test
 	public void logicalPastWindow2() {
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -164,7 +164,7 @@ public class TestRSPSPIN {
 	}
 
 	/* No step */
-	@Test
+	//@Test
 	public void logicalPastWindow3() {
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -183,7 +183,7 @@ public class TestRSPSPIN {
 	}
 	
 	/* Named graph in window clause */
-	@Test
+	//@Test
 	public void graphInWindowClause(){
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -202,7 +202,7 @@ public class TestRSPSPIN {
 	}
 	
 	/* Named graph in construct result */
-	@Test
+	//@Test
 	public void graphInConstructResult(){
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -224,7 +224,7 @@ public class TestRSPSPIN {
 	}
 	
 	/* Istream construct */
-	@Test
+	//@Test
 	public void istreamConstruct(){
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -242,7 +242,7 @@ public class TestRSPSPIN {
 	}
 	
 	/* Dstream construct */
-	@Test
+	//@Test
 	public void dstreamConstruct(){
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -260,7 +260,7 @@ public class TestRSPSPIN {
 	}
 	
 	/* Rstream construct */
-	@Test
+	//@Test
 	public void rstreamConstruct(){
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -278,7 +278,7 @@ public class TestRSPSPIN {
 	}
 	
 	/* Istream select */
-	@Test
+	//@Test
 	public void istreamSelect(){
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -294,7 +294,7 @@ public class TestRSPSPIN {
 	}
 	
 	/* Dstream select */
-	@Test
+	//@Test
 	public void dstreamSelect(){
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
@@ -310,7 +310,7 @@ public class TestRSPSPIN {
 	}
 	
 	/* Rstream select */
-	@Test
+	//@Test
 	public void rstreamSelect(){
 		SPINModuleRegistry.get().init();
 		ParserRSPQL.register();
