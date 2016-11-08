@@ -11,9 +11,9 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import org.rspspin.lang.rspql.ParserRSPQL;
@@ -35,6 +35,7 @@ public class TemplateManager {
 	private Model model;
 	private Syntax syntax = ParserRSPQL.syntax;
 	private ARQ2SPIN arq2spin;
+	private ArrayList<Template> templates = new ArrayList<>();
 
 	/**
 	 * Initialize
@@ -72,6 +73,13 @@ public class TemplateManager {
 	 */
 	public void setModel(Model model) {
 		this.model = model;
+		templates.clear();
+		
+		// Add templates to list
+		ResIterator iter = model.listResourcesWithProperty(RDF.type, SPIN.Template);
+		while(iter.hasNext()){
+			templates.add(iter.next().as(Template.class));
+		}
 	}
 
 	/**
@@ -114,6 +122,7 @@ public class TemplateManager {
 		org.topbraid.spin.model.Query spinQuery = arq2spin.createQuery(arqQuery, null);
 		Template template = createResource(templateUri, templateType).as(Template.class);
 		template.addProperty(SPIN.body, spinQuery);
+		template.addProperty(RDF.type, SPIN.Template);
 		return template;
 	}
 
@@ -203,21 +212,21 @@ public class TemplateManager {
 	 * @return
 	 */
 	public Template getTemplate(String uri) {
-		// Find template type
-		NodeIterator iter = model.listObjectsOfProperty(model.createResource(uri), RDF.type);
-		if (iter.hasNext()) {
-			Resource r = iter.next().asResource();
-			if (r.equals(SPIN.SelectTemplate)) {
-				return model.createResource(uri, SPIN.SelectTemplate).as(Template.class);
-			} else if (r.equals(SPIN.ConstructTemplate)) {
-				return model.createResource(uri, SPIN.ConstructTemplate).as(Template.class);
-			} else if (r.equals(SPIN.AskTemplate)) {
-				return model.createResource(uri, SPIN.AskTemplate).as(Template.class);
-			} else {
-				return model.createResource(uri, SPIN.Template).as(Template.class);
-			}
+		Resource t = model.createResource(uri);
+		if(model.contains(t, RDF.type, SPIN.Template)){
+			Template template = t.as(Template.class);
+			templates.add(template);
+			return template;
 		}
 		return null;
+	}
+	
+	/**
+	 * Get all templates.
+	 * @return
+	 */
+	public ArrayList<Template> getTemplates(){
+		return templates;
 	}
 
 	/**
