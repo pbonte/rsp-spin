@@ -10,7 +10,7 @@ import org.rspspin.lang.rspql.ParserRSPQL;
 public class TestParserAndSerializer {
 
 	/* Output stream name as a variable */
-	//@Test
+	@Test
 	public void registerAs1() {
 		ParserRSPQL.register();
 		String query = "" + "REGISTER STREAM ?out AS SELECT * WHERE { ?a ?b ?c }";
@@ -19,7 +19,7 @@ public class TestParserAndSerializer {
 	}
 
 	/* Output stream name as a URI */
-	//@Test
+	@Test
 	public void registerAs2() {
 		ParserRSPQL.register();
 		String query = "" + "REGISTER STREAM <http://example/stream> AS SELECT * WHERE { ?a  ?b  ?c }";
@@ -28,7 +28,7 @@ public class TestParserAndSerializer {
 	}
 
 	/* Window stream name as a variable */
-	//@Test
+	@Test
 	public void physicalWindow1() {
 		ParserRSPQL.register();
 		String query = ""
@@ -42,7 +42,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Input stream as a URL */
-	//@Test
+	@Test
 	public void physicalWindow2() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -56,7 +56,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Window range and step as variables */
-	//@Test
+	@Test
 	public void physicalWindow3() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -69,7 +69,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Only window range */
-	//@Test
+	@Test
 	public void physicalWindow4() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -82,7 +82,7 @@ public class TestParserAndSerializer {
 	}
 
 	/* Window stream name as a variable */
-	//@Test
+	@Test
 	public void logicalWindow1() {
 		ParserRSPQL.register();
 		String query = ""
@@ -95,7 +95,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Input stream as a URL */
-	//@Test
+	@Test
 	public void logicalWindow2() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -108,7 +108,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Window range and step as variables */
-	//@Test
+	@Test
 	public void logicalWindow3() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -122,7 +122,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Only window range */
-	//@Test
+	@Test
 	public void logicalWindow4() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -135,7 +135,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Window stream name as a variable */
-	//@Test
+	@Test
 	public void logicalPastWindow1() {
 		ParserRSPQL.register();
 		String query = ""
@@ -148,7 +148,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Input stream as a URL */
-	//@Test
+	@Test
 	public void logicalPastWindow2() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -161,7 +161,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Window from, to and step as variables */
-	//@Test
+	@Test
 	public void logicalPastWindow3() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -174,7 +174,7 @@ public class TestParserAndSerializer {
 	}
 	
 	/* Window no step */
-	//@Test
+	@Test
 	public void logicalPastWindow4() {
 		ParserRSPQL.register();
 		String query = "" 
@@ -188,7 +188,7 @@ public class TestParserAndSerializer {
 	
 	
 	/* Test illegal duration format */
-	//@Test
+	@Test
 	public void illegalDuration() {
 		ParserRSPQL.register();
 		Query q = null;
