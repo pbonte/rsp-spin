@@ -1465,17 +1465,17 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   }
 
   final public void LimitClause() throws ParseException {
-  Token t;
+  Node n;
     jj_consume_token(LIMIT);
-    t = jj_consume_token(INTEGER);
-    getQuery().setLimit(integerValue(t.image));
+    n = VarOrInt();
+    getQuery().setLimit(n);
   }
 
   final public void OffsetClause() throws ParseException {
-  Token t;
+  Node n;
     jj_consume_token(OFFSET);
-    t = jj_consume_token(INTEGER);
-    getQuery().setOffset(integerValue(t.image));
+    n = VarOrInt();
+    getQuery().setOffset(n);
   }
 
   final public void ValuesClause() throws ParseException {
