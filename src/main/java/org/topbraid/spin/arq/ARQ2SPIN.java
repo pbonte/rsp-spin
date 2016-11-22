@@ -505,13 +505,19 @@ public class ARQ2SPIN {
 	}
 
 	private void addSolutionModifiers(Query arq, Resource query) {
-		long limit = arq.getLimit();
-		if (limit != Query.NOLIMIT) {
-			query.addProperty(SP.limit, query.getModel().createTypedLiteral(limit));
+		Node limit = arq.getLimit();
+		if (limit != null) {
+			RDFNode limitNode = model.asRDFNode(limit);
+			if (limit.isVariable())
+				limitNode = getVariable(limit.getName());
+			query.addProperty(SP.limit, limitNode);
 		}
-		long offset = arq.getOffset();
-		if (offset != Query.NOLIMIT) {
-			query.addProperty(SP.offset, query.getModel().createTypedLiteral(offset));
+		Node offset = arq.getOffset();
+		if (offset != null) {
+			RDFNode offsetNode = model.asRDFNode(offset);
+			if (offset.isVariable())
+				offsetNode = getVariable(offset.getName());
+			query.addProperty(SP.offset, offsetNode);
 		}
 
 		List<SortCondition> orderBy = arq.getOrderBy();
