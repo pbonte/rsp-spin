@@ -67,9 +67,8 @@ public class Query extends Prologue implements Cloneable, Printable {
 	private Syntax syntax = Syntax.syntaxSPARQL; // Default
 
 	// LIMIT/OFFSET
-	public static final long NOLIMIT = Long.MIN_VALUE;
-	private long resultLimit = NOLIMIT;
-	private long resultOffset = NOLIMIT;
+	private Node resultLimit = null;
+	private Node	 resultOffset = null;
 
 	// ORDER BY
 	private List<SortCondition> orderBy = null;
@@ -216,28 +215,28 @@ public class Query extends Prologue implements Cloneable, Printable {
 
 	// ---- Limit/offset
 
-	public long getLimit() {
+	public Node getLimit() {
 		return resultLimit;
 	}
 
-	public void setLimit(long limit) {
+	public void setLimit(Node limit) {
 		resultLimit = limit;
 	}
 
 	public boolean hasLimit() {
-		return resultLimit != NOLIMIT;
+		return resultLimit != null;
 	}
 
-	public long getOffset() {
+	public Node getOffset() {
 		return resultOffset;
 	}
 
-	public void setOffset(long offset) {
+	public void setOffset(Node offset) {
 		resultOffset = offset;
 	}
 
 	public boolean hasOffset() {
-		return resultOffset != NOLIMIT;
+		return resultOffset != null;
 	}
 
 	// ---- Order By
