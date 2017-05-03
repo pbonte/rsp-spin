@@ -1,6 +1,7 @@
-package org.rspspin.util;
+package org.rspspin.core;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 public class ArgumentConstraintException extends Exception {
 	private static final long serialVersionUID = 1L;
@@ -11,11 +12,8 @@ public class ArgumentConstraintException extends Exception {
 	}
 	
 	public String getMessage(){
-		StringBuilder sb = new StringBuilder();
-		for(String e : errors){
-			sb.append("\n");
-			sb.append(e);
-		}
-		return sb.toString();
+		StringJoiner sj = new StringJoiner("\n");
+		errors.forEach(sj::add);
+		return sj.toString();
 	}
 }

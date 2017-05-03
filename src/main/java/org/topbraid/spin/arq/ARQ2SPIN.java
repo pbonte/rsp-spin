@@ -120,7 +120,7 @@ import org.rspspin.syntax.ElementLogicalPastWindow;
 import org.rspspin.syntax.ElementLogicalWindow;
 import org.rspspin.syntax.ElementPhysicalWindow;
 import org.rspspin.syntax.ElementWindowGraph;
-import org.rspspin.vocabulary.RSP;
+import org.rspspin.vocabulary.RSPSPIN;
 
 /**
  * Takes a ARQ SPARQL Query as input and creates a corresponding SPIN RDF data
@@ -293,7 +293,7 @@ public class ARQ2SPIN {
 		RDFNode outputStreamName = model.asRDFNode(outputStreamNode);
 		if (outputStreamNode.isVariable())
 			outputStreamName = getVariable(outputStreamNode.getName());
-		spinQuery.addProperty(RSP.hasOutputStream, outputStreamName);
+		spinQuery.addProperty(RSPSPIN.hasOutputStream, outputStreamName);
 	}
 
 	/**
@@ -306,13 +306,13 @@ public class ARQ2SPIN {
 		// Output stream operator
 		switch (arq.getOutputStreamType()) {
 		case Query.OutputStreamTypeDstream:
-			spinQuery.addProperty(RSP.hasOutputStreamOperator, RSP.Dstream);
+			spinQuery.addProperty(RSPSPIN.hasOutputStreamOperator, RSPSPIN.Dstream);
 			break;
 		case Query.OutputStreamTypeRstream:
-			spinQuery.addProperty(RSP.hasOutputStreamOperator, RSP.Rstream);
+			spinQuery.addProperty(RSPSPIN.hasOutputStreamOperator, RSPSPIN.Rstream);
 			break;
 		case Query.OutputStreamTypeIstream:
-			spinQuery.addProperty(RSP.hasOutputStreamOperator, RSP.Istream);
+			spinQuery.addProperty(RSPSPIN.hasOutputStreamOperator, RSPSPIN.Istream);
 			break;
 		}
 	}
@@ -331,34 +331,34 @@ public class ARQ2SPIN {
 			Node rangeNode = window.getRangeNode();
 			Node stepNode = window.getStepNode();
 			Resource root = model.createResource();
-			root.addProperty(RDF.type, RSP.LogicalWindow);
+			root.addProperty(RDF.type, RSPSPIN.LogicalWindow);
 
 			// Window name
 			RDFNode windowName = model.asRDFNode(windowNameNode);
 			if (windowNameNode.isVariable())
 				windowName = getVariable(windowNameNode.getName());
-			root.addProperty(RSP.windowUri, windowName);
+			root.addProperty(RSPSPIN.windowUri, windowName);
 
 			// Stream name
 			RDFNode streamName = model.asRDFNode(streamNameNode);
 			if (streamNameNode.isVariable())
 				streamName = getVariable(streamNameNode.getName());
-			root.addProperty(RSP.streamUri, streamName);
+			root.addProperty(RSPSPIN.streamUri, streamName);
 
 			// Logical range
 			RDFNode range = model.asRDFNode(rangeNode);
 			if (rangeNode.isVariable())
 				range = getVariable(rangeNode.getName());
-			root.addProperty(RSP.logicalRange, range);
+			root.addProperty(RSPSPIN.logicalRange, range);
 
 			// Logical step
 			if (stepNode != null) {
 				RDFNode step = model.asRDFNode(stepNode);
 				if (stepNode.isVariable())
 					step = getVariable(stepNode.getName());
-				root.addProperty(RSP.logicalStep, step);
+				root.addProperty(RSPSPIN.logicalStep, step);
 			}
-			spinQuery.addProperty(RSP.fromNamedWindow, root);
+			spinQuery.addProperty(RSPSPIN.fromNamedWindow, root);
 		}
 	}
 
@@ -377,40 +377,40 @@ public class ARQ2SPIN {
 			Node toNode = window.getToNode();
 			Node stepNode = window.getStepNode();
 			Resource root = model.createResource();
-			root.addProperty(RDF.type, RSP.LogicalPastWindow);
+			root.addProperty(RDF.type, RSPSPIN.LogicalPastWindow);
 
 			// Window name
 			RDFNode windowName = model.asRDFNode(windowNameNode);
 			if (windowNameNode.isVariable())
 				windowName = getVariable(windowNameNode.getName());
-			root.addProperty(RSP.windowUri, windowName);
+			root.addProperty(RSPSPIN.windowUri, windowName);
 
 			// Stream name
 			RDFNode streamName = model.asRDFNode(streamNameNode);
 			if (streamNameNode.isVariable())
 				streamName = getVariable(streamNameNode.getName());
-			root.addProperty(RSP.streamUri, streamName);
+			root.addProperty(RSPSPIN.streamUri, streamName);
 
 			// From
 			RDFNode from = model.asRDFNode(fromNode);
 			if (fromNode.isVariable())
 				from = getVariable(fromNode.getName());
-			root.addProperty(RSP.from, from);
+			root.addProperty(RSPSPIN.from, from);
 
 			// To
 			RDFNode to = model.asRDFNode(toNode);
 			if (toNode.isVariable())
 				to = getVariable(toNode.getName());
-			root.addProperty(RSP.to, to);
+			root.addProperty(RSPSPIN.to, to);
 
 			// Logical step
 			if (stepNode != null) {
 				RDFNode step = model.asRDFNode(stepNode);
 				if (stepNode.isVariable())
 					step = getVariable(stepNode.getName());
-				root.addProperty(RSP.logicalStep, step);
+				root.addProperty(RSPSPIN.logicalStep, step);
 			}
-			spinQuery.addProperty(RSP.fromNamedWindow, root);
+			spinQuery.addProperty(RSPSPIN.fromNamedWindow, root);
 		}
 	}
 
@@ -428,33 +428,33 @@ public class ARQ2SPIN {
 			Node rangeNode = window.getRangeNode();
 			Node stepNode = window.getStepNode();
 			Resource root = model.createResource();
-			root.addProperty(RDF.type, RSP.PhysicalWindow);
+			root.addProperty(RDF.type, RSPSPIN.PhysicalWindow);
 
 			// Window name
 			RDFNode windowName = model.asRDFNode(windowNameNode);
 			if (windowNameNode.isVariable())
 				windowName = getVariable(windowNameNode.getName());
-			root.addProperty(RSP.windowUri, windowName);
+			root.addProperty(RSPSPIN.windowUri, windowName);
 
 			// Stream name
 			RDFNode streamName = model.asRDFNode(streamNameNode);
 			if (streamNameNode.isVariable())
 				streamName = getVariable(streamNameNode.getName());
-			root.addProperty(RSP.streamUri, streamName);
+			root.addProperty(RSPSPIN.streamUri, streamName);
 
 			// Physical range
 			RDFNode range = model.asRDFNode(rangeNode);
 			if (rangeNode.isVariable())
 				range = getVariable(rangeNode.getName());
-			root.addProperty(RSP.physicalRange, range);
+			root.addProperty(RSPSPIN.physicalRange, range);
 
 			if (stepNode != null) {
 				RDFNode step = model.asRDFNode(stepNode);
 				if (stepNode.isVariable())
 					step = getVariable(stepNode.getName());
-				root.addProperty(RSP.physicalStep, step);
+				root.addProperty(RSPSPIN.physicalStep, step);
 			}
-			spinQuery.addProperty(RSP.fromNamedWindow, root);
+			spinQuery.addProperty(RSPSPIN.fromNamedWindow, root);
 		}
 	}
 

@@ -1,0 +1,18 @@
+{
+   "id" : "listAnpr",
+   "query" : "
+      PREFIX : <http://ns.valcri.org/stream/>
+      REGISTER STREAM <http://ns.valcri.org#> AS
+      SELECT ?regno
+      FROM NAMED WINDOW :w ON :anpr [RANGE PT10S STEP PT10S]
+      WHERE {
+         WINDOW :w {
+            ?s ?p ?o
+         }
+      }",
+      "parameters" : [
+         { "varName" : "o",
+           "optional" : true,
+           "valueType" : "xsd:string" }
+      ]
+}

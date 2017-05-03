@@ -38,7 +38,7 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.vocabulary.RDF;
 import org.rspspin.model.NamedWindow;
-import org.rspspin.vocabulary.RSP;
+import org.rspspin.vocabulary.RSPSPIN;
 
 /**
  * The singleton that is used to convert plain Jena objects into SPIN API
@@ -547,8 +547,8 @@ public class SPINFactory {
 	 * @return a new NamedWindow
 	 */
 	public static NamedWindow createNamedWindow(Model model, Resource windowNameNode, RDFList elements) {
-		NamedWindow result = model.createResource(RSP.NamedWindow).as(NamedWindow.class);
-		result.addProperty(RSP.windowNameNode, windowNameNode);
+		NamedWindow result = model.createResource(RSPSPIN.NamedWindow).as(NamedWindow.class);
+		result.addProperty(RSPSPIN.windowNameNode, windowNameNode);
 		result.addProperty(SP.elements, elements);
 		return result;
 	}

@@ -9,7 +9,7 @@ import org.topbraid.spin.model.impl.ElementImpl;
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Resource;
-import org.rspspin.vocabulary.RSP;
+import org.rspspin.vocabulary.RSPSPIN;
 
 public class NamedWindowImpl extends ElementImpl implements NamedWindow {
 
@@ -18,7 +18,7 @@ public class NamedWindowImpl extends ElementImpl implements NamedWindow {
 	}
 
 	public Resource getNameNode() {
-		Resource r = getResource(RSP.windowNameNode);
+		Resource r = getResource(RSPSPIN.windowNameNode);
 		if (r != null) {
 			Variable variable = SPINFactory.asVariable(r);
 			if (variable != null) {

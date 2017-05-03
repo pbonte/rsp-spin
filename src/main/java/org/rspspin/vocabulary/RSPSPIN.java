@@ -10,10 +10,13 @@ import org.topbraid.spin.util.SimpleImplementation;
 import org.rspspin.model.NamedWindow;
 import org.rspspin.model.NamedWindowImpl;
 
-public class RSP {
+public class RSPSPIN {
 	public final static String NS = "http://w3id.org/rsp/spin#";
 	
 	// Classes
+	public final static Resource SelectTemplate = ResourceFactory.createResource(NS + "SelectTemplate");
+	public final static Resource ConstructTemplate = ResourceFactory.createResource(NS + "ConstructTemplate");
+	public final static Resource AskTemplate = ResourceFactory.createResource(NS + "AskTemplate");
 	public final static Resource OutputStreamOperator = ResourceFactory.createResource(NS + "OutputStreamOperator");
 	public final static Resource Dstream = ResourceFactory.createResource(NS + "Dstream");
 	public final static Resource Istream = ResourceFactory.createResource(NS + "Istream");
@@ -38,7 +41,7 @@ public class RSP {
 	public final static Property physicalStep = ResourceFactory.createProperty(NS + "physicalStep");
 	
     static {
-		RSP.init(BuiltinPersonalities.model);
+		RSPSPIN.init(BuiltinPersonalities.model);
     }
 	
 	private static void init(Personality<RDFNode> p){

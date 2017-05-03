@@ -13,8 +13,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
-import org.rspspin.util.Formatter;
-import org.rspspin.vocabulary.RSP;
+import org.rspspin.core.Formatter;
+import org.rspspin.vocabulary.RSPSPIN;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.model.Element;
 import org.topbraid.spin.model.ElementList;
@@ -48,22 +48,22 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 	 */
 	private List<String> getLogicalWindows() {
 		List<String> results = new LinkedList<String>();
-		StmtIterator it = listProperties(RSP.fromNamedWindow);
+		StmtIterator it = listProperties(RSPSPIN.fromNamedWindow);
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			Resource root = stmt.getObject().asResource();
 
 			// Check if type is logical window
-			if (!root.hasProperty(RDF.type, RSP.LogicalWindow))
+			if (!root.hasProperty(RDF.type, RSPSPIN.LogicalWindow))
 				continue;
 
-			RDFNode windowNameNode = root.listProperties(RSP.windowUri).next().getObject();
-			RDFNode streamNameNode = root.listProperties(RSP.streamUri).next().getObject();
-			RDFNode range = getModel().listObjectsOfProperty(root, RSP.logicalRange).next();
+			RDFNode windowNameNode = root.listProperties(RSPSPIN.windowUri).next().getObject();
+			RDFNode streamNameNode = root.listProperties(RSPSPIN.streamUri).next().getObject();
+			RDFNode range = getModel().listObjectsOfProperty(root, RSPSPIN.logicalRange).next();
 
 			// If step is defined
-			if (root.hasProperty(RSP.logicalStep)) {
-				RDFNode step = root.listProperties(RSP.logicalStep).next().getObject();
+			if (root.hasProperty(RSPSPIN.logicalStep)) {
+				RDFNode step = root.listProperties(RSPSPIN.logicalStep).next().getObject();
 				String window = String.format("FROM NAMED WINDOW %s ON %s [RANGE %s STEP %s]",
 						Formatter.varOrUriAsString(windowNameNode), Formatter.varOrUriAsString(streamNameNode),
 						Formatter.varOrLiteralAsString(range), Formatter.varOrLiteralAsString(step));
@@ -87,23 +87,23 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 	 */
 	private List<String> getLogicalPastWindows() {
 		List<String> results = new LinkedList<String>();
-		StmtIterator it = listProperties(RSP.fromNamedWindow);
+		StmtIterator it = listProperties(RSPSPIN.fromNamedWindow);
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			Resource root = stmt.getObject().asResource();
 
 			// Check if type is logical past window
-			if (!root.hasProperty(RDF.type, RSP.LogicalPastWindow))
+			if (!root.hasProperty(RDF.type, RSPSPIN.LogicalPastWindow))
 				continue;
 
-			RDFNode windowNameNode = root.listProperties(RSP.windowUri).next().getObject();
-			RDFNode streamNameNode = root.listProperties(RSP.streamUri).next().getObject();
-			RDFNode from = root.listProperties(RSP.from).next().getObject();
-			RDFNode to = root.listProperties(RSP.to).next().getObject();
+			RDFNode windowNameNode = root.listProperties(RSPSPIN.windowUri).next().getObject();
+			RDFNode streamNameNode = root.listProperties(RSPSPIN.streamUri).next().getObject();
+			RDFNode from = root.listProperties(RSPSPIN.from).next().getObject();
+			RDFNode to = root.listProperties(RSPSPIN.to).next().getObject();
 
 			// If step is defined
-			if (root.hasProperty(RSP.logicalStep)) {
-				RDFNode step = root.listProperties(RSP.logicalStep).next().getObject();
+			if (root.hasProperty(RSPSPIN.logicalStep)) {
+				RDFNode step = root.listProperties(RSPSPIN.logicalStep).next().getObject();
 				String window = String.format("FROM NAMED WINDOW %s ON %s [FROM NOW-%s TO NOW-%s STEP %s]",
 						Formatter.varOrUriAsString(windowNameNode), Formatter.varOrUriAsString(streamNameNode),
 						Formatter.varOrLiteralAsString(from), Formatter.varOrLiteralAsString(to),
@@ -129,22 +129,22 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 	 */
 	private List<String> getPhysicalWindows() {
 		List<String> results = new LinkedList<String>();
-		StmtIterator it = listProperties(RSP.fromNamedWindow);
+		StmtIterator it = listProperties(RSPSPIN.fromNamedWindow);
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			Resource root = stmt.getObject().asResource();
 
 			// Check if type is logical window
-			if (!root.hasProperty(RDF.type, RSP.PhysicalWindow))
+			if (!root.hasProperty(RDF.type, RSPSPIN.PhysicalWindow))
 				continue;
 
-			RDFNode windowNameNode = root.listProperties(RSP.windowUri).next().getObject();
-			RDFNode streamNameNode = root.listProperties(RSP.streamUri).next().getObject();
-			RDFNode range = getModel().listObjectsOfProperty(root, RSP.physicalRange).next();
+			RDFNode windowNameNode = root.listProperties(RSPSPIN.windowUri).next().getObject();
+			RDFNode streamNameNode = root.listProperties(RSPSPIN.streamUri).next().getObject();
+			RDFNode range = getModel().listObjectsOfProperty(root, RSPSPIN.physicalRange).next();
 
 			// If step is defined
-			if (root.hasProperty(RSP.physicalStep)) {
-				RDFNode step = root.listProperties(RSP.physicalStep).next().getObject();
+			if (root.hasProperty(RSPSPIN.physicalStep)) {
+				RDFNode step = root.listProperties(RSPSPIN.physicalStep).next().getObject();
 				String window = String.format("FROM NAMED WINDOW %s ON %s [ITEM %s STEP %s]",
 						Formatter.varOrUriAsString(windowNameNode), Formatter.varOrUriAsString(streamNameNode),
 						Formatter.varOrLiteralAsString(range), Formatter.varOrLiteralAsString(step));
@@ -332,7 +332,7 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 	}
 
 	protected void printOutputStream(PrintContext p) {
-		Statement stmt = getProperty(RSP.hasOutputStream);
+		Statement stmt = getProperty(RSPSPIN.hasOutputStream);
 		if(stmt == null) return;
 		RDFNode node = stmt.getObject();
 		p.print(String.format("REGISTER STREAM %s AS", Formatter.varOrUriAsString(node)));
@@ -340,14 +340,14 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 	}
 	
 	protected void printOutputStreamOperator(PrintContext p) {
-		Statement stmt = getProperty(RSP.hasOutputStreamOperator);
+		Statement stmt = getProperty(RSPSPIN.hasOutputStreamOperator);
 		if(stmt == null) return;
 		RDFNode node = stmt.getObject();
-		if(node.equals(RSP.Istream))
+		if(node.equals(RSPSPIN.Istream))
 			p.print("ISTREAM ");
-		if(node.equals(RSP.Dstream))
+		if(node.equals(RSPSPIN.Dstream))
 			p.print("DSTREAM ");
-		if(node.equals(RSP.Rstream))
+		if(node.equals(RSPSPIN.Rstream))
 			p.print("RSTREAM ");
 	}
 }

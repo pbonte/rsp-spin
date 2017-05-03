@@ -1,4 +1,4 @@
-package org.rspspin.util;
+package org.rspspin.core;
 
 import org.apache.jena.rdf.model.RDFNode;
 import org.topbraid.spin.model.SPINFactory;

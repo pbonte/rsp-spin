@@ -18,7 +18,7 @@ import org.rspspin.lang.sparqlstream.ParserSPARQLStream;
  * RSP-QL representations.
  * 
  * Disclaimer: This uses a different set of serializers than those used in the
- * papers. The new serilaizers are developed for Jena 3.0.1 and use a more
+ * papers. The new serializers are developed for Jena 3.0.1 and use a more
  * minimalistic approach to simplify maintenance.
  * 
  * @author Robin Keskisarkka

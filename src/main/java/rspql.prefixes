@@ -1,0 +1,12 @@
+# Prefixes (standard)
+#sp=http://spinrdf.org/sp#
+#spin=http://spinrdf.org/spin#
+#spl=http://spinrdf.org/spl#
+#rspspin:http://w3id.org/rsp/spin#
+xsd=http://www.w3.org/2001/XMLSchema#
+rdf=http://www.w3.org/1999/02/22-rdf-syntax-ns#
+rdfs=http://www.w3.org/2000/01/rdf-schema#
+# VALCRI specific prefixes
+#owl=http://www.w3.org/2002/07/owl#
+cd=http://ns.valcri.org/ontology/crimedomain#
+vcd=http://ns.valcri.org/ontology/valcricrimedata#

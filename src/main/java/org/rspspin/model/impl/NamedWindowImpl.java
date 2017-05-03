@@ -1,7 +1,7 @@
 package org.rspspin.model.impl;
 
 import org.rspspin.model.NamedWindow;
-import org.rspspin.vocabulary.RSP;
+import org.rspspin.vocabulary.RSPSPIN;
 import org.topbraid.spin.model.SPINFactory;
 import org.topbraid.spin.model.Variable;
 import org.topbraid.spin.model.print.PrintContext;
@@ -20,7 +20,7 @@ public class NamedWindowImpl extends ElementImpl implements NamedWindow {
 	}
 	
 	public Resource getNameNode() {
-		Resource r = getResource(RSP.windowNameNode);
+		Resource r = getResource(RSPSPIN.windowNameNode);
 		if(r != null) {
 			Variable variable = SPINFactory.asVariable(r);
 			if(variable != null) {
