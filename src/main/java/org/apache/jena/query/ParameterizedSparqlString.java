@@ -1327,7 +1327,7 @@ public class ParameterizedSparqlString implements PrefixMapping {
 
 			// Special case for RSP-QL: Duration data type in windows should be
 			// printed with lexical form
-			if (n.isLiteral() && n.getLiteralDatatype().equals(XSDDatatype.XSDduration)) {
+			if (n.isLiteral() && n.getLiteralDatatype().getURI().equals(XSDDatatype.XSDduration.getURI())) {
 				p = Pattern.compile("(RANGE\\s+|STEP\\s+)([?$]" + var + ")([^\\w]|$)");
 				command = p.matcher(command).replaceAll("$1" + n.getLiteralLexicalForm() + "$3");
 				p = Pattern.compile("(FROM\\s+NOW\\-|TO\\s+NOW\\-)([?$]" + var + ")([^\\w]|$)");
