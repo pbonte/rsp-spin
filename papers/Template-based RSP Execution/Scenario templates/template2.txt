@@ -1,0 +1,47 @@
+{
+    "id": "trackVehicle",
+    "query": "
+        PREFIX : <http://ns.valcri.org/anpr#>
+        PREFIX anpr: <http://ns.valcri.org/ontology/anpr#>
+        PREFIX geo:  <http://www.w3.org/2003/01/geo/wgs84_pos#>
+        PREFIX ep:   <http://www.ontologydesignpatterns.org/cp/owl/eventprocessing.owl#>
+        REGISTER STREAM ?out AS
+        CONSTRUCT {
+            ?event a anpr:VehicleObservation ;
+                   anpr:hasCamera ?camera ;
+                   anpr:hasVehicle ?vehicle ;
+                   ep:hasObservationTime ?observationTime .
+            ?camera geo:lat ?lat ;
+                    geo:long ?long .
+            ?vehicle anpr:hasVehicleRegno ?regno . 
+        }
+        FROM NAMED WINDOW :w ON ?stream [RANGE PT1S]
+        WHERE {
+            WINDOW :w {
+                ?event a anpr:VehicleObservation ;
+                       anpr:hasCamera ?camera ;
+                       anpr:hasVehicle ?vehicle ;
+                       ep:hasObservationTime ?observationTime .
+                ?camera geo:lat ?lat ;
+                        geo:long ?long .
+                ?vehicle anpr:hasVehicleRegno ?regno .
+            }
+            FILTERregex (?regno, ?regnoFilter, 'i')
+        }
+    ",
+    "parameters": [{
+        "varName": "out",
+        "valueType": "rdfs:Resource",
+        "optional": false
+    }, {
+        "varName": "stream",
+        "valueType": "rdfs:Resource",
+        "optional": false
+    }, {
+        "varName": "regnoFilter",
+        "valueType": "xsd:string",
+        "optional": false
+    }],
+    "preferredEngine": "csparql",
+    "lifespan" : 10
+}

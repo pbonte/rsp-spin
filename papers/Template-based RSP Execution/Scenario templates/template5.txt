@@ -1,0 +1,91 @@
+{
+    "id": "trackPerson",
+    "query": "
+        PREFIX : <http://ns.valcri.org/anpr#>
+        PREFIX cd: <http://ns.valcri.org/ontology/crimedomain#>
+        PREFIX vcd: <http://ns.valcri.org/ontology/valcricrimedata#>
+        PREFIX anpr: <http://ns.valcri.org/ontology/anpr#>
+        PREFIX geo:  <http://www.w3.org/2003/01/geo/wgs84_pos#>
+        PREFIX  ep:   <http://www.ontologydesignpatterns.org/cp/owl/eventprocessing.owl#>
+        PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        REGISTER STREAM ?out AS
+        CONSTRUCT {
+            ?event rdf:type anpr:VehicleObservation ;
+                   anpr:hasCamera ?camera ;
+                   anpr:hasVehicle ?vehicle ;
+                   ep:hasObservationTime ?observationTime .
+            ?camera geo:lat ?lat ;
+                    geo:long ?long .
+            ?vehicle anpr:hasVehicleRegno ?regno . 
+        }
+        FROM ?nominalVehiclesGraph
+        FROM ?nominalsGraph
+        FROM NAMED WINDOW :w ON ?stream [RANGE ?range STEP ?step]
+        WHERE {
+            WINDOW :w {
+                ?event rdf:type anpr:VehicleObservation ;
+                       anpr:hasCamera ?camera ;
+                       anpr:hasVehicle ?vehicle ;
+                       ep:hasObservationTime ?observationTime .
+                ?camera geo:lat ?lat ;
+                        geo:long ?long .
+                ?vehicle anpr:hasVehicleRegno ?regno .
+            }
+            ?vehicle anpr:ownedBy ?nominal .
+
+            ?nominal vcd:hasForename ?forename ;
+                     vcd:hasSurname ?surname ;
+                     vcd:hasGender ?gender ;
+                     vcd:eaDesc ?eaDesc .
+        }
+    ",
+    "parameters": [{
+        "varName": "out",
+        "valueType": "rdfs:Resource",
+        "optional": false
+    }, {
+        "varName": "stream",
+        "valueType": "rdfs:Resource",
+        "optional": false
+    }, {
+        "varName": "nominalVehiclesGraph",
+        "valueType": "rdfs:Resource",
+        "optional": false,
+        "comment": "A dereferenceable URI containing vechile owner information" 
+    }, {
+        "varName": "nominalsGraph",
+        "valueType": "rdfs:Resource",
+        "optional": false,
+        "comment": "A dereferenceable URI containing information about nominals" 
+    }, {
+        "varName": "forename",
+        "valueType": "xsd:string",
+        "optional": true
+    }, {
+        "varName": "surname",
+        "valueType": "xsd:string",
+        "optional": true
+    }, {
+        "varName": "gender",
+        "valueType": "rdfs:Resource",
+        "optional": true
+    }, {
+        "varName": "eaDesc",
+        "valueType": "rdfs:Resource",
+        "optional": true
+    }, {
+        "varName": "range",
+        "valueType": "xsd:duration",
+        "optional": true,
+        "defaultValue": "PT1S",
+        "min" : "PT1S",
+        "max" : "PT30D"
+    }, {
+        "varName": "step",
+        "valueType": "xsd:duration",
+        "optional": true,
+        "default": "PT1S"
+    }],
+    "preferredEngine": "csparql",
+    "lifespan" : 10
+}
