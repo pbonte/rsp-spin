@@ -2,15 +2,16 @@
 package org.rspspin.lang.rspql;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryException;
+import org.apache.jena.sparql.core.Prologue;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.syntax.*;
 import org.apache.jena.sparql.expr.*;
 import org.apache.jena.sparql.path.*;
 import org.apache.jena.sparql.expr.aggregate.*;
+import org.apache.jena.sparql.syntax.*;
 import org.apache.jena.update.*;
 import org.apache.jena.sparql.modify.request.*;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.own.query.RSPQLQuery;
 import org.rspspin.syntax.ElementWindowGraph;
 
 public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants {
@@ -1468,14 +1469,14 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
   Node n;
     jj_consume_token(LIMIT);
     n = VarOrInt();
-    getQuery().setLimit(n);
+    getQuery().setLimitNode(n);
   }
 
   final public void OffsetClause() throws ParseException {
   Node n;
     jj_consume_token(OFFSET);
     n = VarOrInt();
-    getQuery().setOffset(n);
+    getQuery().setOffsetNode(n);
   }
 
   final public void ValuesClause() throws ParseException {
@@ -2257,7 +2258,7 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     case SELECT:
       startSubSelect(beginLine, beginColumn);
       SubSelect();
-      Query q = endSubSelect(beginLine, beginColumn);
+      org.apache.jena.query.Query q = endSubSelect(beginLine, beginColumn);
       el = new ElementSubQuery(q);
       break;
     default:
@@ -7448,6 +7449,11 @@ public class RSPQLParser extends RSPQLParserBase implements RSPQLParserConstants
     Token first;
     int arg;
     JJCalls next;
+  }
+
+  protected Query newSubQuery(Prologue progloue)
+  {
+    return new RSPQLQuery(getPrologue());
   }
 
 }

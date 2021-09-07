@@ -7,6 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.SortCondition;
+import org.apache.jena.sparql.syntax.*;
+import org.apache.own.query.RSPQLQuery;
 import org.topbraid.spin.model.Argument;
 import org.topbraid.spin.model.Ask;
 import org.topbraid.spin.model.Construct;
@@ -45,8 +49,6 @@ import org.topbraid.spin.vocabulary.SPL;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.SortCondition;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFList;
@@ -94,23 +96,6 @@ import org.apache.jena.sparql.path.P_ZeroOrMoreN;
 import org.apache.jena.sparql.path.P_ZeroOrOne;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.serializer.SerializationContext;
-import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.sparql.syntax.ElementAssign;
-import org.apache.jena.sparql.syntax.ElementBind;
-import org.apache.jena.sparql.syntax.ElementData;
-import org.apache.jena.sparql.syntax.ElementExists;
-import org.apache.jena.sparql.syntax.ElementFilter;
-import org.apache.jena.sparql.syntax.ElementGroup;
-import org.apache.jena.sparql.syntax.ElementMinus;
-import org.apache.jena.sparql.syntax.ElementNamedGraph;
-import org.apache.jena.sparql.syntax.ElementNotExists;
-import org.apache.jena.sparql.syntax.ElementOptional;
-import org.apache.jena.sparql.syntax.ElementPathBlock;
-import org.apache.jena.sparql.syntax.ElementService;
-import org.apache.jena.sparql.syntax.ElementSubQuery;
-import org.apache.jena.sparql.syntax.ElementTriplesBlock;
-import org.apache.jena.sparql.syntax.ElementUnion;
-import org.apache.jena.sparql.syntax.Template;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.vocabulary.RDF;
@@ -123,7 +108,7 @@ import org.rspspin.syntax.ElementWindowGraph;
 import org.rspspin.vocabulary.RSPSPIN;
 
 /**
- * Takes a ARQ SPARQL Query as input and creates a corresponding SPIN RDF data
+ * Takes a ARQ SPARQL RSPQLQuery as input and creates a corresponding SPIN RDF data
  * structure from it.
  */
 public class ARQ2SPIN {
@@ -228,7 +213,7 @@ public class ARQ2SPIN {
 		}
 	}
 
-	private void addDescribeProperties(Query arq, Resource spinQuery) {
+	private void addDescribeProperties(RSPQLQuery arq, Resource spinRSPQLQuery) {
 		if (!arq.isQueryResultStar()) {
 			List<Resource> members = new LinkedList<Resource>();
 			Iterator<String> vars = arq.getResultVars().iterator();
@@ -242,11 +227,11 @@ public class ARQ2SPIN {
 				Node uriNode = uris.next();
 				members.add(model.getResource(uriNode.getURI()));
 			}
-			spinQuery.addProperty(SP.resultNodes, model.createList(members.iterator()));
+			spinRSPQLQuery.addProperty(SP.resultNodes, model.createList(members.iterator()));
 		}
 	}
 
-	private void addGroupBy(Query arq, Resource spinQuery) {
+	private void addGroupBy(RSPQLQuery arq, Resource spinRSPQLQuery) {
 		VarExprList namedExprs = arq.getGroupBy();
 		Iterator<Var> vit = namedExprs.getVars().iterator();
 		if (vit.hasNext()) {
@@ -262,21 +247,21 @@ public class ARQ2SPIN {
 					throw new IllegalArgumentException("Expressions not supported in GROUP BY");
 				}
 			}
-			spinQuery.addProperty(SP.groupBy, model.createList(members.iterator()));
+			spinRSPQLQuery.addProperty(SP.groupBy, model.createList(members.iterator()));
 		}
 	}
 
-	private void addNamedGraphClauses(Query arq, Resource spinQuery) {
+	private void addNamedGraphClauses(RSPQLQuery arq, Resource spinRSPQLQuery) {
 		Iterator<String> graphURIs = arq.getGraphURIs().iterator();
 		while (graphURIs.hasNext()) {
 			String graphURI = graphURIs.next();
-			spinQuery.addProperty(SP.from, model.getResource(graphURI));
+			spinRSPQLQuery.addProperty(SP.from, model.getResource(graphURI));
 		}
 
 		Iterator<String> namedGraphURIs = arq.getNamedGraphURIs().iterator();
 		while (namedGraphURIs.hasNext()) {
 			String namedGraphURI = namedGraphURIs.next();
-			spinQuery.addProperty(SP.fromNamed, model.getResource(namedGraphURI));
+			spinRSPQLQuery.addProperty(SP.fromNamed, model.getResource(namedGraphURI));
 		}
 	}
 
@@ -284,35 +269,35 @@ public class ARQ2SPIN {
 	 * Add output stream to model.
 	 * 
 	 * @param arq
-	 * @param spinQuery
+	 * @param spinRSPQLQuery
 	 */
-	private void addOutputStream(Query arq, Resource spinQuery) {
+	private void addOutputStream(RSPQLQuery arq, Resource spinRSPQLQuery) {
 		Node outputStreamNode = arq.getOutputStream();
 		if(outputStreamNode == null) return;
 		// Output stream
 		RDFNode outputStreamName = model.asRDFNode(outputStreamNode);
 		if (outputStreamNode.isVariable())
 			outputStreamName = getVariable(outputStreamNode.getName());
-		spinQuery.addProperty(RSPSPIN.hasOutputStream, outputStreamName);
+		spinRSPQLQuery.addProperty(RSPSPIN.hasOutputStream, outputStreamName);
 	}
 
 	/**
 	 * Add output stream operator to model.
 	 * 
 	 * @param arq
-	 * @param spinQuery
+	 * @param spinRSPQLQuery
 	 */
-	private void addOutputStreamOperator(Query arq, Resource spinQuery) {
+	private void addOutputStreamOperator(RSPQLQuery arq, Resource spinRSPQLQuery) {
 		// Output stream operator
 		switch (arq.getOutputStreamType()) {
-		case Query.OutputStreamTypeDstream:
-			spinQuery.addProperty(RSPSPIN.hasOutputStreamOperator, RSPSPIN.Dstream);
+		case RSPQLQuery.OutputStreamTypeDstream:
+			spinRSPQLQuery.addProperty(RSPSPIN.hasOutputStreamOperator, RSPSPIN.Dstream);
 			break;
-		case Query.OutputStreamTypeRstream:
-			spinQuery.addProperty(RSPSPIN.hasOutputStreamOperator, RSPSPIN.Rstream);
+		case RSPQLQuery.OutputStreamTypeRstream:
+			spinRSPQLQuery.addProperty(RSPSPIN.hasOutputStreamOperator, RSPSPIN.Rstream);
 			break;
-		case Query.OutputStreamTypeIstream:
-			spinQuery.addProperty(RSPSPIN.hasOutputStreamOperator, RSPSPIN.Istream);
+		case RSPQLQuery.OutputStreamTypeIstream:
+			spinRSPQLQuery.addProperty(RSPSPIN.hasOutputStreamOperator, RSPSPIN.Istream);
 			break;
 		}
 	}
@@ -321,9 +306,9 @@ public class ARQ2SPIN {
 	 * Add logical windows to model
 	 * 
 	 * @param arq
-	 * @param spinQuery
+	 * @param spinRSPQLQuery
 	 */
-	private void addLogicalWindows(Query arq, Resource spinQuery) {
+	private void addLogicalWindows(RSPQLQuery arq, Resource spinRSPQLQuery) {
 		List<ElementLogicalWindow> logicalWindows = arq.getLogicalWindows();
 		for (ElementLogicalWindow window : logicalWindows) {
 			Node windowNameNode = window.getWindowNameNode();
@@ -358,7 +343,7 @@ public class ARQ2SPIN {
 					step = getVariable(stepNode.getName());
 				root.addProperty(RSPSPIN.logicalStep, step);
 			}
-			spinQuery.addProperty(RSPSPIN.fromNamedWindow, root);
+			spinRSPQLQuery.addProperty(RSPSPIN.fromNamedWindow, root);
 		}
 	}
 
@@ -366,9 +351,9 @@ public class ARQ2SPIN {
 	 * Add logical past windows to model
 	 * 
 	 * @param arq
-	 * @param spinQuery
+	 * @param spinRSPQLQuery
 	 */
-	private void addLogicalPastWindows(Query arq, Resource spinQuery) {
+	private void addLogicalPastWindows(RSPQLQuery arq, Resource spinRSPQLQuery) {
 		List<ElementLogicalPastWindow> logicalWindows = arq.getLogicalPastWindows();
 		for (ElementLogicalPastWindow window : logicalWindows) {
 			Node windowNameNode = window.getWindowNameNode();
@@ -410,7 +395,7 @@ public class ARQ2SPIN {
 					step = getVariable(stepNode.getName());
 				root.addProperty(RSPSPIN.logicalStep, step);
 			}
-			spinQuery.addProperty(RSPSPIN.fromNamedWindow, root);
+			spinRSPQLQuery.addProperty(RSPSPIN.fromNamedWindow, root);
 		}
 	}
 
@@ -418,9 +403,9 @@ public class ARQ2SPIN {
 	 * Add physical windows to model
 	 * 
 	 * @param arq
-	 * @param spinQuery
+	 * @param spinRSPQLQuery
 	 */
-	private void addPhysicalWindows(Query arq, Resource spinQuery) {
+	private void addPhysicalWindows(RSPQLQuery arq, Resource spinRSPQLQuery) {
 		List<ElementPhysicalWindow> logicalWindows = arq.getPhysicalWindows();
 		for (ElementPhysicalWindow window : logicalWindows) {
 			Node windowNameNode = window.getWindowNameNode();
@@ -454,16 +439,16 @@ public class ARQ2SPIN {
 					step = getVariable(stepNode.getName());
 				root.addProperty(RSPSPIN.physicalStep, step);
 			}
-			spinQuery.addProperty(RSPSPIN.fromNamedWindow, root);
+			spinRSPQLQuery.addProperty(RSPSPIN.fromNamedWindow, root);
 		}
 	}
 
-	private void addSelectProperties(Query arq, Resource spinQuery) {
+	private void addSelectProperties(RSPQLQuery arq, Resource spinRSPQLQuery) {
 		if (arq.isDistinct()) {
-			spinQuery.addProperty(SP.distinct, model.createTypedLiteral(true));
+			spinRSPQLQuery.addProperty(SP.distinct, model.createTypedLiteral(true));
 		}
 		if (arq.isReduced()) {
-			spinQuery.addProperty(SP.reduced, model.createTypedLiteral(true));
+			spinRSPQLQuery.addProperty(SP.reduced, model.createTypedLiteral(true));
 		}
 		if (arq.hasHaving()) {
 			List<Expr> havings = arq.getHavingExprs();
@@ -472,7 +457,7 @@ public class ARQ2SPIN {
 				RDFNode e = createExpression(expr);
 				spinExprs.add(e);
 			}
-			spinQuery.addProperty(SP.having, model.createList(spinExprs.iterator()));
+			spinRSPQLQuery.addProperty(SP.having, model.createList(spinExprs.iterator()));
 		}
 		if (!arq.isQueryResultStar()) {
 			List<RDFNode> members = new LinkedList<RDFNode>();
@@ -499,25 +484,25 @@ public class ARQ2SPIN {
 					}
 				}
 			}
-			spinQuery.addProperty(SP.resultVariables, model.createList(members.iterator()));
+			spinRSPQLQuery.addProperty(SP.resultVariables, model.createList(members.iterator()));
 		}
-		addSolutionModifiers(arq, spinQuery);
+		addSolutionModifiers(arq, spinRSPQLQuery);
 	}
 
-	private void addSolutionModifiers(Query arq, Resource query) {
-		Node limit = arq.getLimit();
+	private void addSolutionModifiers(RSPQLQuery arq, Resource rspqlquery) {
+		Node limit = arq.getLimitNode();
 		if (limit != null) {
 			RDFNode limitNode = model.asRDFNode(limit);
 			if (limit.isVariable())
 				limitNode = getVariable(limit.getName());
-			query.addProperty(SP.limit, limitNode);
+			rspqlquery.addProperty(SP.limit, limitNode);
 		}
-		Node offset = arq.getOffset();
+		Node offset = arq.getOffsetNode();
 		if (offset != null) {
 			RDFNode offsetNode = model.asRDFNode(offset);
 			if (offset.isVariable())
 				offsetNode = getVariable(offset.getName());
-			query.addProperty(SP.offset, offsetNode);
+			rspqlquery.addProperty(SP.offset, offsetNode);
 		}
 
 		List<SortCondition> orderBy = arq.getOrderBy();
@@ -526,28 +511,28 @@ public class ARQ2SPIN {
 			for (SortCondition sortCondition : orderBy) {
 				Expr expr = sortCondition.getExpression();
 				RDFNode node = createExpression(expr);
-				if (sortCondition.getDirection() == Query.ORDER_ASCENDING) {
-					Resource asc = query.getModel().createResource(SP.Asc);
+				if (sortCondition.getDirection() == RSPQLQuery.ORDER_ASCENDING) {
+					Resource asc = rspqlquery.getModel().createResource(SP.Asc);
 					asc.addProperty(SP.expression, node);
 					criteria.add(asc);
-				} else if (sortCondition.getDirection() == Query.ORDER_DESCENDING) {
-					Resource desc = query.getModel().createResource(SP.Desc);
+				} else if (sortCondition.getDirection() == RSPQLQuery.ORDER_DESCENDING) {
+					Resource desc = rspqlquery.getModel().createResource(SP.Desc);
 					desc.addProperty(SP.expression, node);
 					criteria.add(desc);
 				} else {
 					criteria.add(node);
 				}
 			}
-			query.addProperty(SP.orderBy, query.getModel().createList(criteria.iterator()));
+			rspqlquery.addProperty(SP.orderBy, rspqlquery.getModel().createList(criteria.iterator()));
 		}
 	}
 
-	private void addValues(Query arq, Resource spinQuery) {
+	private void addValues(RSPQLQuery arq, Resource spinRSPQLQuery) {
 		if (arq.hasValues()) {
 			List<Var> vars = arq.getValuesVariables();
 			List<Binding> bindings = arq.getValuesData();
 			Values values = SPINFactory.createValues(model, new TableData(vars, bindings), true);
-			spinQuery.addProperty(SP.values, values);
+			spinRSPQLQuery.addProperty(SP.values, values);
 		}
 	}
 
@@ -720,10 +705,10 @@ public class ARQ2SPIN {
 					members.add(SPINFactory.createService(model, uri, body));
 				}
 
-				public void visit(ElementSubQuery subQuery) {
-					Query arq = subQuery.getQuery();
-					org.topbraid.spin.model.Query spinQuery = createQuery(arq, null);
-					members.add(SPINFactory.createSubQuery(model, spinQuery));
+				public void visit(ElementSubQuery subRSPQLQuery) {
+					RSPQLQuery arq = (RSPQLQuery) subRSPQLQuery.getQuery();
+					org.topbraid.spin.model.Query spinRSPQLQuery = createRSPQLQuery(arq, null);
+					members.add(SPINFactory.createSubQuery(model, spinRSPQLQuery));
 				}
 
 				public void visit(ElementTriplesBlock el) {
@@ -1025,56 +1010,61 @@ public class ARQ2SPIN {
 		return triple;
 	}
 
+
+	public org.topbraid.spin.model.Query createQuery(Query arq, String uri) {
+		RSPQLQuery query = (RSPQLQuery)arq;
+		return createRSPQLQuery(query,uri);
+	}
 	/**
-	 * Constructs a new SPIN Query from a given ARQ query, possibly with a URI.
+	 * Constructs a new SPIN RSPQLQuery from a given ARQ RSPQLQuery, possibly with a URI.
 	 * 
 	 * @param arq
-	 *            the ARQ query
+	 *            the ARQ RSPQLQuery
 	 * @param uri
-	 *            the URI of the new Query resource or null for a blank node
-	 * @return the Query
+	 *            the URI of the new RSPQLQuery resource or null for a blank node
+	 * @return the RSPQLQuery
 	 */
-	public org.topbraid.spin.model.Query createQuery(Query arq, String uri) {
+	public org.topbraid.spin.model.Query createRSPQLQuery(RSPQLQuery arq, String uri) {
 
-		Resource spinQuery = model.createResource(uri);
-		addOutputStream(arq, spinQuery);
-		addOutputStreamOperator(arq, spinQuery);
+		Resource spinRSPQLQuery = model.createResource(uri);
+		addOutputStream(arq, spinRSPQLQuery);
+		addOutputStreamOperator(arq, spinRSPQLQuery);
 
-		addNamedGraphClauses(arq, spinQuery);
-		addLogicalWindows(arq, spinQuery);
-		addLogicalPastWindows(arq, spinQuery);
-		addPhysicalWindows(arq, spinQuery);
+		addNamedGraphClauses(arq, spinRSPQLQuery);
+		addLogicalWindows(arq, spinRSPQLQuery);
+		addLogicalPastWindows(arq, spinRSPQLQuery);
+		addPhysicalWindows(arq, spinRSPQLQuery);
 
 		Resource where = createElementList(arq.getQueryPattern());
-		spinQuery.addProperty(SP.where, where);
+		spinRSPQLQuery.addProperty(SP.where, where);
 
 		if (arq.isAskType()) {
-			spinQuery.addProperty(RDF.type, SP.Ask);
-			addValues(arq, spinQuery);
-			return spinQuery.as(Ask.class);
+			spinRSPQLQuery.addProperty(RDF.type, SP.Ask);
+			addValues(arq, spinRSPQLQuery);
+			return spinRSPQLQuery.as(Ask.class);
 		} else if (arq.isConstructType()) {
 			Resource head = createHead(arq.getConstructTemplate());
-			spinQuery.addProperty(RDF.type, SP.Construct);
-			spinQuery.addProperty(SP.templates, head);
-			addSolutionModifiers(arq, spinQuery);
-			addValues(arq, spinQuery);
-			return spinQuery.as(Construct.class);
+			spinRSPQLQuery.addProperty(RDF.type, SP.Construct);
+			spinRSPQLQuery.addProperty(SP.templates, head);
+			addSolutionModifiers(arq, spinRSPQLQuery);
+			addValues(arq, spinRSPQLQuery);
+			return spinRSPQLQuery.as(Construct.class);
 		} else if (arq.isSelectType()) {
-			spinQuery.addProperty(RDF.type, SP.Select);
-			Select select = spinQuery.as(Select.class);
-			addSelectProperties(arq, spinQuery);
-			addGroupBy(arq, spinQuery);
-			addValues(arq, spinQuery);
+			spinRSPQLQuery.addProperty(RDF.type, SP.Select);
+			Select select = spinRSPQLQuery.as(Select.class);
+			addSelectProperties(arq, spinRSPQLQuery);
+			addGroupBy(arq, spinRSPQLQuery);
+			addValues(arq, spinRSPQLQuery);
 			return select;
 		} else if (arq.isDescribeType()) {
-			spinQuery.addProperty(RDF.type, SP.Describe);
-			Describe describe = spinQuery.as(Describe.class);
-			addDescribeProperties(arq, spinQuery);
-			addSolutionModifiers(arq, spinQuery);
-			addValues(arq, spinQuery);
+			spinRSPQLQuery.addProperty(RDF.type, SP.Describe);
+			Describe describe = spinRSPQLQuery.as(Describe.class);
+			addDescribeProperties(arq, spinRSPQLQuery);
+			addSolutionModifiers(arq, spinRSPQLQuery);
+			addValues(arq, spinRSPQLQuery);
 			return describe;
 		}
-		throw new IllegalArgumentException("Unsupported SPARQL query type");
+		throw new IllegalArgumentException("Unsupported SPARQL RSPQLQuery type");
 	}
 
 	private Modify createModify(UpdateModify arq, String uri) {
@@ -1234,19 +1224,19 @@ public class ARQ2SPIN {
 	}
 
 	/**
-	 * Parses a given partial query string and converts it into a SPIN structure
+	 * Parses a given partial RSPQLQuery string and converts it into a SPIN structure
 	 * inside a given Model.
 	 * 
 	 * @param str
-	 *            the partial query string
+	 *            the partial RSPQLQuery string
 	 * @param model
 	 *            the Model to operate on
-	 * @return the new SPIN Query
+	 * @return the new SPIN RSPQLQuery
 	 */
-	public static org.topbraid.spin.model.Query parseQuery(String str, Model model) {
-		Query arq = ARQFactory.get().createQuery(model, str);
+	public static org.topbraid.spin.model.Query parseRSPQLQuery(String str, Model model) {
+		RSPQLQuery arq = (RSPQLQuery)ARQFactory.get().createQuery(model, str);
 		ARQ2SPIN a2s = new ARQ2SPIN(model);
-		return a2s.createQuery(arq, null);
+		return a2s.createRSPQLQuery(arq, null);
 	}
 
 	/**
@@ -1257,7 +1247,7 @@ public class ARQ2SPIN {
 	 *            the partial UPDATE string
 	 * @param model
 	 *            the Model to operate on
-	 * @return the new SPIN Query
+	 * @return the new SPIN RSPQLQuery
 	 */
 	public static org.topbraid.spin.model.update.Update parseUpdate(String str, Model model) {
 		String prefixes = ARQFactory.get().createPrefixDeclarations(model);

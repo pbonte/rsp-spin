@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.jena.sparql.serializer;
+package org.apache.own.sparql.serializer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,12 +34,40 @@ import org.apache.jena.sparql.core.PathBlock;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.path.PathWriter;
+import org.apache.jena.sparql.serializer.*;
 import org.apache.jena.sparql.syntax.*;
 import org.apache.jena.sparql.util.FmtUtils;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.own.query.RSPQLQuery;
+import org.apache.own.query.RSPQLQueryVisitor;
+import org.apache.own.sparql.syntax.WindowedElementVisitor;
+import org.rspspin.lang.cqels.CQELSQLSerializer;
+import org.rspspin.syntax.ElementLogicalPastWindow;
+import org.rspspin.syntax.ElementLogicalWindow;
+import org.rspspin.syntax.ElementPhysicalWindow;
 import org.rspspin.syntax.ElementWindowGraph;
 
-public class FormatterElement extends FormatterBase implements ElementVisitor {
+public class FormatterElement extends FormatterBase implements WindowedElementVisitor {
+	protected List<ElementLogicalWindow> logicalWindows;
+	protected List<ElementLogicalPastWindow> logicalPastWindows;
+	protected List<ElementPhysicalWindow> physicalWindows;
+
+	public void setWindows(RSPQLQuery query) {
+		this.setLogicalWindows(query.getLogicalWindows());
+		this.setLogicalPastWindows(query.getLogicalPastWindows());
+		this.setPhysicalWindows(query.getPhysicalWindows());
+	}
+	public void setLogicalWindows(List<ElementLogicalWindow> logicalWindows) {
+		this.logicalWindows = logicalWindows;
+	}
+
+	public void setLogicalPastWindows(List<ElementLogicalPastWindow> logicalPastWindows) {
+		this.logicalPastWindows = logicalPastWindows;
+	}
+
+	public void setPhysicalWindows(List<ElementPhysicalWindow> physicalWindows) {
+		this.physicalWindows = physicalWindows;
+	}
 	public static final int INDENT = 2;
 
 	/**
@@ -224,7 +252,7 @@ public class FormatterElement extends FormatterBase implements ElementVisitor {
 
 	@Override
 	public void visit(ElementData el) {
-		QuerySerializer.outputDataBlock(out, el.getVars(), el.getRows(), context.getPrologue());
+		RSPQLQuerySerializer.outputDataBlock(out, el.getVars(), el.getRows(), context.getPrologue());
 	}
 
 	@Override
@@ -416,10 +444,12 @@ public class FormatterElement extends FormatterBase implements ElementVisitor {
 		out.print("{ ");
 		out.incIndent(INDENT);
 		Query q = el.getQuery();
+		RSPQLQuery rsqp = (RSPQLQuery)this.context.getPrologue();
 
 		// Serialize with respect to the existing context
-		QuerySerializerFactory factory = SerializerRegistry.get().getQuerySerializerFactory(Syntax.syntaxARQ);
-		QueryVisitor serializer = factory.create(Syntax.syntaxARQ, context, out);
+		QuerySerializerFactory factory = SerializerRegistry.get().getQuerySerializerFactory(rsqp.getSyntax());
+		QueryVisitor serializer = factory.create(rsqp.getSyntax(), context, out);
+
 		q.visit(serializer);
 
 		out.decIndent(INDENT);

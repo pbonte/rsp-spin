@@ -16,46 +16,20 @@
  * limitations under the License.
  */
 
-package org.apache.jena.query;
+package org.apache.own.query;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryVisitor;
 import org.apache.jena.sparql.core.Prologue;
 
 /** Query visitor pattern */
 
-public interface QueryVisitor {
-	public void startVisit(Query query);
+public interface RSPQLQueryVisitor extends QueryVisitor {
 
-	public void visitPrologue(Prologue prologue);
-
-	public void visitResultForm(Query query);
-
-	public void visitSelectResultForm(Query query);
-
-	public void visitConstructResultForm(Query query);
-
-	public void visitDescribeResultForm(Query query);
-
-	public void visitAskResultForm(Query query);
-
-	public void visitDatasetDecl(Query query);
 
 	public void visitWindowDecl(Query query);
 
 	public void visitOutputStreamDecl(Query query);
 
-	public void visitQueryPattern(Query query);
 
-	public void visitGroupBy(Query query);
-
-	public void visitHaving(Query query);
-
-	public void visitOrderBy(Query query);
-
-	public void visitLimit(Query query);
-
-	public void visitOffset(Query query);
-
-	public void visitValues(Query query);
-
-	public void finishVisit(Query query);
 }

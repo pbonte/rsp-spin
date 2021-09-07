@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package org.apache.jena.sparql.syntax;
+package org.apache.own.sparql.syntax;
 
+import org.apache.jena.sparql.syntax.*;
 import org.rspspin.syntax.ElementWindowGraph;
 
 /**
@@ -28,12 +29,12 @@ import org.rspspin.syntax.ElementWindowGraph;
  */
 
 public class ElementWalker {
-	public static void walk(Element el, ElementVisitor visitor) {
+	public static void walk(Element el, WindowedElementVisitor visitor) {
 		walk(el, visitor, null, null);
 	}
 
-	public static void walk(Element el, ElementVisitor visitor, ElementVisitor beforeVisitor,
-			ElementVisitor afterVisitor) {
+	public static void walk(Element el, WindowedElementVisitor visitor, WindowedElementVisitor beforeVisitor,
+							WindowedElementVisitor afterVisitor) {
 		Walker w = new Walker(visitor, beforeVisitor, afterVisitor);
 		el.visit(w);
 	}
@@ -42,12 +43,12 @@ public class ElementWalker {
 		el.visit(walker);
 	}
 
-	static public class Walker implements ElementVisitor {
-		protected final ElementVisitor proc;
-		protected final ElementVisitor beforeVisitor;
-		protected final ElementVisitor afterVisitor;
+	static public class Walker implements WindowedElementVisitor {
+		protected final WindowedElementVisitor proc;
+		protected final WindowedElementVisitor beforeVisitor;
+		protected final WindowedElementVisitor afterVisitor;
 
-		protected Walker(ElementVisitor visitor, ElementVisitor beforeVisitor, ElementVisitor afterVisitor) {
+		protected Walker(WindowedElementVisitor visitor, WindowedElementVisitor beforeVisitor, WindowedElementVisitor afterVisitor) {
 			proc = visitor;
 			this.beforeVisitor = beforeVisitor;
 			this.afterVisitor = afterVisitor;

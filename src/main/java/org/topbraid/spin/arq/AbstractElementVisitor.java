@@ -17,14 +17,14 @@ import org.apache.jena.sparql.syntax.ElementService;
 import org.apache.jena.sparql.syntax.ElementSubQuery;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
-import org.apache.jena.sparql.syntax.ElementVisitor;
+import org.apache.own.sparql.syntax.WindowedElementVisitor;
 import org.rspspin.syntax.ElementWindowGraph;
 
 /**
  * A basic implementation of ElementVisitor that has handling of ElementGroups
  * so that they are recursively walked in.
  */
-public abstract class AbstractElementVisitor implements ElementVisitor {
+public abstract class AbstractElementVisitor implements WindowedElementVisitor {
 
 	public void visit(ElementBind el) {
 	}

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.jena.query;
+package org.apache.own.query;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -37,6 +37,7 @@ import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.iri.IRI;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;

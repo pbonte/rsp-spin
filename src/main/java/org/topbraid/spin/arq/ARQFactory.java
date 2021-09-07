@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.jena.query.*;
 import org.topbraid.spin.model.print.StringPrintContext;
 import org.topbraid.spin.model.update.Update;
 import org.topbraid.spin.system.ExtraPrefixes;
@@ -14,13 +15,6 @@ import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.util.SPINExpressions;
 
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
@@ -28,8 +22,8 @@ import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import org.apache.jena.sparql.syntax.ElementNamedGraph;
-import org.apache.jena.sparql.syntax.ElementVisitorBase;
-import org.apache.jena.sparql.syntax.ElementWalker;
+import org.apache.own.sparql.syntax.ElementVisitorBase;
+import org.apache.own.sparql.syntax.ElementWalker;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
 
@@ -372,7 +366,7 @@ public class ARQFactory {
 	}
 
 	public QueryEngineHTTP createRemoteQueryExecution(String service, Query query, List<String> defaultGraphURIs,
-			List<String> namedGraphURIs, String user, char[] password) {
+													  List<String> namedGraphURIs, String user, char[] password) {
 		QueryEngineHTTP qexec = (QueryEngineHTTP) QueryExecutionFactory.sparqlService(service, query);
 		if (defaultGraphURIs.size() > 0) {
 			qexec.setDefaultGraphURIs(defaultGraphURIs);

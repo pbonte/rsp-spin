@@ -13,11 +13,9 @@ import org.rspspin.syntax.ElementLogicalWindow;
 import org.rspspin.syntax.ElementPhysicalWindow;
 import org.rspspin.syntax.ElementWindowGraph;
 
-public class FormatterElement extends org.apache.jena.sparql.serializer.FormatterElement {
+public class FormatterElement extends org.apache.own.sparql.serializer.FormatterElement {
 	boolean strict = false;
-	List<ElementLogicalWindow> logicalWindows;
-	List<ElementLogicalPastWindow> logicalPastWindows;
-	List<ElementPhysicalWindow> physicalWindows;
+
 
 	public FormatterElement(IndentedWriter out, SerializationContext context) {
 		super(out, context);

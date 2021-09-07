@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.Query;
 import org.json.JSONObject;
-import org.rspspin.lang.cqels.CQELSQLSerializer;
 import org.rspspin.lang.cqels.ParserCQELS;
 import org.rspspin.lang.csparql.ParserCSPARQL;
 import org.rspspin.lang.rspql.ParserRSPQL;

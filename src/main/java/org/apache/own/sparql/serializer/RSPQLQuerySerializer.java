@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.jena.sparql.serializer;
+package org.apache.own.sparql.serializer;
 
 import java.io.OutputStream;
 import java.util.List;
@@ -24,34 +24,35 @@ import java.util.List;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryVisitor;
 import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.core.Prologue;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.serializer.*;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.Template;
 import org.apache.jena.sparql.util.FmtUtils;
+import org.apache.own.query.RSPQLQueryVisitor;
 
 /**
  * Serialize a query into SPARQL or ARQ formats
  */
-public class QuerySerializer implements QueryVisitor {
+public class RSPQLQuerySerializer implements RSPQLQueryVisitor {
 	protected static final int BLOCK_INDENT = 2;
 	protected FormatterTemplate fmtTemplate;
-	protected FormatterElement fmtElement;
+	protected org.apache.own.sparql.serializer.FormatterElement fmtElement;
 	protected FmtExprSPARQL fmtExpr;
 	protected IndentedWriter out = null;
 
-	public QuerySerializer(OutputStream _out, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
-			FormatterTemplate formatterTemplate) {
+	public RSPQLQuerySerializer(OutputStream _out, org.apache.own.sparql.serializer.FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
+								FormatterTemplate formatterTemplate) {
 		this(new IndentedWriter(_out), formatterElement, formatterExpr, formatterTemplate);
 	}
 
-	public QuerySerializer(IndentedWriter iwriter, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
-			FormatterTemplate formatterTemplate) {
+	public RSPQLQuerySerializer(IndentedWriter iwriter, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
+								FormatterTemplate formatterTemplate) {
 		out = iwriter;
 		fmtTemplate = formatterTemplate;
 		fmtElement = formatterElement;

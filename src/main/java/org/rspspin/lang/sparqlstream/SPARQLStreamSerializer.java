@@ -7,16 +7,17 @@ import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryException;
-import org.apache.jena.query.QueryVisitor;
+import org.apache.own.query.RSPQLQuery;
+import org.apache.own.query.RSPQLQueryVisitor;
 import org.apache.jena.sparql.serializer.FmtExprSPARQL;
 import org.apache.jena.sparql.serializer.FormatterTemplate;
 import org.apache.jena.sparql.syntax.Template;
+import org.apache.own.sparql.serializer.RSPQLQuerySerializer;
 import org.rspspin.syntax.ElementLogicalPastWindow;
 import org.rspspin.syntax.ElementLogicalWindow;
-import org.rspspin.syntax.ElementPhysicalWindow;
 import org.rspspin.syntax.ElementWindow;
 
-public class SPARQLStreamSerializer extends org.apache.jena.sparql.serializer.QuerySerializer implements QueryVisitor {
+public class SPARQLStreamSerializer extends RSPQLQuerySerializer implements RSPQLQueryVisitor {
 	public boolean strict = false;
 
 	public SPARQLStreamSerializer(IndentedWriter iwriter, FormatterElement formatterElement,
@@ -25,7 +26,9 @@ public class SPARQLStreamSerializer extends org.apache.jena.sparql.serializer.Qu
 	}
 
 	@Override
-	public void visitWindowDecl(Query query) {
+	public void visitWindowDecl(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+
 		if (!query.getPhysicalWindows().isEmpty()) {
 			throw new QueryException("ERROR: SPARQLStream does not support physical windows.");
 		}
@@ -124,8 +127,8 @@ public class SPARQLStreamSerializer extends org.apache.jena.sparql.serializer.Qu
 	 * minimum step. No step will be interpreted as the minimum supported step
 	 * size. Clashing variables or window types throws an exception.
 	 * 
-	 * @param window
-	 * @param elementWindow
+	 * @param
+	 * @param
 	 * @return
 	 */
 	private ElementWindow combineWindows(ElementWindow window1, ElementWindow window2) {
@@ -226,16 +229,18 @@ public class SPARQLStreamSerializer extends org.apache.jena.sparql.serializer.Qu
 	}
 
 	@Override
-	public void visitSelectResultForm(Query query) {
+	public void visitSelectResultForm(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+
 		out.print("SELECT ");
 		switch (query.getOutputStreamType()) {
-		case Query.OutputStreamTypeRstream:
+		case RSPQLQuery.OutputStreamTypeRstream:
 			out.print("RSTREAM ");
 			break;
-		case Query.OutputStreamTypeDstream:
+		case RSPQLQuery.OutputStreamTypeDstream:
 			out.print("DSTREAM ");
 			break;
-		case Query.OutputStreamTypeIstream:
+		case RSPQLQuery.OutputStreamTypeIstream:
 			out.print("ISTREAM ");
 			break;
 		}
@@ -253,17 +258,18 @@ public class SPARQLStreamSerializer extends org.apache.jena.sparql.serializer.Qu
 	}
 
 	@Override
-	public void visitConstructResultForm(Query query) {
+	public void visitConstructResultForm(Query inputQuery) {
 		out.print("CONSTRUCT ");
-		
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+
 		switch (query.getOutputStreamType()) {
-		case Query.OutputStreamTypeRstream:
+		case RSPQLQuery.OutputStreamTypeRstream:
 			out.print("RSTREAM ");
 			break;
-		case Query.OutputStreamTypeDstream:
+		case RSPQLQuery.OutputStreamTypeDstream:
 			out.print("DSTREAM ");
 			break;
-		case Query.OutputStreamTypeIstream:
+		case RSPQLQuery.OutputStreamTypeIstream:
 			out.print("ISTREAM ");
 			break;
 		}
@@ -278,7 +284,9 @@ public class SPARQLStreamSerializer extends org.apache.jena.sparql.serializer.Qu
 	}
 
 	@Override
-	public void visitOutputStreamDecl(Query query) {
+	public void visitOutputStreamDecl(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+
 		if (query.getOutputStream() == null)
 			return;
 		System.err.println("WARNING: SPARQLStream does not support naming of the output stream.");

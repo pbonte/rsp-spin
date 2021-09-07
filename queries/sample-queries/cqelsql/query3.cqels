@@ -8,9 +8,8 @@ CONSTRUCT
 WHERE
   { { SELECT  (SUM(?amount) AS ?totalamount) ?location
       WHERE
-        {  }
+        { STREAM  }
       GROUP BY ?location
       ORDER BY DESC(?totalamount)
-      LIMIT   "3"^^http://www.w3.org/2001/XMLSchema#int
     }
   }

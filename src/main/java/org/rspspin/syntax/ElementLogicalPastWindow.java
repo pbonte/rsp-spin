@@ -6,6 +6,7 @@ package org.rspspin.syntax;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementVisitor;
+import org.apache.own.sparql.syntax.WindowedElementVisitor;
 import org.apache.jena.sparql.util.NodeIsomorphismMap;
 
 public class ElementLogicalPastWindow extends ElementWindow {
@@ -29,12 +30,18 @@ public class ElementLogicalPastWindow extends ElementWindow {
 	}
 
 	@Override
+	public void visit(ElementVisitor v) {
+
+	}
+
+	@Override
 	public int hashCode() {
 		return getWindowNameNode().hashCode() ^ getStreamNameNode().hashCode();
 	}
 
-	@Override
-	public void visit(ElementVisitor v) {
+
+	public void visit(WindowedElementVisitor v) {
+
 	}
 
 	public Node getFromNode() {

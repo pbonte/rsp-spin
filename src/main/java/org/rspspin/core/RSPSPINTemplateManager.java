@@ -8,15 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.jena.query.ARQ;
-import org.apache.jena.query.ParameterizedSparqlString;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QueryParseException;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.Syntax;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -26,6 +18,7 @@ import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.log4j.Logger;
+import org.apache.own.query.RSPQLQuery;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -95,7 +88,7 @@ public class RSPSPINTemplateManager {
 	/**
 	 * Load properties
 	 * 
-	 * @param path
+	 * @param propsPath
 	 */
 	private void loadProperties(String propsPath) {
 		try {
@@ -159,7 +152,7 @@ public class RSPSPINTemplateManager {
 		default:
 			throw new RSPSPINException("Unsupported template type");
 		}
-		template.addProperty(SPIN.body, arq2spin.createQuery(query, null));
+		template.addProperty(SPIN.body, arq2spin.createRSPQLQuery((RSPQLQuery) query, null));
 
 		return template;
 	}
@@ -227,7 +220,7 @@ public class RSPSPINTemplateManager {
 	 * @param valueType
 	 * @param defaultValue
 	 * @param optional
-	 * @param isArray
+	 * @param optional
 	 * @param model
 	 * @return
 	 * @throws RSPSPINException
@@ -389,7 +382,7 @@ public class RSPSPINTemplateManager {
 	 * bindings.
 	 * 
 	 * @param template
-	 * @param parameters
+	 * @param bindings
 	 * @return
 	 * @throws RSPSPINException
 	 * @throws ArgumentConstraintException
@@ -403,7 +396,7 @@ public class RSPSPINTemplateManager {
 		arq.setPrefixMapping(RSPSPINUtils.getDefaultPrefixMapping());
 
 		// Parameterized
-		ParameterizedSparqlString pss = new ParameterizedSparqlString(arq.toString(), bindings);
+		org.apache.own.query.ParameterizedSparqlString pss = new org.apache.own.query.ParameterizedSparqlString(arq.toString(), bindings);
 		return pss.asQuery();
 	}
 
@@ -412,7 +405,7 @@ public class RSPSPINTemplateManager {
 	 * bindings.
 	 * 
 	 * @param template
-	 * @param parameters
+	 * @param bindings
 	 * @return
 	 * @throws RSPSPINException
 	 * @throws ArgumentConstraintException
@@ -426,7 +419,7 @@ public class RSPSPINTemplateManager {
 		arq.setPrefixMapping(RSPSPINUtils.getDefaultPrefixMapping());
 
 		// Parameterized
-		ParameterizedSparqlString pss = new ParameterizedSparqlString(arq.toString(), bindings);
+		org.apache.own.query.ParameterizedSparqlString pss = new org.apache.own.query.ParameterizedSparqlString(arq.toString(), bindings);
 		return pss.asUpdate();
 	}
 
@@ -434,7 +427,6 @@ public class RSPSPINTemplateManager {
 	 * Get uninstantiated query from template
 	 * 
 	 * @param template
-	 * @param parameters
 	 * @return
 	 * @throws RSPSPINException
 	 */
@@ -449,7 +441,6 @@ public class RSPSPINTemplateManager {
 	 * Get uninstantiated update from template.
 	 * 
 	 * @param template
-	 * @param parameters
 	 * @return
 	 * @throws RSPSPINException
 	 */

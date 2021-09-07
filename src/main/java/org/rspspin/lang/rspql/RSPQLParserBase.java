@@ -24,6 +24,7 @@ import org.apache.jena.atlas.json.io.JSONHandler;
 import org.apache.jena.atlas.json.io.JSONHandlerBase;
 import org.apache.jena.atlas.lib.NotImplemented;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Query;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.lang.SPARQLParserBase;
@@ -32,6 +33,7 @@ import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementNamedGraph;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.syntax.Template;
+import org.apache.own.query.RSPQLQuery;
 
 class RSPQLParserBase extends SPARQLParserBase implements RSPQLParserConstants {
 	// JSON
@@ -42,6 +44,10 @@ class RSPQLParserBase extends SPARQLParserBase implements RSPQLParserConstants {
 			this.handler = new JSONHandlerBase();
 		else
 			this.handler = handler;
+	}
+
+	public RSPQLQuery getQuery() {
+		return (RSPQLQuery)query ;
 	}
 
 	// All the signals from the parsing process.

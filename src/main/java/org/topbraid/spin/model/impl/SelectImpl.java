@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.jena.query.Query;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.model.Aggregation;
@@ -43,7 +44,7 @@ public class SelectImpl extends QueryImpl implements Select {
 		} else {
 			String text = ARQ2SPIN.getTextOnly(this);
 			if (text != null) {
-				org.apache.jena.query.Query arqQuery = ARQFactory.get().createQuery(this);
+				Query arqQuery = ARQFactory.get().createQuery(this);
 				return arqQuery.getResultVars();
 			} else {
 				return Collections.emptyList();

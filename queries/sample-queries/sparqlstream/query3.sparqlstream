@@ -9,9 +9,11 @@ FROM STREAM <http://debs2015.org/streams/s> [NOW-30 MINUTE SLIDE 15 MINUTE]
 WHERE
   { { SELECT  (SUM(?amount) AS ?totalamount) ?location
       WHERE
-        {  }
+        { 
+          ?taxi     debs:pickup  ?location .
+          ?location  debs:amount  ?amount .
+        }
       GROUP BY ?location
       ORDER BY DESC(?totalamount)
-      LIMIT   "3"^^http://www.w3.org/2001/XMLSchema#int
     }
   }

@@ -17,12 +17,10 @@ import org.rspspin.syntax.ElementPhysicalWindow;
 import org.rspspin.syntax.ElementWindow;
 import org.rspspin.syntax.ElementWindowGraph;
 
-public class FormatterElement extends org.apache.jena.sparql.serializer.FormatterElement {
+public class FormatterElement extends org.apache.own.sparql.serializer.FormatterElement {
 	boolean strict = false;
 	boolean abbrStream = false;
-	List<ElementLogicalWindow> logicalWindows;
-	List<ElementLogicalPastWindow> logicalPastWindows;
-	List<ElementPhysicalWindow> physicalWindows;
+
 
 	public FormatterElement(IndentedWriter out, SerializationContext context) {
 		super(out, context);
@@ -100,12 +98,7 @@ public class FormatterElement extends org.apache.jena.sparql.serializer.Formatte
 		}
 	}
 
-	/**
-	 * Get duration formatted as CQELS-QL time.
-	 * 
-	 * @param rangeNode
-	 * @return
-	 */
+
 	private String cqelsTime(Node node) {
 		if (node.isVariable()) {
 			return node.toString();
@@ -176,16 +169,6 @@ public class FormatterElement extends org.apache.jena.sparql.serializer.Formatte
 		return null;
 	}
 
-	public void setLogicalWindows(List<ElementLogicalWindow> logicalWindows) {
-		this.logicalWindows = logicalWindows;
-	}
 
-	public void setLogicalPastWindows(List<ElementLogicalPastWindow> logicalPastWindows) {
-		this.logicalPastWindows = logicalPastWindows;
-	}
-
-	public void setPhysicalWindows(List<ElementPhysicalWindow> physicalWindows) {
-		this.physicalWindows = physicalWindows;
-	}
 
 }

@@ -5,7 +5,8 @@ import java.io.OutputStream;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryVisitor;
+import org.apache.own.query.RSPQLQuery;
+import org.apache.own.query.RSPQLQueryVisitor;
 import org.apache.jena.sparql.serializer.FmtExprSPARQL;
 import org.apache.jena.sparql.serializer.FormatterTemplate;
 import org.apache.jena.sparql.syntax.Template;
@@ -17,33 +18,35 @@ import org.rspspin.syntax.ElementLogicalPastWindow;
 /**
  * Serialize a query into RSP-QL or standard SPARQL/ARQ
  */
-public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySerializer implements QueryVisitor {
-	public QuerySerializer(OutputStream _out, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
-			FormatterTemplate formatterTemplate) {
+public class RSPQLQuerySerializer extends org.apache.own.sparql.serializer.RSPQLQuerySerializer implements RSPQLQueryVisitor {
+	public RSPQLQuerySerializer(OutputStream _out, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
+								FormatterTemplate formatterTemplate) {
 		this(new IndentedWriter(_out), formatterElement, formatterExpr, formatterTemplate);
 	}
 
-	public QuerySerializer(IndentedWriter iwriter, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
-			FormatterTemplate formatterTemplate) {
+	public RSPQLQuerySerializer(IndentedWriter iwriter, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
+								FormatterTemplate formatterTemplate) {
 		super(iwriter, formatterElement, formatterExpr, formatterTemplate);
 	}
 
 	@Override
-	public void visitSelectResultForm(Query query) {
+	public void visitSelectResultForm(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+
 		out.print("SELECT ");
 		if (query.isDistinct())
 			out.print("DISTINCT ");
 		if (query.isReduced())
 			out.print("REDUCED ");
-		if (query.getOutputStreamType() != Query.OutputStreamTypeUnknown) {
+		if (query.getOutputStreamType() != RSPQLQuery.OutputStreamTypeUnknown) {
 			switch (query.getOutputStreamType()) {
-			case Query.OutputStreamTypeIstream:
+			case RSPQLQuery.OutputStreamTypeIstream:
 				out.print("ISTREAM ");
 				break;
-			case Query.OutputStreamTypeRstream:
+			case RSPQLQuery.OutputStreamTypeRstream:
 				out.print("RSTREAM ");
 				break;
-			case Query.OutputStreamTypeDstream:
+			case RSPQLQuery.OutputStreamTypeDstream:
 				out.print("DSTREAM ");
 				break;
 			}
@@ -58,17 +61,19 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 	}
 
 	@Override
-	public void visitConstructResultForm(Query query) {
+	public void visitConstructResultForm(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+
 		out.print("CONSTRUCT ");
-		if (query.getOutputStreamType() != Query.OutputStreamTypeUnknown) {
+		if (query.getOutputStreamType() != RSPQLQuery.OutputStreamTypeUnknown) {
 			switch (query.getOutputStreamType()) {
-			case Query.OutputStreamTypeIstream:
+			case RSPQLQuery.OutputStreamTypeIstream:
 				out.print("ISTREAM ");
 				break;
-			case Query.OutputStreamTypeRstream:
+			case RSPQLQuery.OutputStreamTypeRstream:
 				out.print("RSTREAM ");
 				break;
-			case Query.OutputStreamTypeDstream:
+			case RSPQLQuery.OutputStreamTypeDstream:
 				out.print("DSTREAM ");
 				break;
 			}
@@ -81,7 +86,9 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 	}
 	
 	@Override
-	public void visitWindowDecl(Query query) {
+	public void visitWindowDecl(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+
 		// Logical windows
 		for (ElementLogicalWindow window : query.getLogicalWindows()) {
 			out.print("FROM NAMED WINDOW ");
@@ -148,7 +155,9 @@ public class QuerySerializer extends org.apache.jena.sparql.serializer.QuerySeri
 		return "NOW-" + n.getLiteral().getValue().toString();
 	}
 
-	public void visitOutputStreamDecl(Query query) {
+	public void visitOutputStreamDecl(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+
 		if (query.getOutputStream() != null) {
 			out.print("REGISTER STREAM ");
 			out.print(FmtUtils.stringForNode(query.getOutputStream(), query.getPrefixMapping()));

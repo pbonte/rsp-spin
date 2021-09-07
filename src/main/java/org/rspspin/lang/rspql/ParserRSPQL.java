@@ -5,10 +5,7 @@ import java.io.StringReader;
 
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.atlas.logging.Log;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryException;
-import org.apache.jena.query.QueryParseException;
-import org.apache.jena.query.QueryVisitor;
+import org.apache.jena.query.*;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.sparql.core.Prologue;
 import org.apache.jena.sparql.lang.SPARQLParser;
@@ -19,20 +16,17 @@ import org.apache.jena.sparql.serializer.FmtTemplate;
 import org.apache.jena.sparql.serializer.QuerySerializerFactory;
 import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.serializer.SerializerRegistry;
+
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.Template;
 import org.apache.jena.sparql.util.NodeToLabelMapBNode;
+import org.apache.own.query.RSPQLQueryVisitor;
+import org.rspspin.lang.RSPQLSyntax;
 
 public class ParserRSPQL extends SPARQLParser {
 
-	final static public Syntax syntax = new Syntax("rspql", "https://w3id.org/rsp/rspql");
+	final static public RSPQLSyntax syntax = new RSPQLSyntax("rspql", "https://w3id.org/rsp/rspql");
 
-	public static class Syntax extends org.apache.jena.query.Syntax {
-		protected Syntax(String lookupName, String uri) {
-			super(uri);
-			querySyntaxNames.put(lookupName, this);
-		}
-	}
 
 	/** Registers parser factory and serializer */
 	static public void register() {
@@ -51,20 +45,20 @@ public class ParserRSPQL extends SPARQLParser {
 		QuerySerializerFactory factory = new QuerySerializerFactory() {
 
 			@Override
-			public QueryVisitor create(org.apache.jena.query.Syntax syntax, Prologue prologue, IndentedWriter writer) {
+			public RSPQLQueryVisitor create(org.apache.jena.query.Syntax syntax, Prologue prologue, IndentedWriter writer) {
 				// For the query pattern
 				SerializationContext cxt1 = new SerializationContext(prologue, new NodeToLabelMapBNode("b", false));
 				// For the construct pattern
 				SerializationContext cxt2 = new SerializationContext(prologue, new NodeToLabelMapBNode("c", false));
 
-				return new QuerySerializer(writer, new FormatterElement(writer, cxt1), new FmtExprSPARQL(writer, cxt1),
+				return new RSPQLQuerySerializer(writer, new FormatterElement(writer, cxt1), new FmtExprSPARQL(writer, cxt1),
 						new FmtTemplate(writer, cxt2));
 			}
 
 			@Override
-			public QueryVisitor create(org.apache.jena.query.Syntax syntax, SerializationContext context,
-					IndentedWriter writer) {
-				return new QuerySerializer(writer, new FormatterElement(writer, context),
+			public RSPQLQueryVisitor create(org.apache.jena.query.Syntax syntax, SerializationContext context,
+											IndentedWriter writer) {
+				return new RSPQLQuerySerializer(writer, new FormatterElement(writer, context),
 						new FmtExprSPARQL(writer, context), new FmtTemplate(writer, context));
 			}
 

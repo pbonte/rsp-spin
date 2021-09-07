@@ -2,12 +2,14 @@ package org.rspspin.lang.cqels;
 
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryVisitor;
+import org.apache.own.query.RSPQLQuery;
+import org.apache.own.query.RSPQLQueryVisitor;
 import org.apache.jena.sparql.serializer.FmtExprSPARQL;
 import org.apache.jena.sparql.serializer.FormatterTemplate;
 import org.apache.jena.sparql.syntax.Template;
+import org.apache.own.sparql.serializer.RSPQLQuerySerializer;
 
-public class CQELSQLSerializer extends org.apache.jena.sparql.serializer.QuerySerializer implements QueryVisitor {
+public class CQELSQLSerializer extends RSPQLQuerySerializer implements RSPQLQueryVisitor {
 
 	public CQELSQLSerializer(IndentedWriter iwriter, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
 			FormatterTemplate formatterTemplate) {
@@ -15,16 +17,19 @@ public class CQELSQLSerializer extends org.apache.jena.sparql.serializer.QuerySe
 	}
 
 	@Override
-	public void visitWindowDecl(Query query) {
-		((FormatterElement) fmtElement).setLogicalWindows(query.getLogicalWindows());
-		((FormatterElement) fmtElement).setLogicalPastWindows(query.getLogicalPastWindows());
-		((FormatterElement) fmtElement).setPhysicalWindows(query.getPhysicalWindows());
+	public void visitWindowDecl(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+
+		((FormatterElement) fmtElement).setWindows(query);
 	}
 
+
+
 	@Override
-	public void visitSelectResultForm(Query query) {
-		if (query.getOutputStreamType() != Query.OutputStreamTypeUnknown) {
-			if (query.getOutputStreamType() != Query.OutputStreamTypeIstream) {
+	public void visitSelectResultForm(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+		if (query.getOutputStreamType() != RSPQLQuery.OutputStreamTypeUnknown) {
+			if (query.getOutputStreamType() != RSPQLQuery.OutputStreamTypeIstream) {
 				System.err.println("WARNING: CQELS-QL only supports implicit Istream as the output stream operator.");
 			}
 		}
@@ -32,9 +37,11 @@ public class CQELSQLSerializer extends org.apache.jena.sparql.serializer.QuerySe
 	}
 
 	@Override
-	public void visitConstructResultForm(Query query) {
-		if (query.getOutputStreamType() != Query.OutputStreamTypeUnknown) {
-			if (query.getOutputStreamType() != Query.OutputStreamTypeIstream) {
+	public void visitConstructResultForm(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+
+		if (query.getOutputStreamType() != RSPQLQuery.OutputStreamTypeUnknown) {
+			if (query.getOutputStreamType() != RSPQLQuery.OutputStreamTypeIstream) {
 				System.err.println("WARNING: CQELS-QL only supports implicit Istream as the output stream operator.");
 			}
 		}
@@ -48,7 +55,9 @@ public class CQELSQLSerializer extends org.apache.jena.sparql.serializer.QuerySe
 	}
 
 	@Override
-	public void visitOutputStreamDecl(Query query) {
+	public void visitOutputStreamDecl(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
+
 		if (query.getOutputStream() == null)
 			return;
 		System.err.println("WARNING: CQELS-QL does not support naming of the output stream.");

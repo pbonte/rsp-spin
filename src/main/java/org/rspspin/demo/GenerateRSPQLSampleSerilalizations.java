@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryException;
 import org.apache.jena.query.QueryFactory;
+import org.apache.own.query.RSPQLQueryFactory;
 import org.rspspin.lang.cqels.ParserCQELS;
 import org.rspspin.lang.csparql.ParserCSPARQL;
 import org.rspspin.lang.rspql.ParserRSPQL;
@@ -38,14 +39,15 @@ public class GenerateRSPQLSampleSerilalizations {
 
 		FileWriter fw;
 
-		for (String file : new String[] { "query1", "query2", "query3", "query4", "query5", "query6", "query7",
+		for (String file : new String[] {"query3","query1", "query2", "query3", "query4", "query5", "query6", "query7",
 				"query8", "extra" }) {
+			System.out.println("Parsing: " + file);
 			System.err.println("Query: " + file);
 			String path = String.format("./queries/sample-queries/rspql/%s.rspql", file);
 			String queryString = new String(Files.readAllBytes(Paths.get(path)));
 			Query query;
 			try {
-				query = QueryFactory.create(queryString, ParserRSPQL.syntax);
+				query = RSPQLQueryFactory.create(queryString, ParserRSPQL.syntax);
 			} catch (QueryException e) {
 				System.err.println(e.getMessage());
 				System.err.println("Skipping");

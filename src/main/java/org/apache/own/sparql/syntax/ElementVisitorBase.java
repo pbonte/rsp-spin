@@ -1,5 +1,6 @@
-package org.apache.jena.sparql.syntax;
+package org.apache.own.sparql.syntax;
 
+import org.apache.jena.sparql.syntax.*;
 import org.rspspin.syntax.ElementWindowGraph;
 
 /**
@@ -7,7 +8,7 @@ import org.rspspin.syntax.ElementWindowGraph;
  * when only interested in a few element types.
  */
 
-public class ElementVisitorBase implements ElementVisitor {
+public class ElementVisitorBase implements WindowedElementVisitor {
 	@Override
 	public void visit(ElementTriplesBlock el) {
 	}

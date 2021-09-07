@@ -1,26 +1,24 @@
 package org.rspspin.lang.csparql;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
-import org.apache.commons.lang3.text.WordUtils;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryException;
-import org.apache.jena.query.QueryVisitor;
-import org.apache.jena.reasoner.ValidityReport;
+import org.apache.own.query.RSPQLQueryVisitor;
 import org.apache.jena.sparql.core.Prologue;
 import org.apache.jena.sparql.serializer.FmtExprSPARQL;
 import org.apache.jena.sparql.serializer.FormatterTemplate;
 import org.apache.jena.sparql.syntax.Template;
+import org.apache.own.query.RSPQLQuery;
+import org.apache.own.sparql.serializer.RSPQLQuerySerializer;
 import org.rspspin.syntax.ElementLogicalWindow;
 import org.rspspin.syntax.ElementPhysicalWindow;
 import org.rspspin.syntax.ElementWindow;
 
-public class CSPARQLSerializer extends org.apache.jena.sparql.serializer.QuerySerializer implements QueryVisitor {
+public class CSPARQLSerializer extends RSPQLQuerySerializer implements RSPQLQueryVisitor {
 	public boolean strict = false;
 
 	public CSPARQLSerializer(IndentedWriter iwriter, FormatterElement formatterElement, FmtExprSPARQL formatterExpr,
@@ -32,7 +30,7 @@ public class CSPARQLSerializer extends org.apache.jena.sparql.serializer.QuerySe
 	public void visitPrologue(Prologue prologue) {
 
 		// Output stream
-		Query query = (Query) prologue;
+		RSPQLQuery query = (RSPQLQuery) prologue;
 		if (query.getOutputStream() == null)
 			return;
 		out.print("REGISTER ");
@@ -65,7 +63,8 @@ public class CSPARQLSerializer extends org.apache.jena.sparql.serializer.QuerySe
 	}
 
 	@Override
-	public void visitWindowDecl(Query query) {
+	public void visitWindowDecl(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery)inputQuery;
 		if (!query.getLogicalPastWindows().isEmpty()) {
 			throw new QueryException("ERROR: CSPARQL does not support windows in the past.");
 		}
@@ -164,8 +163,7 @@ public class CSPARQLSerializer extends org.apache.jena.sparql.serializer.QuerySe
 	 * minimum step. No step will be interpreted as the minimum supported step
 	 * size. Clashing variables or window types throws an exception.
 	 * 
-	 * @param window
-	 * @param elementWindow
+
 	 * @return
 	 */
 	private ElementWindow combineWindows(ElementWindow window1, ElementWindow window2) {
@@ -239,9 +237,10 @@ public class CSPARQLSerializer extends org.apache.jena.sparql.serializer.QuerySe
 	}
 
 	@Override
-	public void visitSelectResultForm(Query query) {
-		if (query.getOutputStreamType() != Query.OutputStreamTypeUnknown) {
-			if (query.getOutputStreamType() != Query.OutputStreamTypeRstream) {
+	public void visitSelectResultForm(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery) inputQuery;
+		if (query.getOutputStreamType() != RSPQLQuery.OutputStreamTypeUnknown) {
+			if (query.getOutputStreamType() != RSPQLQuery.OutputStreamTypeRstream) {
 				System.err.println("WARNING: CSPARQL only supports implicit Rstream as the output stream operator.");
 			}
 		}
@@ -249,9 +248,10 @@ public class CSPARQLSerializer extends org.apache.jena.sparql.serializer.QuerySe
 	}
 
 	@Override
-	public void visitConstructResultForm(Query query) {
-		if (query.getOutputStreamType() != Query.OutputStreamTypeUnknown) {
-			if (query.getOutputStreamType() != Query.OutputStreamTypeRstream) {
+	public void visitConstructResultForm(Query inputQuery) {
+		RSPQLQuery query = (RSPQLQuery) inputQuery;
+		if (query.getOutputStreamType() != RSPQLQuery.OutputStreamTypeUnknown) {
+			if (query.getOutputStreamType() != RSPQLQuery.OutputStreamTypeRstream) {
 				System.err.println("WARNING: CSPARQL only supports implicit Rstream as the output stream operator.");
 			}
 		}
