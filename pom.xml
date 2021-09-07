@@ -60,18 +60,7 @@
 			<artifactId>json</artifactId>
 			<version>20160810</version>
 		</dependency>
-		<dependency>
-			<groupId>org.streamreasoning.rsp4j</groupId>
-			<artifactId>api</artifactId>
-			<version>1.0.0</version>
-			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.jena</groupId>
-					<artifactId>jena-osgi</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+
 
 	</dependencies>
 
