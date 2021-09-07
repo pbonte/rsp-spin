@@ -3,6 +3,7 @@ package org.rspspin.tests;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.rdf.model.Model;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rspspin.lang.rspql.ParserRSPQL;
 import org.topbraid.spin.arq.ARQ2SPIN;
@@ -10,7 +11,7 @@ import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.system.SPINModuleRegistry;
 import org.topbraid.spin.util.JenaUtil;
 import static org.junit.Assert.*;
-
+@Ignore
 public class TestRSPSPIN {
 
 	/* Literals and URIs */

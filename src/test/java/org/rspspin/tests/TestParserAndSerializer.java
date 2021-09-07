@@ -4,9 +4,10 @@ import static org.junit.Assert.*;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rspspin.lang.rspql.ParserRSPQL;
-
+@Ignore
 public class TestParserAndSerializer {
 
 	/* Output stream name as a variable */
